@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Feeds
+Allow: /rss.xml
+Allow: /feed.xml
+Allow: /en-us/rss.xml
+Allow: /en-us/feed.xml
