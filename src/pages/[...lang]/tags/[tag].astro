@@ -1,0 +1,80 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '@/layouts/Layout.astro';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { siteConfig } from '@/config';
+import { useTranslations, languages, defaultLang, type Lang } from '@/i18n/ui';
+import { localizeAndSortPosts, getPostHref, formatDateTime } from '@/lib/content';
+import { getTagName } from '@/i18n/taxonomy';
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('blog');
+  const locales = Object.keys(languages) as Lang[];
+  const allTags = [...new Set(allPosts.flatMap(p => p.data.tags ?? []))];
+
+  return locales.flatMap(lang =>
+    allTags.map(tag => ({
+      params: { lang: lang === defaultLang ? undefined : lang, tag },
+      props: { lang, tag },
+    })),
+  );
+}
+
+const { lang, tag } = Astro.props as { lang: string; tag: string };
+const t = useTranslations(lang as Lang);
+
+const allPosts = await getCollection('blog');
+const localizedPosts = localizeAndSortPosts(allPosts, lang)
+  .filter(({ post }) => post.data.tags?.includes(tag));
+
+const pageHeading = t('tag.title').replace('{tag}', getTagName(tag, lang as Lang));
+---
+
+<Layout
+  title={`${pageHeading} | ${siteConfig.name}`}
+  lang={lang}
+>
+  <div class="max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold tracking-tight text-foreground mb-2">{pageHeading}</h1>
+    <p class="text-sm text-muted-foreground mb-8">
+      {t('listing.postCount').replace('{count}', String(localizedPosts.length))}
+    </p>
+
+    {localizedPosts.length === 0 ? (
+      <div class="text-center py-20 text-muted-foreground border border-dashed border-border/60 rounded-md">
+        {t('listing.empty')}
+      </div>
+    ) : (
+      <div class="flex flex-col gap-5">
+        {localizedPosts.map(({ post, slug }) => (
+          <div class="relative">
+            <Card className="flex flex-col border-border/50">
+              <CardHeader>
+                <div class="flex items-center gap-3 mb-1">
+                  <span class="text-xs text-muted-foreground">
+                    {post.data.date && formatDateTime(post.data.date, lang)}
+                  </span>
+                </div>
+                <CardTitle className="text-xl leading-tight">
+                  <a
+                    href={getPostHref(slug, lang)}
+                    class="hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
+                  >
+                    {post.data.title}
+                  </a>
+                </CardTitle>
+              </CardHeader>
+              {post.data.description && (
+                <CardContent>
+                  <CardDescription className="line-clamp-2 text-sm">
+                    {post.data.description}
+                  </CardDescription>
+                </CardContent>
+              )}
+            </Card>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+</Layout>

@@ -1,0 +1,171 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { getPostHref, getTagHref, getCategoryHref, countWords, readingMinutes, formatDateTime } from '@/lib/content';
+import { getTagName, getCategoryName } from '@/i18n/taxonomy';
+import { useTranslations, type Lang } from '@/i18n/ui';
+
+interface Props {
+  posts: Array<{ post: CollectionEntry<'blog'>; slug: string }>;
+  lang: string;
+  currentPage: number;
+  totalPages: number;
+  /** Base href for the listing, e.g. '/' or '/en-us/' */
+  baseHref: string;
+}
+
+const { posts, lang, currentPage, totalPages, baseHref } = Astro.props;
+const t = useTranslations(lang as Lang);
+
+function pageHref(n: number) {
+  return n === 1 ? baseHref : `${baseHref}page/${n}/`;
+}
+
+function getPageNumbers(current: number, total: number): (number | '...')[] {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+
+  // Keep it compact for large totals: first + last + (current-1, current, current+1)
+  const NEARBY = 1;
+  const pages: (number | '...')[] = [1];
+
+  const start = Math.max(2, current - NEARBY);
+  const end = Math.min(total - 1, current + NEARBY);
+
+  if (start > 2) pages.push('...');
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+  if (end < total - 1) pages.push('...');
+  pages.push(total);
+
+  return pages;
+}
+
+const pageNumbers = getPageNumbers(currentPage, totalPages);
+---
+
+<div class="flex flex-col gap-5">
+  {posts.map(({ post, slug }) => {
+    const words = countWords(post.body ?? '');
+    const mins = readingMinutes(words);
+    const wordStr = t('post.wordCount').replace('{count}', String(words));
+    const timeStr = t('post.readingTime').replace('{min}', String(mins));
+    return (
+      <div class="group relative" transition:name={`post-${slug}`}>
+        <Card className="flex flex-col border-border/50 bg-card overflow-hidden">
+          {post.data.cover && (
+            <div class="h-52 w-full overflow-hidden border-b border-border/30">
+              <img src={post.data.cover} alt={post.data.title} class="w-full h-full object-cover" />
+            </div>
+          )}
+
+          <CardHeader>
+            <div class="flex flex-wrap items-center gap-x-1 gap-y-0.5 text-xs text-muted-foreground mb-2">
+              {post.data.category && (
+                <>
+                  <a
+                    href={getCategoryHref(post.data.category, lang)}
+                    class="relative z-10 font-medium text-foreground/60 hover:text-primary transition-colors"
+                  >
+                    [{getCategoryName(post.data.category, lang as Lang)}]
+                  </a>
+                  <span class="opacity-40">·</span>
+                </>
+              )}
+              {post.data.date && (
+                <time datetime={post.data.date.toISOString()} class="shrink-0">
+                  {formatDateTime(post.data.date, lang)}
+                </time>
+              )}
+              <span class="opacity-40">·</span>
+              <span class="shrink-0">{wordStr}</span>
+              <span class="opacity-40">·</span>
+              <span class="shrink-0">{timeStr}</span>
+            </div>
+
+            <CardTitle className="text-xl leading-tight">
+              <a
+                href={getPostHref(slug, lang)}
+                class="hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
+              >
+                {post.data.title}
+              </a>
+            </CardTitle>
+          </CardHeader>
+
+          {post.data.description && (
+            <CardContent>
+              <CardDescription className="line-clamp-3 text-sm">
+                {post.data.description}
+              </CardDescription>
+            </CardContent>
+          )}
+
+          <CardContent>
+            <div class="flex flex-wrap items-center gap-1.5">
+              {post.data.tags?.map(tag => (
+                <a
+                  href={getTagHref(tag, lang)}
+                  class="relative z-10 text-xs px-2 py-0.5 rounded-md bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+                >
+                  #{getTagName(tag, lang as Lang)}
+                </a>
+              ))}
+              <a href={getPostHref(slug, lang)} class="relative z-10 ml-auto text-xs font-medium text-primary/70 hover:text-primary transition-colors shrink-0">
+                {t('post.continueReading')}
+              </a>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  })}
+</div>
+
+{totalPages > 1 && (
+  <nav class="flex items-center justify-center gap-1 mt-8" aria-label="Pagination">
+    {currentPage > 1 ? (
+      <a
+        href={pageHref(currentPage - 1)}
+        class="px-3 py-1.5 text-sm rounded-md border border-border/50 text-muted-foreground hover:text-primary hover:border-primary/50 transition-colors"
+      >
+        {t('pagination.prev')}
+      </a>
+    ) : (
+      <span class="px-3 py-1.5 text-sm rounded-md border border-border/30 text-muted-foreground/30 cursor-not-allowed select-none">
+        {t('pagination.prev')}
+      </span>
+    )}
+
+    {pageNumbers.map(p =>
+      p === '...' ? (
+        <span class="px-2 py-1.5 text-sm text-muted-foreground/50">…</span>
+      ) : (
+        <a
+          href={pageHref(p as number)}
+          class={`px-3 py-1.5 text-sm rounded-md border transition-colors ${
+            p === currentPage
+              ? 'border-primary bg-primary/10 text-primary font-medium'
+              : 'border-border/50 text-muted-foreground hover:text-primary hover:border-primary/50'
+          }`}
+          aria-current={p === currentPage ? 'page' : undefined}
+        >
+          {p}
+        </a>
+      )
+    )}
+
+    {currentPage < totalPages ? (
+      <a
+        href={pageHref(currentPage + 1)}
+        class="px-3 py-1.5 text-sm rounded-md border border-border/50 text-muted-foreground hover:text-primary hover:border-primary/50 transition-colors"
+      >
+        {t('pagination.next')}
+      </a>
+    ) : (
+      <span class="px-3 py-1.5 text-sm rounded-md border border-border/30 text-muted-foreground/30 cursor-not-allowed select-none">
+        {t('pagination.next')}
+      </span>
+    )}
+  </nav>
+)}

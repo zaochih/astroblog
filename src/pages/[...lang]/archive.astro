@@ -1,0 +1,76 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '@/layouts/Layout.astro';
+import { siteConfig } from '@/config';
+import { useTranslations, languages, defaultLang, type Lang } from '@/i18n/ui';
+import { localizeAndSortPosts, getPostHref, formatDate, formatTime } from '@/lib/content';
+
+export async function getStaticPaths() {
+  return Object.keys(languages).map(lang => ({
+    params: { lang: lang === defaultLang ? undefined : lang },
+    props: { lang },
+  }));
+}
+
+const { lang } = Astro.props as { lang: string };
+const t = useTranslations(lang as Lang);
+
+const allPosts = await getCollection('blog');
+const localizedPosts = localizeAndSortPosts(allPosts, lang);
+
+// Group posts by year, newest first
+const postsByYear = localizedPosts.reduce<Record<number, typeof localizedPosts>>((acc, p) => {
+  const year = p.post.data.date?.getFullYear() ?? 0;
+  if (!acc[year]) acc[year] = [];
+  acc[year].push(p);
+  return acc;
+}, {});
+const years = Object.keys(postsByYear).map(Number).sort((a, b) => b - a);
+---
+
+<Layout
+  title={`${t('archive.title')} | ${siteConfig.name}`}
+  lang={lang}
+>
+  <div class="max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold tracking-tight text-foreground mb-2">{t('archive.title')}</h1>
+    <p class="text-sm text-muted-foreground mb-10">
+      {t('listing.postCount').replace('{count}', String(localizedPosts.length))}
+    </p>
+
+    {localizedPosts.length === 0 ? (
+      <div class="text-center py-20 text-muted-foreground border border-dashed border-border/60 rounded-md">
+        {t('listing.empty')}
+      </div>
+    ) : (
+      <div class="space-y-10">
+        {years.map(year => (
+          <section>
+            <h2 class="text-xl font-semibold text-foreground mb-4 pb-2 border-b border-border/50">{year}</h2>
+            <ol class="space-y-3">
+              {postsByYear[year].map(({ post, slug }) => (
+                <li class="flex items-baseline gap-4">
+                  {post.data.date && (
+                    <time
+                      datetime={post.data.date.toISOString()}
+                      class="shrink-0 text-xs text-muted-foreground flex flex-col items-end w-[6rem]"
+                    >
+                      <span class="whitespace-nowrap">{formatDate(post.data.date, lang)}</span>
+                      <span class="whitespace-nowrap">{formatTime(post.data.date, lang)}</span>
+                    </time>
+                  )}
+                  <a
+                    href={getPostHref(slug, lang)}
+                    class="text-sm text-foreground hover:text-primary transition-colors leading-snug"
+                  >
+                    {post.data.title}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </section>
+        ))}
+      </div>
+    )}
+  </div>
+</Layout>

@@ -1,0 +1,104 @@
+---
+import { languages, defaultLang, ui } from '@/i18n/ui';
+
+interface Props {
+  lang: string;
+}
+
+const { lang } = Astro.props;
+
+// Pass all lang data to client so the toast can render in the TARGET language
+const toastConfig = JSON.stringify({
+  currentLang: lang,
+  defaultLang,
+  languages,
+  ui,
+});
+---
+
+<script is:inline define:vars={{ toastConfig }}>
+  (() => {
+    const config = JSON.parse(toastConfig);
+    const { currentLang, defaultLang, languages, ui } = config;
+
+    const DISMISSED_KEY = 'lang-toast-dismissed';
+    if (sessionStorage.getItem(DISMISSED_KEY)) return;
+
+    const supported = Object.keys(languages);
+    // Match browser locale by primary subtag: 'zh-CN' → 'zh' matches 'zh-cn'
+    const raw = (navigator.languages?.[0] ?? navigator.language) || '';
+    const primarySubtag = raw.split('-')[0].toLowerCase();
+    const preferred = supported.find(s => s.split('-')[0] === primarySubtag) ?? null;
+
+    if (!preferred || preferred === currentLang) return;
+
+    // Use the TARGET language's translations (e.g. English toast when offering English)
+    const t = ui[preferred] ?? ui[defaultLang];
+    const langName = languages[preferred];
+    const message = t['toast.langAvailable'].replace('{lang}', langName);
+    const switchLabel = t['toast.switch'];
+    const dismissLabel = t['toast.dismiss'];
+
+    // Build the switch URL
+    const path = window.location.pathname;
+    let switchUrl;
+    if (preferred === defaultLang) {
+      switchUrl = path.replace(new RegExp(`^/${currentLang}(/|$)`), '$1') || '/';
+    } else if (currentLang === defaultLang) {
+      switchUrl = `/${preferred}${path}`;
+    } else {
+      switchUrl = path.replace(new RegExp(`^/${currentLang}(/|$)`), `/${preferred}$1`);
+    }
+
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.setAttribute('role', 'alert');
+    Object.assign(toast.style, {
+      position: 'fixed', bottom: '1.5rem', right: '1.5rem', zIndex: '50',
+      display: 'flex', alignItems: 'center', gap: '0.75rem',
+      borderRadius: '0.5rem', border: '1px solid var(--border)',
+      background: 'var(--card)', padding: '1rem',
+      boxShadow: '0 8px 16px rgba(0,0,0,.14), 0 0 2px rgba(0,0,0,.12)',
+      opacity: '0', transform: 'translateY(1rem)',
+      transition: 'opacity .3s ease, transform .3s ease',
+    });
+
+    const msgEl = document.createElement('p');
+    Object.assign(msgEl.style, { fontSize: '0.875rem', color: 'var(--foreground)', margin: '0' });
+    msgEl.textContent = message;
+
+    const switchBtn = document.createElement('a');
+    switchBtn.href = switchUrl;
+    switchBtn.textContent = switchLabel;
+    Object.assign(switchBtn.style, {
+      flexShrink: '0', borderRadius: '0.375rem',
+      background: 'var(--primary)', padding: '0.375rem 0.75rem',
+      fontSize: '0.75rem', fontWeight: '500', color: 'var(--primary-foreground)',
+      textDecoration: 'none',
+    });
+
+    const dismissBtn = document.createElement('button');
+    dismissBtn.textContent = dismissLabel;
+    Object.assign(dismissBtn.style, {
+      flexShrink: '0', borderRadius: '0.375rem',
+      padding: '0.375rem 0.5rem', fontSize: '0.75rem',
+      color: 'var(--muted-foreground)', background: 'none',
+      border: 'none', cursor: 'pointer',
+    });
+
+    toast.append(msgEl, switchBtn, dismissBtn);
+    document.body.appendChild(toast);
+
+    requestAnimationFrame(() => {
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateY(0)';
+    });
+
+    dismissBtn.addEventListener('click', () => {
+      sessionStorage.setItem(DISMISSED_KEY, 'true');
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(1rem)';
+      setTimeout(() => toast.remove(), 300);
+    });
+  })();
+</script>
