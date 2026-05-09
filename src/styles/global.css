@@ -143,6 +143,18 @@
     }
 }
 
+/* Heading scroll offset: compensate for sticky navbar (h-14 = 3.5rem) */
+.prose :is(h1, h2, h3, h4, h5, h6) {
+  scroll-margin-top: 5rem;
+}
+
+/* Footnotes: replace auto-generated heading with a top border */
+.prose section[data-footnotes] {
+  border-top: 1px solid var(--border);
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+}
+
 /* Shiki code block language label */
 pre[data-lang] {
   position: relative;

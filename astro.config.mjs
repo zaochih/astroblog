@@ -7,6 +7,26 @@ import mdx from '@astrojs/mdx';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 
+/** Remove the auto-generated "Footnotes" h2 from the hast tree at build time. */
+function rehypeRemoveFootnoteLabel() {
+  return function (tree) {
+    removeNode(tree);
+  };
+  function removeNode(node) {
+    if (!node.children) return;
+    node.children = node.children.filter((child) => {
+      if (
+        child.type === 'element' &&
+        child.properties?.id === 'footnote-label'
+      ) {
+        return false;
+      }
+      removeNode(child);
+      return true;
+    });
+  }
+}
+
 // https://astro.build/config
 export default defineConfig({
   integrations: [
@@ -33,6 +53,6 @@ export default defineConfig({
       ],
     },
     remarkPlugins: [remarkMath],
-    rehypePlugins: [[rehypeKatex, {}]],
+    rehypePlugins: [rehypeRemoveFootnoteLabel, [rehypeKatex, {}]],
   },
 });
