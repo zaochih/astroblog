@@ -9,6 +9,8 @@ function toHtmlLang(tag: string) {
 }
 import LanguageToast from '@/components/LanguageToast.astro';
 import LanguagePreference from '@/components/LanguagePreference.astro';
+import SmartHeader from '@/components/SmartHeader.astro';
+import DetailsAnimator from '@/components/DetailsAnimator.astro';
 import { ClientRouter } from 'astro:transitions';
 
 interface Props {
@@ -101,12 +103,16 @@ function getLangHref(targetLang: string): string {
         }
     </head>
     <body class="flex flex-col">
-        <header class="sticky top-0 z-50 w-full border-b border-border/40 bg-background/70 backdrop-blur-xl shadow-fluent-sm transition-all">
-          <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-            <a href={homeHref} class="font-semibold text-primary tracking-tight hover:opacity-80 transition-opacity">
+        <header
+          id="site-header"
+          data-state="visible"
+          class="fixed top-0 left-0 right-0 z-50 w-full border-b border-border/40 bg-background/70 backdrop-blur-xl shadow-fluent-sm transition-transform duration-200 ease-out data-[state=hidden]:-translate-y-full"
+        >
+          <div class="max-w-6xl mx-auto px-3 sm:px-4 min-h-14 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 py-2">
+            <a href={homeHref} class="shrink-0 font-semibold text-primary tracking-tight hover:opacity-80 transition-opacity">
               {siteConfig.name}
             </a>
-            <nav class="flex items-center gap-6 text-sm font-medium text-muted-foreground">
+            <nav class="flex min-w-0 flex-1 items-center justify-end gap-3 overflow-x-auto whitespace-nowrap text-sm font-medium text-muted-foreground sm:gap-6">
               <a href={homeHref} class="hover:text-primary transition-colors">{t('nav.home')}</a>
               <a href={`${homeHref}archive`} class="hover:text-primary transition-colors">{t('nav.archive')}</a>
               <a href={`${homeHref}friends`} class="hover:text-primary transition-colors">{t('nav.friends')}</a>
@@ -115,7 +121,7 @@ function getLangHref(targetLang: string): string {
           </div>
         </header>
 
-        <main class="flex-1 w-full max-w-6xl mx-auto px-4 py-8">
+        <main class="flex-1 w-full max-w-6xl mx-auto px-3 py-6 sm:px-4 sm:py-8">
             <slot />
         </main>
 
@@ -155,6 +161,9 @@ function getLangHref(targetLang: string): string {
         </footer>
 
         {showLanguageSwitcher && <LanguagePreference currentLang={lang} />}
+
+        <SmartHeader />
+        <DetailsAnimator />
 
         {showLangToast && <LanguageToast lang={lang} />}
     </body>

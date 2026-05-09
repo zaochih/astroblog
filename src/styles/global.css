@@ -137,6 +137,7 @@
     }
   body {
     @apply bg-background text-foreground;
+    padding-top: var(--site-header-height, 3.5rem);
     }
   html {
     @apply font-sans;
@@ -174,4 +175,18 @@ pre[data-lang]::before {
   pointer-events: none;
   -webkit-user-select: none;
   user-select: none;
+}
+
+.animated-details .details-content {
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition:
+    height 180ms ease,
+    opacity 160ms ease;
+}
+
+.animated-details[open] .details-content {
+  height: auto;
+  opacity: 1;
 }

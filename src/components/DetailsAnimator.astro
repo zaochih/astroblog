@@ -1,0 +1,73 @@
+<script is:inline>
+  (() => {
+    const duration = 180;
+
+    function getContent(details) {
+      return details.querySelector(':scope > .details-content');
+    }
+
+    function finish(details, content, open) {
+      details.dataset.animating = 'false';
+      content.style.height = open ? 'auto' : '0px';
+      content.style.opacity = open ? '1' : '0';
+      if (!open) details.open = false;
+    }
+
+    function openDetails(details, content) {
+      details.open = true;
+      details.dataset.animating = 'true';
+      content.style.height = '0px';
+      content.style.opacity = '0';
+
+      requestAnimationFrame(() => {
+        content.style.height = `${content.scrollHeight}px`;
+        content.style.opacity = '1';
+      });
+
+      window.setTimeout(() => finish(details, content, true), duration);
+    }
+
+    function closeDetails(details, content) {
+      details.dataset.animating = 'true';
+      content.style.height = `${content.scrollHeight}px`;
+      content.style.opacity = '1';
+
+      requestAnimationFrame(() => {
+        content.style.height = '0px';
+        content.style.opacity = '0';
+      });
+
+      window.setTimeout(() => finish(details, content, false), duration);
+    }
+
+    function bindDetails(root = document) {
+      root.querySelectorAll('details.animated-details').forEach((details) => {
+        if (details.dataset.animatedBound === 'true') return;
+        const summary = details.querySelector(':scope > summary');
+        const content = getContent(details);
+        if (!summary || !content) return;
+
+        details.dataset.animatedBound = 'true';
+        content.style.height = details.open ? 'auto' : '0px';
+        content.style.opacity = details.open ? '1' : '0';
+
+        summary.addEventListener('click', (event) => {
+          if (window.matchMedia('(min-width: 1024px)').matches && summary.classList.contains('lg:pointer-events-none')) {
+            return;
+          }
+          event.preventDefault();
+          if (details.dataset.animating === 'true') return;
+
+          if (details.open) {
+            closeDetails(details, content);
+          } else {
+            openDetails(details, content);
+          }
+        });
+      });
+    }
+
+    bindDetails();
+    document.addEventListener('astro:page-load', () => bindDetails());
+  })();
+</script>

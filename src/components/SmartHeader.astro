@@ -1,0 +1,100 @@
+<script is:inline>
+  (() => {
+    const existing = window.__lczSmartHeader;
+    if (existing) {
+      existing.refresh();
+      return;
+    }
+
+    const state = {
+      lastY: getScrollY(),
+      ticking: false,
+      hideAfter: 96,
+      directionThreshold: 4,
+      showAfterUp: 24,
+      upwardDistance: 0,
+    };
+
+    function getHeader() {
+      return document.getElementById('site-header');
+    }
+
+    function getScrollY() {
+      return Math.max(0, window.scrollY || document.scrollingElement?.scrollTop || 0);
+    }
+
+    function syncHeaderHeight() {
+      const header = getHeader();
+      const height = header?.offsetHeight || 56;
+      const value = `${height}px`;
+      document.documentElement.style.setProperty('--site-header-height', value);
+      document.body?.style.setProperty('padding-top', value);
+    }
+
+    function setHeaderState(value) {
+      const header = getHeader();
+      if (header) header.dataset.state = value;
+    }
+
+    function update() {
+      const header = getHeader();
+      if (!header) {
+        state.ticking = false;
+        return;
+      }
+
+      const currentY = getScrollY();
+      const delta = currentY - state.lastY;
+
+      if (currentY <= 8) {
+        state.upwardDistance = 0;
+        header.dataset.state = 'visible';
+      } else if (delta > state.directionThreshold && currentY > state.hideAfter) {
+        state.upwardDistance = 0;
+        header.dataset.state = 'hidden';
+      } else if (delta < 0) {
+        state.upwardDistance += Math.abs(delta);
+        if (state.upwardDistance >= state.showAfterUp) {
+          header.dataset.state = 'visible';
+        }
+      } else if (delta > 0) {
+        state.upwardDistance = 0;
+      }
+
+      if (delta < -state.directionThreshold && currentY <= state.hideAfter) {
+        header.dataset.state = 'visible';
+      }
+
+      state.lastY = currentY;
+      state.ticking = false;
+    }
+
+    function requestUpdate() {
+      if (state.ticking) return;
+      state.ticking = true;
+      requestAnimationFrame(update);
+    }
+
+    function refresh() {
+      syncHeaderHeight();
+      state.lastY = getScrollY();
+      state.upwardDistance = 0;
+      state.ticking = false;
+      setHeaderState('visible');
+    }
+
+    function refreshAfterLayout() {
+      refresh();
+      requestAnimationFrame(refresh);
+    }
+
+    window.addEventListener('scroll', requestUpdate, { passive: true });
+    window.addEventListener('resize', refreshAfterLayout, { passive: true });
+    window.addEventListener('pageshow', refreshAfterLayout);
+    document.addEventListener('astro:page-load', refreshAfterLayout);
+    document.addEventListener('astro:after-swap', refreshAfterLayout);
+
+    window.__lczSmartHeader = { refresh: refreshAfterLayout };
+    refreshAfterLayout();
+  })();
+</script>
