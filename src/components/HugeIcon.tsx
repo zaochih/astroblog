@@ -18,6 +18,7 @@ import {
   RssIcon,
   XVariableIcon,
   WechatIcon,
+  LanguageCircleIcon
 } from '@hugeicons/core-free-icons';
 
 const icons = {
@@ -39,6 +40,7 @@ const icons = {
   rss: RssIcon,
   x: XVariableIcon,
   wechat: WechatIcon,
+  lang: LanguageCircleIcon,
 } as const;
 
 export type HugeIconName = keyof typeof icons;

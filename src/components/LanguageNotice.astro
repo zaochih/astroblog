@@ -23,7 +23,7 @@ const isFallback = type === 'fallback';
   </div>
 ) : (
   <div class="mb-4 flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 p-4 text-sm text-foreground shadow-fluent-sm">
-    <HugeIcon name="info" className="size-4 shrink-0 text-primary" size={16} />
+    <HugeIcon name="lang" className="size-4 shrink-0 text-primary" size={16} />
     <span>{availableLabel}</span>
     {languages.map(language => (
       <a href={language.href} data-lang-switch={language.lang} class="text-primary font-medium hover:underline">
