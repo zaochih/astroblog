@@ -33,7 +33,7 @@ const friends = yaml.load(friendsRaw) as Friend[];
 
 <Layout title={`${t('friends.title')} | ${siteConfig.name}`} lang={lang}>
   <div class="max-w-4xl mx-auto">
-    <h1 class="text-3xl font-bold tracking-tight text-foreground 6">{t('friends.title')}</h1>
+    <h1 class="text-3xl font-bold tracking-tight text-foreground mb-6">{t('friends.title')}</h1>
 
     {friends.length === 0 ? (
       <div class="text-center py-20 text-muted-foreground border border-dashed border-border/60 rounded-md">
