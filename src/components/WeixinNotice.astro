@@ -1,0 +1,25 @@
+---
+import HugeIcon from '@/components/HugeIcon';
+
+interface Props {
+  name: string;
+  href: string;
+}
+
+const { name, href } = Astro.props as Props;
+---
+
+<div class="mb-8 flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm text-foreground shadow-fluent-sm">
+  <HugeIcon name="wechat" className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" size={16} />
+  <span>
+    本文亦发布于微信公众号「{name}」
+  </span>
+  <a
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="font-medium text-emerald-700 underline underline-offset-2 hover:text-emerald-800 dark:text-emerald-300 dark:hover:text-emerald-200"
+  >
+    → 前往微信公众平台阅读
+  </a>
+</div>

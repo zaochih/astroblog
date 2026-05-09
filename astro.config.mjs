@@ -7,11 +7,20 @@ import mdx from '@astrojs/mdx';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 
+/**
+ * @typedef {object} HastNode
+ * @property {string} [type]
+ * @property {{ id?: unknown }} [properties]
+ * @property {HastNode[]} [children]
+ */
+
 /** Remove the auto-generated "Footnotes" h2 from the hast tree at build time. */
 function rehypeRemoveFootnoteLabel() {
+  /** @param {HastNode} tree */
   return function (tree) {
     removeNode(tree);
   };
+  /** @param {HastNode} node */
   function removeNode(node) {
     if (!node.children) return;
     node.children = node.children.filter((child) => {

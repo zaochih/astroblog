@@ -1,0 +1,34 @@
+---
+import HugeIcon from '@/components/HugeIcon';
+
+interface Props {
+  type: 'fallback' | 'available';
+  title?: string;
+  message?: string;
+  availableLabel?: string;
+  languages?: Array<{ href: string; label: string; lang: string }>;
+}
+
+const { type, title, message, availableLabel, languages = [] } = Astro.props;
+const isFallback = type === 'fallback';
+---
+
+{isFallback ? (
+  <div role="alert" class="mb-8 flex gap-3 rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-destructive text-sm">
+    <HugeIcon name="alert" className="size-4 shrink-0 mt-0.5" size={16} />
+    <div>
+      {title && <p class="font-semibold">{title}</p>}
+      {message && <p class="mt-1">{message}</p>}
+    </div>
+  </div>
+) : (
+  <div class="mb-8 flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 p-4 text-sm text-foreground shadow-fluent-sm">
+    <HugeIcon name="info" className="size-4 shrink-0 text-primary" size={16} />
+    <span>{availableLabel}</span>
+    {languages.map(language => (
+      <a href={language.href} data-lang-switch={language.lang} class="text-primary font-medium hover:underline">
+        [{language.label}]
+      </a>
+    ))}
+  </div>
+)}

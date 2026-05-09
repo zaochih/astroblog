@@ -1,6 +1,29 @@
 ---
-import NotFound from '@/components/NotFound.astro';
-import { defaultLang } from '@/i18n/ui';
+import Layout from '@/layouts/Layout.astro';
+import { buttonVariants } from '@/components/ui/button';
+import { siteConfig } from '@/config';
 ---
 
-<NotFound lang={defaultLang} />
+<Layout title={`404 — ${siteConfig.name}`} lang="zh-cn" showLanguageSwitcher={false}>
+  <div class="flex min-h-[calc(100vh-14rem)] flex-col items-center justify-center px-4 text-center">
+    <p class="mb-6 select-none text-[clamp(10rem,35vw,22rem)] font-black leading-none tracking-tight text-muted-foreground/15">
+      404
+    </p>
+
+    <h1 class="mb-2 text-xl font-semibold text-foreground">
+      你似乎来到了没有内容的荒原……
+    </h1>
+    <p class="mb-10 max-w-sm text-sm leading-relaxed text-muted-foreground">
+      请联系链接提供者以确认此链接的有效性。
+    </p>
+
+    <div class="flex items-center gap-3">
+      <a href="/" class={`${buttonVariants({ variant: 'default', size: 'lg' })} rounded-lg px-6 text-sm`}>
+        返回首页
+      </a>
+      <button onclick="history.back()" class={`${buttonVariants({ variant: 'outline', size: 'lg' })} rounded-lg px-6 text-sm`}>
+        返回上一页
+      </button>
+    </div>
+  </div>
+</Layout>

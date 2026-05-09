@@ -15,6 +15,10 @@ export interface LocalizedPost {
   isFallback: boolean;
 }
 
+export function isPublishedEntry<T extends { data: { draft?: boolean } }>(entry: T): boolean {
+  return !entry.data.draft;
+}
+
 /**
  * Given all posts, return one de-duplicated post per slug for `lang`.
  * Falls back to defaultLang if the target lang has no version of that post.
@@ -25,7 +29,7 @@ export function localizeAndSortPosts(
   lang: string,
 ): LocalizedPost[] {
   const bySlug = new Map<string, Record<string, CollectionEntry<'blog'>>>();
-  for (const post of allPosts) {
+  for (const post of allPosts.filter(isPublishedEntry)) {
     const postLang = getLangFromId(post.id);
     const slug = getSlugFromId(post.id);
     if (!bySlug.has(slug)) bySlug.set(slug, {});
@@ -108,9 +112,17 @@ export function mergeWithPrimary(
   return {
     ...data,
     date: data.date ?? primaryData.date,
+    updated: data.updated ?? primaryData.updated,
     tags: data.tags ?? primaryData.tags,
     category: data.category ?? primaryData.category,
     cover: data.cover ?? primaryData.cover,
+    coverAlt: data.coverAlt ?? primaryData.coverAlt,
+    series: data.series ?? primaryData.series,
+    seriesOrder: data.seriesOrder ?? primaryData.seriesOrder,
+    canonicalUrl: data.canonicalUrl ?? primaryData.canonicalUrl,
+    redirectUrl: data.redirectUrl ?? primaryData.redirectUrl,
+    weixinName: data.weixinName ?? primaryData.weixinName,
+    weixinLink: data.weixinLink ?? primaryData.weixinLink,
   };
 }
 

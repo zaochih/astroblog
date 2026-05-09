@@ -3,6 +3,8 @@ import { getCollection, render, type CollectionEntry } from 'astro:content';
 import Layout from '@/layouts/Layout.astro';
 import { siteConfig } from '@/config';
 import { useTranslations, languages, languageNames, defaultLang, type Lang } from '@/i18n/ui';
+import { isPublishedEntry } from '@/lib/content';
+import LanguageNotice from '@/components/LanguageNotice.astro';
 
 export async function getStaticPaths() {
   function parseEntryId(id: string) {
@@ -10,7 +12,7 @@ export async function getStaticPaths() {
     return { lang, slug: rest.join('/') };
   }
 
-  const allPages = await getCollection('pages');
+  const allPages = (await getCollection('pages')).filter(isPublishedEntry);
   const locales = Object.keys(languages) as Lang[];
 
   const pagesBySlug = new Map<string, Record<string, CollectionEntry<'pages'>>>();
@@ -69,6 +71,11 @@ const fallbackDesc = t('page.fallback.desc').replace('{lang}', fallbackLangName)
 
 const getLangLink = (l: string) =>
   l === defaultLang ? `/${slug}` : `/${l}/${slug}`;
+const otherLanguageLinks = otherLangs.map(l => ({
+  href: getLangLink(l),
+  label: languages[l as Lang],
+  lang: l,
+}));
 ---
 
 <Layout
@@ -85,25 +92,11 @@ const getLangLink = (l: string) =>
     </header>
 
     {isFallback && (
-      <div role="alert" class="mb-8 flex gap-3 rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-destructive text-sm">
-        <svg xmlns="http://www.w3.org/2000/svg" class="size-4 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
-        <div>
-          <p class="font-semibold">{t('alert.fallback.title')}</p>
-          <p class="mt-1">{fallbackDesc}</p>
-        </div>
-      </div>
+      <LanguageNotice type="fallback" title={t('alert.fallback.title')} message={fallbackDesc} />
     )}
 
     {!isFallback && otherLangs.length > 0 && (
-      <div class="mb-8 flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 p-4 text-sm text-foreground shadow-fluent-sm">
-        <svg xmlns="http://www.w3.org/2000/svg" class="size-4 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>
-        <span>{t('page.available')}</span>
-        {otherLangs.map(l => (
-          <a href={getLangLink(l)} class="text-primary font-medium hover:underline">
-            [{languages[l as Lang]}]
-          </a>
-        ))}
-      </div>
+      <LanguageNotice type="available" availableLabel={t('page.available')} languages={otherLanguageLinks} />
     )}
 
     <div class="prose dark:prose-invert max-w-none prose-a:text-primary prose-a:no-underline hover:prose-a:underline">

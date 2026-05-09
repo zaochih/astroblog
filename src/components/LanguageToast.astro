@@ -21,10 +21,21 @@ const toastConfig = JSON.stringify({
     const config = JSON.parse(toastConfig);
     const { currentLang, defaultLang, languages, ui } = config;
 
+    const PREFERENCE_KEY = 'lang-preference';
     const DISMISSED_KEY = 'lang-toast-dismissed';
+    const supported = Object.keys(languages);
+    const storedPreference = (() => {
+      try {
+        const value = localStorage.getItem(PREFERENCE_KEY);
+        return supported.includes(value) ? value : null;
+      } catch {
+        return null;
+      }
+    })();
+
+    if (storedPreference) return;
     if (sessionStorage.getItem(DISMISSED_KEY)) return;
 
-    const supported = Object.keys(languages);
     // Match browser locale by primary subtag: 'zh-CN' → 'zh' matches 'zh-cn'
     const raw = (navigator.languages?.[0] ?? navigator.language) || '';
     const primarySubtag = raw.split('-')[0].toLowerCase();
@@ -69,6 +80,7 @@ const toastConfig = JSON.stringify({
 
     const switchBtn = document.createElement('a');
     switchBtn.href = switchUrl;
+    switchBtn.dataset.langSwitch = preferred;
     switchBtn.textContent = switchLabel;
     Object.assign(switchBtn.style, {
       flexShrink: '0', borderRadius: '0.375rem',
@@ -88,6 +100,14 @@ const toastConfig = JSON.stringify({
 
     toast.append(msgEl, switchBtn, dismissBtn);
     document.body.appendChild(toast);
+
+    switchBtn.addEventListener('click', () => {
+      try {
+        localStorage.setItem(PREFERENCE_KEY, preferred);
+      } catch {
+        // Ignore storage failures; the link navigation should still work.
+      }
+    });
 
     requestAnimationFrame(() => {
       toast.style.opacity = '1';

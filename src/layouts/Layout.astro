@@ -8,6 +8,7 @@ function toHtmlLang(tag: string) {
   return tag.replace(/-([a-z]+)$/, (_, r) => '-' + r.toUpperCase());
 }
 import LanguageToast from '@/components/LanguageToast.astro';
+import LanguagePreference from '@/components/LanguagePreference.astro';
 import { ClientRouter } from 'astro:transitions';
 
 interface Props {
@@ -15,8 +16,10 @@ interface Props {
   description?: string;
   lang?: string;
   showLangToast?: boolean;
+  showLanguageSwitcher?: boolean;
   /** Optional OG image URL (absolute) */
   image?: string;
+  canonicalUrl?: string;
 }
 
 const {
@@ -24,15 +27,17 @@ const {
   description,
   lang = defaultLang,
   showLangToast = false,
+  showLanguageSwitcher = true,
   image,
-} = Astro.props;
+  canonicalUrl: canonicalUrlProp,
+} = Astro.props as Props;
 
 const t = useTranslations(lang as Lang);
 const siteDesc = siteConfig.description[lang as keyof typeof siteConfig.description] ?? siteConfig.description[siteConfig.defaultLang];
 const pageTitle = title ?? siteConfig.name;
 const pageDescription = description ?? siteDesc;
 const homeHref = lang === defaultLang ? '/' : `/${lang}/`;
-const canonicalUrl = `${siteConfig.siteUrl}${Astro.url.pathname}`;
+const canonicalUrl = canonicalUrlProp ?? `${siteConfig.siteUrl}${Astro.url.pathname}`;
 
 // Footer: license
 const licenseKey = siteConfig.license as LicensePreset | null;
@@ -85,6 +90,8 @@ function getLangHref(targetLang: string): string {
         {siteConfig.author.links.twitter && <meta name="twitter:site" content={`@${siteConfig.author.links.twitter}`} />}
         {siteConfig.author.links.twitter && <meta name="twitter:creator" content={`@${siteConfig.author.links.twitter}`} />}
 
+        <slot name="head" />
+
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
 
         {/* RSS autodiscovery */}
@@ -114,18 +121,19 @@ function getLangHref(targetLang: string): string {
 
         <footer class="border-t border-border/40 bg-background mt-auto">
           <div class="max-w-6xl mx-auto px-4 py-6 space-y-3 text-center text-xs text-muted-foreground">
-            {/* Language switcher */}
-            <div class="flex items-center justify-center gap-2">
-              {Object.entries(languages).map(([l, name]) => (
-                <a
-                  href={getLangHref(l)}
-                  data-lang-switch={l}
-                  class={`px-2.5 py-1 rounded-full border text-xs font-medium transition-colors ${lang === l ? 'border-primary bg-primary/10 text-primary' : 'border-border hover:border-primary/50 hover:text-foreground'}`}
-                >
-                  {name}
-                </a>
-              ))}
-            </div>
+            {showLanguageSwitcher && (
+              <div class="flex items-center justify-center gap-2">
+                {Object.entries(languages).map(([l, name]) => (
+                  <a
+                    href={getLangHref(l)}
+                    data-lang-switch={l}
+                    class={`px-2.5 py-1 rounded-full border text-xs font-medium transition-colors ${lang === l ? 'border-primary bg-primary/10 text-primary' : 'border-border hover:border-primary/50 hover:text-foreground'}`}
+                  >
+                    {name}
+                  </a>
+                ))}
+              </div>
+            )}
 
             {/* License */}
             {licenseInfo && (
@@ -145,6 +153,8 @@ function getLangHref(targetLang: string): string {
             <p>© {new Date().getFullYear()} {siteConfig.author.name}. <Fragment set:html={t('footer.builtWith')} /></p>
           </div>
         </footer>
+
+        {showLanguageSwitcher && <LanguagePreference currentLang={lang} />}
 
         {showLangToast && <LanguageToast lang={lang} />}
     </body>

@@ -55,7 +55,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
         <Card className="flex flex-col border-border/50 bg-card overflow-hidden">
           {post.data.cover && (
             <div class="h-52 w-full overflow-hidden border-b border-border/30">
-              <img src={post.data.cover} alt={post.data.title} class="w-full h-full object-cover" />
+              <img src={post.data.cover} alt={post.data.coverAlt ?? post.data.title} class="w-full h-full object-cover" />
             </div>
           )}
 

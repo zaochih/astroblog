@@ -1,0 +1,114 @@
+---
+import HugeIcon from '@/components/HugeIcon';
+import { siteConfig } from '@/config';
+import type { CollectionEntry } from 'astro:content';
+import { getTagHref, getCategoryHref, countWords, formatWordCount } from '@/lib/content';
+import { getTagName, getCategoryName } from '@/i18n/taxonomy';
+import { useTranslations, type Lang } from '@/i18n/ui';
+
+interface Props {
+  posts: Array<{ post: CollectionEntry<'blog'>; slug: string }>;
+  lang: string;
+  side: 'left' | 'right';
+}
+
+const { posts, lang, side } = Astro.props;
+const t = useTranslations(lang as Lang);
+const bio = siteConfig.author.bio[lang as keyof typeof siteConfig.author.bio] ?? siteConfig.author.bio[siteConfig.defaultLang];
+const allTags = [...new Set(posts.flatMap(({ post }) => post.data.tags ?? []))].sort();
+const allCategories = [...new Set(posts.map(({ post }) => post.data.category).filter((category): category is string => Boolean(category)))].sort();
+const totalWords = posts.reduce((sum, { post }) => sum + countWords(post.body ?? ''), 0);
+const totalWordsFormatted = formatWordCount(totalWords, lang);
+const [wordTotal, ...wordUnit] = totalWordsFormatted.split(' ');
+---
+
+{side === 'left' ? (
+<aside class="hidden lg:block sticky top-20 self-start space-y-4">
+  <div class="flex flex-col items-center gap-3 rounded-lg border border-border/50 bg-card p-5">
+    <img
+      src={siteConfig.author.avatar}
+      alt={siteConfig.author.name}
+      class="size-20 rounded-full border-2 border-primary/20 object-cover"
+    />
+    <h2 class="text-sm font-semibold text-foreground">{siteConfig.author.name}</h2>
+    <p class="text-xs text-muted-foreground text-center leading-relaxed">{bio}</p>
+    <div class="flex items-center gap-3">
+      {siteConfig.author.links.github && (
+        <a
+          href={siteConfig.author.links.github}
+          target="_blank"
+          rel="noopener noreferrer me"
+          class="text-muted-foreground hover:text-primary transition-colors"
+          title="GitHub"
+        >
+          <HugeIcon name="github" className="size-4" size={16} />
+        </a>
+      )}
+      {siteConfig.author.links.twitter && (
+        <a
+          href={`https://x.com/${siteConfig.author.links.twitter}`}
+          target="_blank"
+          rel="noopener noreferrer me"
+          class="text-muted-foreground hover:text-primary transition-colors"
+          title="X / Twitter"
+        >
+          <HugeIcon name="x" className="size-4" size={16} />
+        </a>
+      )}
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-px rounded-lg border border-border/50 bg-border/50 overflow-hidden">
+    <div class="flex flex-col items-center py-3 bg-card">
+      <span class="text-base font-bold text-foreground">{posts.length}</span>
+      <span class="text-[10px] text-muted-foreground">{t('stats.posts')}</span>
+    </div>
+    <div class="flex flex-col items-center py-3 bg-card">
+      <span class="text-base font-bold text-foreground">{allCategories.length}</span>
+      <span class="text-[10px] text-muted-foreground">{t('stats.categories')}</span>
+    </div>
+    <div class="flex flex-col items-center py-3 bg-card">
+      <span class="text-base font-bold text-foreground">{allTags.length}</span>
+      <span class="text-[10px] text-muted-foreground">{t('stats.tags')}</span>
+    </div>
+    <div class="flex flex-col items-center py-3 bg-card">
+      <span class="text-base font-bold text-foreground">{wordTotal}</span>
+      <span class="text-[10px] text-muted-foreground">{wordUnit.join(' ')}</span>
+    </div>
+  </div>
+</aside>
+) : (
+<aside class="hidden lg:block sticky top-20 self-start space-y-6">
+  {allCategories.length > 0 && (
+    <div class="rounded-lg border border-border/50 bg-card p-5">
+      <h3 class="text-xs font-semibold text-foreground uppercase tracking-wider mb-3">{t('sidebar.categories')}</h3>
+      <div class="flex flex-col gap-1.5">
+        {allCategories.map(category => (
+          <a
+            href={getCategoryHref(category, lang)}
+            class="text-xs text-muted-foreground hover:text-primary transition-colors"
+          >
+            {getCategoryName(category, lang as Lang)}
+          </a>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {allTags.length > 0 && (
+    <div class="rounded-lg border border-border/50 bg-card p-5">
+      <h3 class="text-xs font-semibold text-foreground uppercase tracking-wider mb-3">{t('sidebar.tags')}</h3>
+      <div class="flex flex-wrap gap-1.5">
+        {allTags.map(tag => (
+          <a
+            href={getTagHref(tag, lang)}
+            class="text-xs px-2 py-0.5 rounded-md bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+          >
+            #{getTagName(tag, lang as Lang)}
+          </a>
+        ))}
+      </div>
+    </div>
+  )}
+</aside>
+)}

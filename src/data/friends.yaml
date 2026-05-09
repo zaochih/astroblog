@@ -4,7 +4,7 @@
 # description: 一句话描述
 # url:         主链接
 # links:       可选，子链接列表
-#   - icon: lucide 图标名 (home / image / globe / link / rss / github / mail / pen)
+#   - icon: HugeIcon 名称 (home / image / globe / link / rss / github / mail / pen)
 #     url:  子链接地址
 
 - name: Alice

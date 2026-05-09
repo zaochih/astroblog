@@ -1,0 +1,91 @@
+---
+import { languages, defaultLang } from '@/i18n/ui';
+
+interface Props {
+  currentLang: string;
+}
+
+const { currentLang } = Astro.props as Props;
+const langPreferenceConfig = JSON.stringify({
+  currentLang,
+  defaultLang,
+  supportedLangs: Object.keys(languages),
+});
+---
+
+<script is:inline define:vars={{ langPreferenceConfig }}>
+  (() => {
+    const config = JSON.parse(langPreferenceConfig);
+    const { currentLang, defaultLang, supportedLangs } = config;
+    const PREFERENCE_KEY = 'lang-preference';
+
+    function getStoredPreference() {
+      try {
+        const value = localStorage.getItem(PREFERENCE_KEY);
+        return supportedLangs.includes(value) ? value : null;
+      } catch {
+        return null;
+      }
+    }
+
+    function setStoredPreference(lang) {
+      if (!supportedLangs.includes(lang)) return;
+      try {
+        localStorage.setItem(PREFERENCE_KEY, lang);
+      } catch {
+        // Ignore storage failures in private or restricted browsing contexts.
+      }
+    }
+
+    function escapeRegExp(value) {
+      return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function getPathLang(pathname) {
+      return supportedLangs.find((lang) => {
+        if (lang === defaultLang) return false;
+        return pathname === `/${lang}` || pathname.startsWith(`/${lang}/`);
+      }) ?? defaultLang;
+    }
+
+    function getLangUrl(targetLang) {
+      const path = window.location.pathname;
+      const activePathLang = getPathLang(path);
+      let nextPath = path;
+
+      if (targetLang === defaultLang) {
+        if (activePathLang !== defaultLang) {
+          nextPath = path.replace(new RegExp(`^/${escapeRegExp(activePathLang)}(?=/|$)`), '') || '/';
+        }
+      } else if (activePathLang === defaultLang) {
+        nextPath = path === '/' ? `/${targetLang}/` : `/${targetLang}${path}`;
+      } else {
+        nextPath = path.replace(new RegExp(`^/${escapeRegExp(activePathLang)}(?=/|$)`), `/${targetLang}`);
+      }
+
+      return `${nextPath}${window.location.search}${window.location.hash}`;
+    }
+
+    if (!window.__lczLangPreferenceBound) {
+      window.__lczLangPreferenceBound = true;
+      document.addEventListener('click', (event) => {
+        const link = event.target instanceof Element
+          ? event.target.closest('a[data-lang-switch]')
+          : null;
+        const targetLang = link?.getAttribute('data-lang-switch');
+        if (targetLang) {
+          setStoredPreference(targetLang);
+        }
+      });
+    }
+
+    const preferredLang = getStoredPreference();
+    if (!preferredLang || preferredLang === currentLang) return;
+
+    const targetUrl = getLangUrl(preferredLang);
+    const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+    if (targetUrl !== currentUrl) {
+      window.location.replace(targetUrl);
+    }
+  })();
+</script>
