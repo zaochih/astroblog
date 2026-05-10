@@ -115,6 +115,8 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: #0078D4;
+
+  text-autospace: normal;
 }
 
 @media (prefers-color-scheme: dark) {
