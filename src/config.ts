@@ -50,4 +50,13 @@ export const siteConfig = {
       twitter: 'zaochih' as string | null,
     },
   },
+  comments: {
+    provider: 'giscus',
+    enabled: import.meta.env.PUBLIC_GISCUS_ENABLED === 'true',
+    repo: import.meta.env.PUBLIC_GISCUS_REPO ?? '',
+    repoId: import.meta.env.PUBLIC_GISCUS_REPO_ID ?? '',
+    category: import.meta.env.PUBLIC_GISCUS_CATEGORY ?? 'General',
+    categoryId: import.meta.env.PUBLIC_GISCUS_CATEGORY_ID ?? '',
+    privacyUrl: 'https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement',
+  },
 } as const;

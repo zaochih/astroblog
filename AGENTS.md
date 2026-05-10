@@ -8,6 +8,7 @@
   - `bun post zh-cn my-post "标题"` and `bun page zh-cn about "关于"` are shorter aliases.
 - The default language is `zh-cn`; secondary-language posts inherit reusable metadata such as date, tags, category, cover, series, and canonical URL from the default-language post when omitted.
 - KaTeX CSS is opt-in. Set `math: true` in post/page frontmatter when the content contains TeX math.
+- Comments use giscus when configured with `PUBLIC_GISCUS_ENABLED=true`, `PUBLIC_GISCUS_REPO`, `PUBLIC_GISCUS_REPO_ID`, `PUBLIC_GISCUS_CATEGORY`, and `PUBLIC_GISCUS_CATEGORY_ID`. Posts default to comments on and can use `comments: false`; pages default to comments off and can use `comments: true`. Use stable terms `posts/<slug>` and `pages/<slug>` so multilingual variants share one discussion.
 - The 404 page is intentionally Chinese-only at `src/pages/404.astro`; keep the footer language switcher hidden there.
 - Shadcn is configured with Hugeicons. Prefer `src/components/HugeIcon.tsx` for UI icons before adding inline SVG.
 - Explicit language switches write `localStorage["lang-preference"]`; pages with a stored preference should redirect to the preferred language without showing the toast again.

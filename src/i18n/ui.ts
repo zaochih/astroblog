@@ -82,6 +82,9 @@ export const ui = {
     'aria.seriesNext': '下一篇同系列文章：{title}',
     'aria.pageNumber': '第 {page} 页',
     'aria.archivePost': '阅读归档文章：{title}',
+    'comments.title': '评论',
+    'comments.description': '评论由 GitHub Discussions 提供。参与讨论会受到 GitHub 隐私声明约束。',
+    'comments.privacy': 'GitHub 隐私声明',
   },
   'en-us': {
     'nav.home': 'Articles',
@@ -146,6 +149,9 @@ export const ui = {
     'aria.seriesNext': 'Next article in this series: {title}',
     'aria.pageNumber': 'Page {page}',
     'aria.archivePost': 'Read archived article: {title}',
+    'comments.title': 'Comments',
+    'comments.description': 'Comments are powered by GitHub Discussions. Joining the discussion is subject to GitHub’s privacy statement.',
+    'comments.privacy': 'GitHub Privacy Statement',
   },
 } as const;
 

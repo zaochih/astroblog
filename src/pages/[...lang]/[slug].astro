@@ -5,6 +5,7 @@ import { siteConfig } from '@/config';
 import { useTranslations, languages, languageNames, defaultLang, type Lang } from '@/i18n/ui';
 import { isPublishedEntry } from '@/lib/content';
 import LanguageNotice from '@/components/LanguageNotice.astro';
+import Comments from '@/components/Comments.astro';
 
 export async function getStaticPaths() {
   function parseEntryId(id: string) {
@@ -104,6 +105,8 @@ const otherLanguageLinks = otherLangs.map(l => ({
     <div class="prose dark:prose-invert max-w-none prose-a:text-primary prose-a:no-underline hover:prose-a:underline">
       <Content />
     </div>
+
+    <Comments lang={currentLang} term={`pages/${slug}`} enabled={page.data.comments === true} />
 
   </article>
 </Layout>

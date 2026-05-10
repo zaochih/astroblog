@@ -10,6 +10,7 @@ import HugeIcon from '@/components/HugeIcon';
 import LanguageNotice from '@/components/LanguageNotice.astro';
 import WeixinNotice from '@/components/WeixinNotice.astro';
 import ExternalPostRedirect from '@/components/ExternalPostRedirect.astro';
+import Comments from '@/components/Comments.astro';
 
 export async function getStaticPaths() {
   // Helper: "zh/hello-world" → ["zh", "hello-world"]
@@ -234,6 +235,8 @@ const homeHref = currentLang === defaultLang ? '/' : `/${currentLang}/`;
         )}
       </nav>
     )}
+
+    <Comments lang={currentLang} term={`posts/${slug}`} enabled={data.comments !== false} />
 
   </article>
 
