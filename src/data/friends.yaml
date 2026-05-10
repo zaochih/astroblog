@@ -3,6 +3,8 @@
 # name:        显示名称
 # description: 一句话描述
 # url:         主链接
+# pinned:      可选，true 时置顶显示
+# sponsored:   可选，true 时标记为赞助链接，并输出 rel="sponsored"
 # links:       可选，子链接列表
 #   - icon: HugeIcon 名称 (home / image / globe / link / rss / github / mail / pen)
 #     url:  子链接地址
