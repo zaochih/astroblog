@@ -6,7 +6,7 @@ interface Props {
   title?: string;
   message?: string;
   availableLabel?: string;
-  languages?: Array<{ href: string; label: string; lang: string }>;
+  languages?: Array<{ href: string; label: string; lang: string; ariaLabel?: string }>;
 }
 
 const { type, title, message, availableLabel, languages = [] } = Astro.props;
@@ -26,7 +26,12 @@ const isFallback = type === 'fallback';
     <HugeIcon name="lang" className="size-4 shrink-0 text-primary" size={16} />
     <span>{availableLabel}</span>
     {languages.map(language => (
-      <a href={language.href} data-lang-switch={language.lang} class="text-primary font-medium hover:underline">
+      <a
+        href={language.href}
+        data-lang-switch={language.lang}
+        aria-label={language.ariaLabel}
+        class="text-primary font-medium hover:underline"
+      >
         [{language.label}]
       </a>
     ))}

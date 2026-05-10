@@ -2,6 +2,9 @@
 import Layout from '@/layouts/Layout.astro';
 import { buttonVariants } from '@/components/ui/button';
 import { siteConfig } from '@/config';
+import { useTranslations } from '@/i18n/ui';
+
+const t = useTranslations('zh-cn');
 ---
 
 <Layout title={`404 — ${siteConfig.name}`} lang="zh-cn" showLanguageSwitcher={false}>
@@ -18,10 +21,10 @@ import { siteConfig } from '@/config';
     </p>
 
     <div class="flex items-center gap-3">
-      <a href="/" class={`${buttonVariants({ variant: 'default', size: 'lg' })} rounded-lg px-6 text-sm`}>
+      <a href="/" aria-label={t('aria.backHome')} class={`${buttonVariants({ variant: 'default', size: 'lg' })} rounded-lg px-6 text-sm`}>
         返回首页
       </a>
-      <button onclick="history.back()" class={`${buttonVariants({ variant: 'outline', size: 'lg' })} rounded-lg px-6 text-sm`}>
+      <button onclick="history.back()" aria-label={t('aria.backPrevious')} class={`${buttonVariants({ variant: 'outline', size: 'lg' })} rounded-lg px-6 text-sm`}>
         返回上一页
       </button>
     </div>

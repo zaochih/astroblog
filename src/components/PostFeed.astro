@@ -50,6 +50,8 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
     const mins = readingMinutes(words);
     const wordStr = t('post.wordCount').replace('{count}', String(words));
     const timeStr = t('post.readingTime').replace('{min}', String(mins));
+    const postHref = getPostHref(slug, lang);
+    const categoryName = post.data.category ? getCategoryName(post.data.category, lang as Lang) : '';
     return (
       <div class="group relative" transition:name={`post-${slug}`}>
         <Card className="flex flex-col border-border/50 bg-card overflow-hidden">
@@ -65,9 +67,10 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
                 <>
                   <a
                     href={getCategoryHref(post.data.category, lang)}
+                    aria-label={t('aria.category').replace('{name}', categoryName)}
                     class="relative z-10 font-medium text-foreground/60 hover:text-primary transition-colors"
                   >
-                    [{getCategoryName(post.data.category, lang as Lang)}]
+                    [{categoryName}]
                   </a>
                   <span class="opacity-40">·</span>
                 </>
@@ -85,7 +88,8 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
 
             <CardTitle className="text-xl leading-tight">
               <a
-                href={getPostHref(slug, lang)}
+                href={postHref}
+                aria-label={t('aria.readPost').replace('{title}', post.data.title)}
                 class="hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
               >
                 {post.data.title}
@@ -106,12 +110,17 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
               {post.data.tags?.map(tag => (
                 <a
                   href={getTagHref(tag, lang)}
+                  aria-label={t('aria.tag').replace('{name}', getTagName(tag, lang as Lang))}
                   class="relative z-10 text-xs px-2 py-0.5 rounded-md bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
                 >
                   #{getTagName(tag, lang as Lang)}
                 </a>
               ))}
-              <a href={getPostHref(slug, lang)} class="relative z-10 ml-auto text-xs font-medium text-primary/70 hover:text-primary transition-colors shrink-0">
+              <a
+                href={postHref}
+                aria-label={t('aria.continueReading').replace('{title}', post.data.title)}
+                class="relative z-10 ml-auto text-xs font-medium text-primary/70 hover:text-primary transition-colors shrink-0"
+              >
                 {t('post.continueReading')}
               </a>
             </div>
@@ -127,6 +136,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
     {currentPage > 1 ? (
       <a
         href={pageHref(currentPage - 1)}
+        aria-label={t('pagination.prev')}
         class="px-3 py-1.5 text-sm rounded-md border border-border/50 text-muted-foreground hover:text-primary hover:border-primary/50 transition-colors"
       >
         {t('pagination.prev')}
@@ -143,6 +153,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
       ) : (
         <a
           href={pageHref(p as number)}
+          aria-label={t('aria.pageNumber').replace('{page}', String(p))}
           class={`px-3 py-1.5 text-sm rounded-md border transition-colors ${
             p === currentPage
               ? 'border-primary bg-primary/10 text-primary font-medium'
@@ -158,6 +169,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
     {currentPage < totalPages ? (
       <a
         href={pageHref(currentPage + 1)}
+        aria-label={t('pagination.next')}
         class="px-3 py-1.5 text-sm rounded-md border border-border/50 text-muted-foreground hover:text-primary hover:border-primary/50 transition-colors"
       >
         {t('pagination.next')}

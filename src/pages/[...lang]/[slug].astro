@@ -75,6 +75,7 @@ const otherLanguageLinks = otherLangs.map(l => ({
   href: getLangLink(l),
   label: languages[l as Lang],
   lang: l,
+  ariaLabel: t('aria.switchLanguage').replace('{lang}', languageNames[currentLang][l as Lang]),
 }));
 ---
 

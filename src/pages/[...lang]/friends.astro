@@ -58,6 +58,7 @@ const friends = yaml.load(friendsRaw) as Friend[];
                     target="_blank"
                     rel="noopener noreferrer"
                     class="relative z-10 text-muted-foreground hover:text-primary transition-colors"
+                    aria-label={t('aria.friendLink').replace('{name}', friend.name).replace('{type}', link.icon)}
                     title={link.icon}
                   >
                     <HugeIcon name={link.icon} className="size-4" size={16} />
@@ -69,7 +70,7 @@ const friends = yaml.load(friendsRaw) as Friend[];
                 target="_blank"
                 rel="noopener noreferrer"
                 class="text-muted-foreground/50 hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
-                aria-label={`Visit ${friend.name}`}
+                aria-label={t('aria.friendSite').replace('{name}', friend.name)}
               >
                 <HugeIcon name="arrowRight" className="size-5" size={20} />
               </a>

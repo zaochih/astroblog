@@ -40,6 +40,7 @@ const [wordTotal, ...wordUnit] = totalWordsFormatted.split(' ');
             target="_blank"
             rel="noopener noreferrer me"
             class="text-muted-foreground hover:text-primary transition-colors"
+            aria-label={t('aria.authorGithub').replace('{name}', siteConfig.author.name)}
             title="GitHub"
           >
             <HugeIcon name="github" className="size-4" size={16} />
@@ -51,6 +52,7 @@ const [wordTotal, ...wordUnit] = totalWordsFormatted.split(' ');
             target="_blank"
             rel="noopener noreferrer me"
             class="text-muted-foreground hover:text-primary transition-colors"
+            aria-label={t('aria.authorTwitter').replace('{name}', siteConfig.author.name)}
             title="X / Twitter"
           >
             <HugeIcon name="x" className="size-4" size={16} />
@@ -91,6 +93,7 @@ const [wordTotal, ...wordUnit] = totalWordsFormatted.split(' ');
           {allCategories.map(category => (
             <a
               href={getCategoryHref(category, lang)}
+              aria-label={t('aria.category').replace('{name}', getCategoryName(category, lang as Lang))}
               class="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary lg:bg-transparent lg:px-0 lg:py-0"
             >
               {getCategoryName(category, lang as Lang)}
@@ -111,6 +114,7 @@ const [wordTotal, ...wordUnit] = totalWordsFormatted.split(' ');
           {allTags.map(tag => (
             <a
               href={getTagHref(tag, lang)}
+              aria-label={t('aria.tag').replace('{name}', getTagName(tag, lang as Lang))}
               class="text-xs px-2 py-0.5 rounded-md bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
             >
               #{getTagName(tag, lang as Lang)}

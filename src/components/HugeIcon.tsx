@@ -66,6 +66,8 @@ export default function HugeIcon({
       size={size}
       strokeWidth={strokeWidth}
       className={className}
+      aria-hidden="true"
+      focusable="false"
     />
   );
 }

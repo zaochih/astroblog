@@ -61,6 +61,7 @@ const years = Object.keys(postsByYear).map(Number).sort((a, b) => b - a);
                   )}
                   <a
                     href={getPostHref(slug, lang)}
+                    aria-label={t('aria.archivePost').replace('{title}', post.data.title)}
                     class="text-sm text-foreground hover:text-primary transition-colors leading-snug"
                   >
                     {post.data.title}

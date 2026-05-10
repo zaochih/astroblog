@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { getPostHref, formatDateTime } from '@/lib/content';
+import { useTranslations, type Lang } from '@/i18n/ui';
 
 interface Props {
   posts: Array<{ post: CollectionEntry<'blog'>; slug: string }>;
@@ -9,6 +10,7 @@ interface Props {
 }
 
 const { posts, lang } = Astro.props;
+const t = useTranslations(lang as Lang);
 ---
 
 <div class="flex flex-col gap-5">
@@ -24,6 +26,7 @@ const { posts, lang } = Astro.props;
           <CardTitle className="text-xl leading-tight">
             <a
               href={getPostHref(slug, lang)}
+              aria-label={t('aria.readPost').replace('{title}', post.data.title)}
               class="hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
             >
               {post.data.title}
