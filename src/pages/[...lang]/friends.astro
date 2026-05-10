@@ -58,6 +58,8 @@ const sortedFriends = friends
   .sort((a, b) => {
     if (a.friend.pinned !== b.friend.pinned) return a.friend.pinned ? -1 : 1;
     if (a.friend.sponsored !== b.friend.sponsored) return a.friend.sponsored ? -1 : 1;
+    const nameOrder = a.friend.name.localeCompare(b.friend.name, lang);
+    if (nameOrder !== 0) return nameOrder;
     return a.index - b.index;
   })
   .map(({ friend }) => friend);
