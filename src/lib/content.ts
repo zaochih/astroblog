@@ -47,7 +47,7 @@ export function localizeAndSortPosts(
       const fallbackPost = langsMap[defaultLang];
       const post = localizedPost && isPublishedEntry(localizedPost)
         ? localizedPost
-        : fallbackPost && isPublishedEntry(fallbackPost)
+        : lang !== 'en-us' && fallbackPost && isPublishedEntry(fallbackPost)
           ? fallbackPost
           : undefined;
       if (!post) return null;
