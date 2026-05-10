@@ -1,0 +1,169 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import HugeIcon from '@/components/HugeIcon';
+import { siteConfig } from '@/config';
+import { useTranslations, languages, defaultLang, type Lang } from '@/i18n/ui';
+
+export async function getStaticPaths() {
+  return Object.keys(languages).map(lang => ({
+    params: { lang: lang === defaultLang ? undefined : lang },
+    props: { lang },
+  }));
+}
+
+const { lang } = Astro.props as { lang: Lang };
+const t = useTranslations(lang);
+
+const labels = {
+  placeholder: t('search.placeholder'),
+  idle: t('search.idle'),
+  loading: t('search.loading'),
+  empty: t('search.empty'),
+  error: t('search.error'),
+  devUnavailable: t('search.devUnavailable'),
+  results: t('search.results'),
+};
+---
+
+<Layout
+  title={`${t('search.title')} | ${siteConfig.name}`}
+  description={t('search.placeholder')}
+  lang={lang}
+  searchable={false}
+>
+  <section class="max-w-3xl mx-auto mt-6 sm:mt-10" data-search-root data-lang={lang} data-labels={JSON.stringify(labels)}>
+    <h1 class="text-3xl font-bold tracking-tight text-foreground mb-6">{t('search.title')}</h1>
+
+    <label class="relative block">
+      <span class="sr-only">{t('search.title')}</span>
+      <HugeIcon name="search" className="pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2 text-muted-foreground" size={20} />
+      <input
+        data-search-input
+        type="search"
+        autocomplete="off"
+        inputmode="search"
+        placeholder={t('search.placeholder')}
+        class="h-12 w-full rounded-md border border-input bg-card pl-10 pr-4 text-base shadow-fluent-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-ring/20"
+      />
+    </label>
+
+    <p data-search-status class="mt-4 text-sm text-muted-foreground">{t('search.idle')}</p>
+    <ol data-search-results class="mt-6 space-y-3"></ol>
+  </section>
+
+  <script>
+    const pagefindState = {
+      module: null,
+      promise: null,
+    };
+
+    async function loadPagefind(status, labels) {
+      if (pagefindState.module) return pagefindState.module;
+      if (!pagefindState.promise) {
+        status.textContent = labels.loading;
+        const pagefindUrl = '/pagefind/pagefind.js';
+        pagefindState.promise = import(/* @vite-ignore */ pagefindUrl)
+          .then(async (pagefind) => {
+            await pagefind.init();
+            pagefindState.module = pagefind;
+            return pagefind;
+          })
+          .catch((error) => {
+            pagefindState.promise = null;
+            throw error;
+          });
+      }
+      return pagefindState.promise;
+    }
+
+    function escapeHtml(value) {
+      return value.replace(/[&<>"']/g, (char) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+      }[char]));
+    }
+
+    function resultCountLabel(template, count) {
+      return template.replace('{count}', String(count));
+    }
+
+    function renderResults(container, results) {
+      container.innerHTML = results.map((result) => {
+        const title = escapeHtml(result.meta?.title || result.url);
+        const excerpt = result.excerpt || '';
+        const url = result.url;
+
+        return `
+          <li>
+            <a href="${url}" class="block rounded-md border border-border/50 bg-card p-4 shadow-fluent-sm transition-colors hover:border-primary/50">
+              <span class="block text-base font-semibold text-foreground">${title}</span>
+              <span class="mt-2 block text-sm leading-6 text-muted-foreground">${excerpt}</span>
+            </a>
+          </li>
+        `;
+      }).join('');
+    }
+
+    function initSearchPage() {
+      const root = document.querySelector('[data-search-root]');
+      if (!root || root.__searchReady) return;
+      root.__searchReady = true;
+
+      const input = root.querySelector('[data-search-input]');
+      const status = root.querySelector('[data-search-status]');
+      const resultsContainer = root.querySelector('[data-search-results]');
+      const lang = root.dataset.lang;
+      const labels = JSON.parse(root.dataset.labels || '{}');
+      let runId = 0;
+
+      function isLikelyAstroDev() {
+        return window.location.hostname === 'localhost' && window.location.port === '4321';
+      }
+
+      async function runSearch() {
+        const query = input.value.trim();
+        const currentRun = ++runId;
+
+        if (!query) {
+          status.textContent = labels.idle;
+          resultsContainer.innerHTML = '';
+          return;
+        }
+
+        try {
+          const pagefind = await loadPagefind(status, labels);
+          const search = await pagefind.search(query, { filters: { lang } });
+          if (currentRun !== runId) return;
+
+          const results = await Promise.all(search.results.slice(0, 12).map((result) => result.data()));
+          if (currentRun !== runId) return;
+
+          status.textContent = results.length
+            ? resultCountLabel(labels.results, search.results.length)
+            : labels.empty;
+          renderResults(resultsContainer, results);
+        } catch (error) {
+          console.error(error);
+          if (currentRun !== runId) return;
+          status.textContent = isLikelyAstroDev() ? labels.devUnavailable : labels.error;
+          resultsContainer.innerHTML = '';
+        }
+      }
+
+      input.addEventListener('input', runSearch);
+
+      const url = new URL(window.location.href);
+      const query = url.searchParams.get('q');
+      if (query) {
+        input.value = query;
+        runSearch();
+      }
+    }
+
+    initSearchPage();
+    document.addEventListener('astro:page-load', initSearchPage);
+  </script>
+</Layout>

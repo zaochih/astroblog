@@ -10,6 +10,7 @@ import remarkCjkFriendly from "remark-cjk-friendly";
 import remarkCjkFriendlyGfmStrikethrough from "remark-cjk-friendly-gfm-strikethrough";
 import rehypeKatex from "rehype-katex";
 import rehypeImageSize from "./src/lib/rehype-image-size.mjs";
+import remarkHidden from "./src/lib/remark-hidden.mjs";
 
 /**
  * @typedef {object} HastNode
@@ -117,9 +118,11 @@ export default defineConfig({
         },
       ],
     },
+    smartypants: false,
     remarkPlugins: [
       remarkMath,
       remarkCustomHeaderId,
+      remarkHidden, // must run before remarkCjkFriendly
       remarkCjkFriendly,
       remarkCjkFriendlyGfmStrikethrough,
     ],

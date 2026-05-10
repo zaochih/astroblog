@@ -241,3 +241,27 @@ pre[data-lang]::before {
 .prose code::after {
   content: none !important;
 }
+
+/* Hidden / spoiler text */
+.hidden-text {
+  filter: blur(4px);
+  transition: all 0.3s ease;
+}
+
+.hidden-text:hover,
+.hidden-text-blur:hover {
+  filter: blur(0);
+}
+
+.hidden-text-background {
+  background: #000;
+  color: transparent;
+  filter: none;
+  border-radius: 1px;
+}
+
+.hidden-text-background:hover {
+  background: transparent;
+  color: inherit;
+  border-radius: 0;
+}

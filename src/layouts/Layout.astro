@@ -11,6 +11,7 @@ import LanguageToast from '@/components/LanguageToast.astro';
 import LanguagePreference from '@/components/LanguagePreference.astro';
 import SmartHeader from '@/components/SmartHeader.astro';
 import DetailsAnimator from '@/components/DetailsAnimator.astro';
+import HugeIcon from '@/components/HugeIcon';
 import { ClientRouter } from 'astro:transitions';
 
 interface Props {
@@ -24,6 +25,7 @@ interface Props {
   canonicalUrl?: string;
   math?: boolean;
   hideHeaderOnScroll?: boolean;
+  searchable?: boolean;
 }
 
 const {
@@ -36,6 +38,7 @@ const {
   canonicalUrl: canonicalUrlProp,
   math = false,
   hideHeaderOnScroll = false,
+  searchable = false,
 } = Astro.props as Props;
 
 const t = useTranslations(lang as Lang);
@@ -43,6 +46,7 @@ const siteDesc = siteConfig.description[lang as keyof typeof siteConfig.descript
 const pageTitle = title ?? siteConfig.name;
 const pageDescription = description ?? siteDesc;
 const homeHref = lang === defaultLang ? '/' : `/${lang}/`;
+const searchHref = lang === defaultLang ? '/search' : `/${lang}/search`;
 const canonicalUrl = canonicalUrlProp ?? `${siteConfig.siteUrl}${Astro.url.pathname}`;
 
 // Footer: license
@@ -114,6 +118,7 @@ function getLangHref(targetLang: string): string {
     </head>
     <body class="flex flex-col">
         <header
+          data-pagefind-ignore
           id="site-header"
           data-state="visible"
           data-hide-on-scroll={hideHeaderOnScroll ? 'true' : 'false'}
@@ -128,15 +133,21 @@ function getLangHref(targetLang: string): string {
               <a href={`${homeHref}archive`} class="hover:text-primary transition-colors">{t('nav.archive')}</a>
               <a href={`${homeHref}friends`} class="hover:text-primary transition-colors">{t('nav.friends')}</a>
               <a href={`${homeHref}about`} class="hover:text-primary transition-colors">{t('nav.about')}</a>
+              <a href={searchHref} aria-label={t('aria.nav.search')} class="inline-flex items-center justify-center rounded-sm p-1.5 hover:bg-accent hover:text-primary transition-colors">
+                <HugeIcon name="search" className="size-4" size={16} />
+              </a>
             </nav>
           </div>
         </header>
 
-        <main class="flex-1 w-full max-w-6xl mx-auto px-3 py-6 sm:px-4 sm:py-8">
+        <main
+          class="flex-1 w-full max-w-6xl mx-auto px-3 py-6 sm:px-4 sm:py-8"
+          {...(searchable ? { 'data-pagefind-body': true, 'data-pagefind-filter': `lang:${lang}` } : { 'data-pagefind-ignore': true })}
+        >
             <slot />
         </main>
 
-        <footer class="border-t border-border/40 bg-background mt-auto">
+        <footer data-pagefind-ignore class="border-t border-border/40 bg-background mt-auto">
           <div class="max-w-6xl mx-auto px-4 py-6 space-y-3 text-center text-xs text-muted-foreground">
             {showLanguageSwitcher && (
               <nav class="flex items-center justify-center gap-2" aria-label={t('aria.footer.language')}>
