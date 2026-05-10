@@ -6,6 +6,7 @@ import mdx from '@astrojs/mdx';
 
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import rehypeImageSize from './src/lib/rehype-image-size.mjs';
 
 /**
  * @typedef {object} HastNode
@@ -96,6 +97,10 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()]
   },
+  image: {
+    layout: 'constrained',
+    responsiveStyles: true,
+  },
   markdown: {
     shikiConfig: {
       theme: 'github-dark',
@@ -113,6 +118,6 @@ export default defineConfig({
       ],
     },
     remarkPlugins: [remarkMath],
-    rehypePlugins: [rehypeRemoveFootnoteLabel, rehypeTaskListA11y, [rehypeKatex, {}]],
+    rehypePlugins: [rehypeRemoveFootnoteLabel, rehypeTaskListA11y, [rehypeKatex, {}], rehypeImageSize],
   },
 });
