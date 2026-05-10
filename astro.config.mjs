@@ -6,6 +6,8 @@ import mdx from "@astrojs/mdx";
 
 import remarkMath from "remark-math";
 import remarkCustomHeaderId from "remark-custom-header-id";
+import remarkCjkFriendly from "remark-cjk-friendly";
+import remarkCjkFriendlyGfmStrikethrough from "remark-cjk-friendly-gfm-strikethrough";
 import rehypeKatex from "rehype-katex";
 import rehypeImageSize from "./src/lib/rehype-image-size.mjs";
 
@@ -115,7 +117,12 @@ export default defineConfig({
         },
       ],
     },
-    remarkPlugins: [remarkMath, remarkCustomHeaderId],
+    remarkPlugins: [
+      remarkMath,
+      remarkCustomHeaderId,
+      remarkCjkFriendly,
+      remarkCjkFriendlyGfmStrikethrough,
+    ],
     rehypePlugins: [
       rehypeRemoveFootnoteLabel,
       rehypeTaskListA11y,
