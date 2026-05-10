@@ -21,6 +21,13 @@ interface FriendLink {
   url: string;
 }
 
+interface FriendLocale {
+  name?: string;
+  description?: string;
+  url?: string;
+  links?: FriendLink[];
+}
+
 interface Friend {
   name: string;
   description: string;
@@ -28,11 +35,26 @@ interface Friend {
   pinned?: boolean;
   sponsored?: boolean;
   links?: FriendLink[];
+  i18n?: Partial<Record<Lang, FriendLocale>>;
 }
 
 const friends = yaml.load(friendsRaw) as Friend[];
+function localizeFriend(friend: Friend, lang: Lang): Friend {
+  const localized = friend.i18n?.[lang];
+  if (!localized) return friend;
+
+  return {
+    ...friend,
+    name: localized.name ?? friend.name,
+    description: localized.description ?? friend.description,
+    url: localized.url ?? friend.url,
+    links: localized.links ?? friend.links,
+    i18n: friend.i18n,
+  };
+}
+
 const sortedFriends = friends
-  .map((friend, index) => ({ friend, index }))
+  .map((friend, index) => ({ friend: localizeFriend(friend, lang as Lang), index }))
   .sort((a, b) => {
     if (a.friend.pinned !== b.friend.pinned) return a.friend.pinned ? -1 : 1;
     if (a.friend.sponsored !== b.friend.sponsored) return a.friend.sponsored ? -1 : 1;

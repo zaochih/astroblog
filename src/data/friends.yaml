@@ -5,6 +5,10 @@
 # url:         主链接
 # pinned:      可选，true 时置顶显示
 # sponsored:   可选，true 时标记为赞助链接，并输出 rel="sponsored"
+# i18n:        可选，按语言覆盖 name / description / url / links
+#   en-us:
+#     name: Localized Name
+#     description: Localized description
 # links:       可选，子链接列表
 #   - icon: HugeIcon 名称 (home / image / globe / link / rss / github / mail / pen)
 #     url:  子链接地址
@@ -15,3 +19,13 @@
   links:
     - icon: link
       url: https://example.com
+
+- name: 微软电脑管家
+  description: 简单勿打扰，安全又安心。
+  url: https://pcmanager.microsoft.com/zh-cn
+  sponsored: true
+  i18n:
+    en-us:
+      name: Microsoft PC Manager
+      description: Safeguard your PC in a quiet and reliable way
+      url: https://pcmanager.microsoft.com/en-us
