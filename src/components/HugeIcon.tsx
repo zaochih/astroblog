@@ -1,4 +1,4 @@
-import { HugeiconsIcon } from '@hugeicons/react';
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Alert02Icon,
   ArrowRight01Icon,
@@ -18,8 +18,9 @@ import {
   RssIcon,
   XVariableIcon,
   WechatIcon,
-  LanguageCircleIcon
-} from '@hugeicons/core-free-icons';
+  LanguageCircleIcon,
+  MicrosoftIcon,
+} from "@hugeicons/core-free-icons";
 
 const icons = {
   alert: Alert02Icon,
@@ -41,6 +42,7 @@ const icons = {
   x: XVariableIcon,
   wechat: WechatIcon,
   lang: LanguageCircleIcon,
+  microsoft: MicrosoftIcon,
 } as const;
 
 export type HugeIconName = keyof typeof icons;

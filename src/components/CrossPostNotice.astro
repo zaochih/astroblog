@@ -1,0 +1,62 @@
+---
+import HugeIcon from '@/components/HugeIcon';
+import type { Lang } from '@/i18n/ui';
+
+type Props =
+  | { platform: 'weixin'; name: string; href: string; lang: Lang }
+  | { platform: 'msft'; href: string; lang: Lang };
+
+const { platform, href, lang } = Astro.props as Props;
+const name = 'name' in Astro.props ? Astro.props.name : undefined;
+
+const isZh = lang === 'zh-cn';
+
+const colors = {
+  weixin: {
+    wrap: 'border-emerald-500/30 bg-emerald-500/10',
+    icon: 'text-emerald-800 dark:text-emerald-200',
+    btn:  'border-emerald-800/40 text-emerald-800 hover:border-emerald-900/60 hover:bg-emerald-700/10 hover:text-emerald-900 dark:border-emerald-200/40 dark:text-emerald-200 dark:hover:border-emerald-100/60 dark:hover:bg-emerald-200/10 dark:hover:text-emerald-100',
+  },
+  msft: {
+    wrap: 'border-[#0f6cbd]/30 bg-[#0f6cbd]/10',
+    icon: 'text-[#0c5499] dark:text-[#6bb4e8]',
+    btn:  'border-[#0c5499]/40 text-[#0c5499] hover:border-[#093f73]/60 hover:bg-[#0f6cbd]/10 hover:text-[#093f73] dark:border-[#6bb4e8]/40 dark:text-[#6bb4e8] dark:hover:border-[#8dc6ef]/60 dark:hover:bg-[#6bb4e8]/10 dark:hover:text-[#8dc6ef]',
+  },
+} as const;
+
+const iconName = platform === 'weixin' ? 'wechat' : 'microsoft';
+
+const label =
+  platform === 'weixin'
+    ? `本文亦发布于公众号「${name}」`
+    : isZh
+      ? '本文亦发布于 Microsoft 支持社区'
+      : 'This article is also published on Microsoft Q&A Community';
+
+const ariaLabel =
+  platform === 'weixin'
+    ? `前往微信公众号「${name}」阅读`
+    : isZh
+      ? '前往 Microsoft 支持社区阅读'
+      : 'Read this article on Microsoft Q&A Community';
+
+const btnText = isZh ? '→ 前往阅读' : '→ Read on';
+
+const c = colors[platform];
+---
+
+<div class={`mb-4 flex flex-wrap items-center gap-3 rounded-lg border p-4 text-sm text-foreground shadow-fluent-sm ${c.wrap}`}>
+  <div class="flex min-w-0 items-center gap-2">
+    <HugeIcon name={iconName} className={`size-4 shrink-0 ${c.icon}`} size={16} />
+    <span class="min-w-0">{label}</span>
+  </div>
+  <a
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label={ariaLabel}
+    class={`ml-auto inline-flex w-fit shrink-0 items-center rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${c.btn}`}
+  >
+    {btnText}
+  </a>
+</div>
