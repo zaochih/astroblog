@@ -79,7 +79,8 @@ const giscusConfig = JSON.stringify({
           script.setAttribute('data-reactions-enabled', '1');
           script.setAttribute('data-emit-metadata', '0');
           script.setAttribute('data-input-position', 'top');
-          script.setAttribute('data-theme', 'preferred_color_scheme');
+          const themeUrl = new URL('/giscus-theme.css', window.location.origin).href;
+          script.setAttribute('data-theme', themeUrl);
           script.setAttribute('data-lang', config.lang || 'en');
           host.append(script);
           host.dataset.loaded = 'true';
