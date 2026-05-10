@@ -181,6 +181,31 @@ function getLangHref(targetLang: string): string {
         {showLangToast && <LanguageToast lang={lang} />}
 
         <script>
+          function initExternalLinks() {
+            document.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((anchor) => {
+              const rawHref = anchor.getAttribute('href');
+              if (!rawHref) return;
+
+              let url: URL;
+              try {
+                url = new URL(rawHref, window.location.href);
+              } catch {
+                return;
+              }
+
+              if (!['http:', 'https:'].includes(url.protocol) || url.origin === window.location.origin) {
+                return;
+              }
+
+              anchor.target = '_blank';
+
+              const rel = new Set((anchor.rel || '').split(/\s+/).filter(Boolean));
+              rel.add('noopener');
+              rel.add('noreferrer');
+              anchor.rel = Array.from(rel).join(' ');
+            });
+          }
+
           function initLocalDatetimes() {
             const htmlLang = document.documentElement.lang || navigator.language || 'en-US';
             const isZh = htmlLang.toLowerCase().startsWith('zh');
@@ -245,7 +270,9 @@ function getLangHref(targetLang: string): string {
             });
           }
 
+          initExternalLinks();
           initLocalDatetimes();
+          document.addEventListener('astro:page-load', initExternalLinks);
           document.addEventListener('astro:page-load', initLocalDatetimes);
         </script>
     </body>
