@@ -34,7 +34,7 @@ const years = Object.keys(postsByYear).map(Number).sort((a, b) => b - a);
 >
   <div class="max-w-2xl mx-auto">
     <h1 class="text-3xl font-bold tracking-tight text-foreground mb-2">{t('archive.title')}</h1>
-    <p class="text-sm text-muted-foreground mb-10">
+    <p class="text-sm text-muted-foreground mb-6">
       {t('listing.postCount').replace('{count}', String(localizedPosts.length))}
     </p>
 

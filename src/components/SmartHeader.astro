@@ -13,22 +13,39 @@
       directionThreshold: 4,
       showAfterUp: 24,
       upwardDistance: 0,
+      observedHeader: null,
+      headerHeight: 0,
     };
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      const borderBox = entry.borderBoxSize?.[0];
+      const height = Math.ceil(borderBox?.blockSize ?? entry.contentRect.height);
+      syncHeaderHeight(height);
+    });
 
     function getHeader() {
       return document.getElementById('site-header');
     }
 
     function getScrollY() {
-      return Math.max(0, window.scrollY || document.scrollingElement?.scrollTop || 0);
+      return Math.max(0, window.scrollY || window.pageYOffset || 0);
     }
 
-    function syncHeaderHeight() {
-      const header = getHeader();
-      const height = header?.offsetHeight || 56;
+    function syncHeaderHeight(height) {
       const value = `${height}px`;
+      if (height === state.headerHeight) return;
+      state.headerHeight = height;
       document.documentElement.style.setProperty('--site-header-height', value);
       document.body?.style.setProperty('padding-top', value);
+    }
+
+    function observeHeader() {
+      const header = getHeader();
+      if (!header || header === state.observedHeader) return;
+      if (state.observedHeader) resizeObserver.unobserve(state.observedHeader);
+      state.observedHeader = header;
+      resizeObserver.observe(header);
     }
 
     function setHeaderState(value) {
@@ -76,7 +93,7 @@
     }
 
     function refresh() {
-      syncHeaderHeight();
+      observeHeader();
       state.lastY = getScrollY();
       state.upwardDistance = 0;
       state.ticking = false;

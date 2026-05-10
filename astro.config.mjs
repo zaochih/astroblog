@@ -10,7 +10,9 @@ import rehypeKatex from 'rehype-katex';
 /**
  * @typedef {object} HastNode
  * @property {string} [type]
- * @property {{ id?: unknown }} [properties]
+ * @property {string} [tagName]
+ * @property {{ id?: unknown, type?: unknown, checked?: unknown, [key: string]: unknown }} [properties]
+ * @property {string} [value]
  * @property {HastNode[]} [children]
  */
 
@@ -33,6 +35,55 @@ function rehypeRemoveFootnoteLabel() {
       removeNode(child);
       return true;
     });
+  }
+}
+
+/** Add accessible names to generated Markdown task-list checkboxes. */
+function rehypeTaskListA11y() {
+  /** @param {HastNode} tree */
+  return function (tree) {
+    visit(tree);
+  };
+
+  /** @param {HastNode} node */
+  function visit(node) {
+    if (!node.children) return;
+
+    for (const child of node.children) {
+      if (isTaskCheckbox(child)) {
+        child.properties ??= {};
+        child.properties.ariaLabel = getTaskLabel(node);
+      }
+      visit(child);
+    }
+  }
+
+  /** @param {HastNode} node */
+  function isTaskCheckbox(node) {
+    return (
+      node.type === 'element' &&
+      node.tagName === 'input' &&
+      String(node.properties?.type) === 'checkbox'
+    );
+  }
+
+  /** @param {HastNode} node */
+  function getTaskLabel(node) {
+    const text = collectText(node).trim().replace(/\s+/g, ' ');
+    return text ? `Task: ${text}` : 'Task list item';
+  }
+
+  /**
+   * @param {HastNode} node
+   * @returns {string}
+   */
+  function collectText(node) {
+    if (node.type === 'text') return node.value ?? '';
+    if (!node.children) return '';
+    return node.children
+      .filter((child) => !isTaskCheckbox(child))
+      .map(collectText)
+      .join('');
   }
 }
 
@@ -62,6 +113,6 @@ export default defineConfig({
       ],
     },
     remarkPlugins: [remarkMath],
-    rehypePlugins: [rehypeRemoveFootnoteLabel, [rehypeKatex, {}]],
+    rehypePlugins: [rehypeRemoveFootnoteLabel, rehypeTaskListA11y, [rehypeKatex, {}]],
   },
 });

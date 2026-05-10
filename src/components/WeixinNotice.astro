@@ -11,7 +11,7 @@ const { name, href } = Astro.props as Props;
 
 <div class="mb-4 flex flex-col gap-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm text-foreground shadow-fluent-sm sm:flex-row sm:items-center sm:justify-between">
   <div class="flex min-w-0 items-center gap-2">
-    <HugeIcon name="wechat" className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" size={16} />
+    <HugeIcon name="wechat" className="size-4 shrink-0 text-emerald-800 dark:text-emerald-200" size={16} />
     <span class="min-w-0">
       本文亦发布于公众号「{name}」
     </span>
@@ -21,7 +21,7 @@ const { name, href } = Astro.props as Props;
     target="_blank"
     rel="noopener noreferrer"
     aria-label={`前往微信公众号「${name}」阅读`}
-    class="inline-flex w-fit shrink-0 items-center self-end rounded-lg border border-emerald-600/30 px-2.5 py-1 text-xs font-medium text-emerald-700 transition-colors hover:border-emerald-700/50 hover:bg-emerald-600/10 hover:text-emerald-800 sm:self-auto dark:border-emerald-400/30 dark:text-emerald-300 dark:hover:border-emerald-300/50 dark:hover:bg-emerald-400/10 dark:hover:text-emerald-200"
+    class="inline-flex w-fit shrink-0 items-center self-end rounded-lg border border-emerald-800/40 px-2.5 py-1 text-xs font-medium text-emerald-800 transition-colors hover:border-emerald-900/60 hover:bg-emerald-700/10 hover:text-emerald-900 sm:self-auto dark:border-emerald-200/40 dark:text-emerald-200 dark:hover:border-emerald-100/60 dark:hover:bg-emerald-200/10 dark:hover:text-emerald-100"
   >
     → 前往阅读
   </a>

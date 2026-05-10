@@ -39,7 +39,7 @@ export const siteConfig = {
   license: 'cc-by-nc-sa-4.0' as LicensePreset | null,
   author: {
     name: 'Caozhi Li',
-    avatar: 'https://github.com/zaochih.png',
+    avatar: '/avtr.jpeg',
     bio: {
       'zh-cn': '「行千里，致广大。」',
       'en-us': '「行千里，致广大。」',

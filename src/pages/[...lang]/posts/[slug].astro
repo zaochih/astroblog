@@ -126,6 +126,7 @@ const homeHref = currentLang === defaultLang ? '/' : `/${currentLang}/`;
   lang={currentLang}
   image={data.cover}
   canonicalUrl={data.canonicalUrl}
+  math={data.math}
 >
   <div class={hasToc ? "max-w-5xl mx-auto mt-6 sm:mt-10 xl:grid xl:grid-cols-[1fr_220px] xl:gap-10 xl:items-start" : "max-w-3xl mx-auto mt-6 sm:mt-10"}>
   <article transition:name={`post-${slug}`} class="min-w-0">
@@ -295,9 +296,13 @@ const homeHref = currentLang === defaultLang ? '/' : `/${currentLang}/`;
 
       if (!ring && !btn) return;
 
+      let docHeight = 0;
+      const refreshMetrics = () => {
+        docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      };
+
       const update = () => {
         const scrollTop = window.scrollY;
-        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
         const pct = docHeight > 0 ? Math.min(100, Math.round((scrollTop / docHeight) * 100)) : 0;
 
         if (ring) ring.style.strokeDashoffset = String(100 - pct);
@@ -314,7 +319,12 @@ const homeHref = currentLang === defaultLang ? '/' : `/${currentLang}/`;
         }
       };
 
+      refreshMetrics();
       window.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', () => {
+        refreshMetrics();
+        update();
+      }, { passive: true });
       update();
 
       btn?.addEventListener('click', () => {
@@ -322,6 +332,7 @@ const homeHref = currentLang === defaultLang ? '/' : `/${currentLang}/`;
       });
     }
 
+    initScrollFeatures();
     document.addEventListener('astro:page-load', initScrollFeatures);
   </script>
 
