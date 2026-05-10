@@ -176,6 +176,75 @@ function getLangHref(targetLang: string): string {
         <DetailsAnimator />
 
         {showLangToast && <LanguageToast lang={lang} />}
+
+        <script>
+          function initLocalDatetimes() {
+            const htmlLang = document.documentElement.lang || navigator.language || 'en-US';
+            const isZh = htmlLang.toLowerCase().startsWith('zh');
+
+            const partsFor = (date) => {
+              const parts = new Intl.DateTimeFormat(isZh ? 'zh-CN' : 'en-US', {
+                year: 'numeric',
+                month: isZh ? '2-digit' : 'short',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: !isZh,
+              }).formatToParts(date);
+              const value = (type) => parts.find(part => part.type === type)?.value ?? '';
+              const hour = value('hour') === '24' ? '00' : value('hour');
+              return {
+                year: value('year'),
+                month: value('month'),
+                day: value('day'),
+                hour,
+                minute: value('minute'),
+                dayPeriod: value('dayPeriod'),
+              };
+            };
+
+            const formatDate = (date) => {
+              if (isZh) {
+                const { year, month, day } = partsFor(date);
+                return `${year}年${month}月${day}日`;
+              }
+              return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+              });
+            };
+
+            const formatTime = (date) => {
+              if (isZh) {
+                const { hour, minute } = partsFor(date);
+                return `${hour}:${minute}`;
+              }
+              return date.toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+              });
+            };
+
+            document.querySelectorAll('time[datetime]').forEach((time) => {
+              const date = new Date(time.getAttribute('datetime') || '');
+              if (Number.isNaN(date.valueOf())) return;
+
+              if (time.hasAttribute('data-local-datetime')) {
+                time.textContent = `${formatDate(date)} ${formatTime(date)}`;
+              }
+
+              const dateNode = time.querySelector('[data-local-date]');
+              if (dateNode) dateNode.textContent = formatDate(date);
+
+              const timeNode = time.querySelector('[data-local-time]');
+              if (timeNode) timeNode.textContent = formatTime(date);
+            });
+          }
+
+          initLocalDatetimes();
+          document.addEventListener('astro:page-load', initLocalDatetimes);
+        </script>
     </body>
 </html>
 

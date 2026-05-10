@@ -149,6 +149,22 @@
   scroll-margin-top: 5rem;
 }
 
+.prose a:not(:has(img)) {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 0 1px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  text-decoration: none;
+  transition: background-size 180ms ease;
+}
+
+.prose a:not(:has(img)):hover,
+.prose a:not(:has(img)):focus-visible {
+  background-size: 100% 1px;
+}
+
 /* Footnotes: replace auto-generated heading with a top border */
 .prose section[data-footnotes] {
   border-top: 1px solid var(--border);

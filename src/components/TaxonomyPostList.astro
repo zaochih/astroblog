@@ -19,9 +19,11 @@ const t = useTranslations(lang as Lang);
       <Card className="flex flex-col border-border/50">
         <CardHeader>
           <div class="flex items-center gap-3 mb-1">
-            <span class="text-xs text-muted-foreground">
-              {post.data.date && formatDateTime(post.data.date, lang)}
-            </span>
+            {post.data.date && (
+              <time data-local-datetime datetime={post.data.date.toISOString()} class="text-xs text-muted-foreground">
+                {formatDateTime(post.data.date, lang)}
+              </time>
+            )}
           </div>
           <CardTitle className="text-xl leading-tight">
             <a

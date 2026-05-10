@@ -1,6 +1,11 @@
 import type { CollectionEntry } from 'astro:content';
 import { defaultLang } from '@/i18n/ui';
 
+const defaultTimeZones: Record<string, string> = {
+  'zh-cn': 'Asia/Shanghai',
+  'en-us': 'UTC',
+};
+
 export function getSlugFromId(id: string): string {
   return id.split('/').slice(1).join('/');
 }
@@ -29,7 +34,7 @@ export function localizeAndSortPosts(
   lang: string,
 ): LocalizedPost[] {
   const bySlug = new Map<string, Record<string, CollectionEntry<'blog'>>>();
-  for (const post of allPosts.filter(isPublishedEntry)) {
+  for (const post of allPosts) {
     const postLang = getLangFromId(post.id);
     const slug = getSlugFromId(post.id);
     if (!bySlug.has(slug)) bySlug.set(slug, {});
@@ -38,7 +43,13 @@ export function localizeAndSortPosts(
 
   return [...bySlug.entries()]
     .map(([slug, langsMap]) => {
-      const post = langsMap[lang] ?? langsMap[defaultLang];
+      const localizedPost = langsMap[lang];
+      const fallbackPost = langsMap[defaultLang];
+      const post = localizedPost && isPublishedEntry(localizedPost)
+        ? localizedPost
+        : fallbackPost && isPublishedEntry(fallbackPost)
+          ? fallbackPost
+          : undefined;
       if (!post) return null;
       const primary = langsMap[defaultLang];
       // Secondary-lang posts inherit date/tags/category/cover from primary
@@ -52,7 +63,7 @@ export function localizeAndSortPosts(
 }
 
 export function getPostHref(slug: string, lang: string): string {
-  return lang === defaultLang ? `/posts/${slug}` : `/${lang}/posts/${slug}`;
+  return lang === defaultLang ? `/post/${slug}` : `/${lang}/post/${slug}`;
 }
 
 export function getTagHref(tag: string, lang: string): string {
@@ -67,32 +78,58 @@ export function getArchiveHref(lang: string): string {
   return lang === defaultLang ? '/archive' : `/${lang}/archive`;
 }
 
-/** Format a Date as a human-readable datetime string in the given page language (UTC). */
+function fallbackTimeZone(lang: string): string {
+  return defaultTimeZones[lang] ?? 'UTC';
+}
+
+function dateParts(date: Date, lang: string): { year: string; month: string; day: string; hour: string; minute: string } {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: fallbackTimeZone(lang),
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).formatToParts(date);
+
+  const value = (type: string) => parts.find(part => part.type === type)?.value ?? '';
+  return {
+    year: value('year'),
+    month: value('month'),
+    day: value('day'),
+    hour: value('hour') === '24' ? '00' : value('hour'),
+    minute: value('minute'),
+  };
+}
+
+export function getPostYear(date: Date, lang: string): number {
+  return Number(dateParts(date, lang).year);
+}
+
+/** Format a Date as a human-readable date string in the language's fallback timezone. */
 export function formatDate(date: Date, lang: string): string {
   if (lang === 'zh-cn') {
-    const y = date.getUTCFullYear();
-    const m = String(date.getUTCMonth() + 1).padStart(2, '0');
-    const d = String(date.getUTCDate()).padStart(2, '0');
-    return `${y}年${m}月${d}日`;
+    const { year, month, day } = dateParts(date, lang);
+    return `${year}年${month}月${day}日`;
   }
   return date.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
-    timeZone: 'UTC',
+    timeZone: fallbackTimeZone(lang),
   });
 }
 
 export function formatTime(date: Date, lang: string): string {
   if (lang === 'zh-cn') {
-    const h = String(date.getUTCHours()).padStart(2, '0');
-    const min = String(date.getUTCMinutes()).padStart(2, '0');
-    return `${h}:${min}`;
+    const { hour, minute } = dateParts(date, lang);
+    return `${hour}:${minute}`;
   }
   return date.toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
-    timeZone: 'UTC',
+    timeZone: fallbackTimeZone(lang),
   });
 }
 

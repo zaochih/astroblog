@@ -19,7 +19,7 @@ export async function getStaticPaths() {
     return { lang, slug: rest.join('/') };
   }
 
-  const allPosts = (await getCollection('blog')).filter(isPublishedEntry);
+  const allPosts = await getCollection('blog');
   const locales = Object.keys(languages) as Lang[];
 
   // Group posts by slug across languages
@@ -37,9 +37,13 @@ export async function getStaticPaths() {
 
   for (const [slug, langsMap] of postsBySlug) {
     for (const lang of locales) {
-      const post = langsMap[lang];
+      const localizedPost = langsMap[lang];
       const fallbackPost = langsMap[defaultLang];
-      const availableLangs = Object.keys(langsMap);
+      const post = localizedPost && isPublishedEntry(localizedPost) ? localizedPost : undefined;
+      const publishedFallbackPost = fallbackPost && isPublishedEntry(fallbackPost) ? fallbackPost : undefined;
+      const availableLangs = Object.entries(langsMap)
+        .filter(([, post]) => isPublishedEntry(post))
+        .map(([lang]) => lang);
       const otherLangs = availableLangs.filter(l => l !== lang);
       const routeLang = lang === defaultLang ? undefined : lang;
 
@@ -51,11 +55,11 @@ export async function getStaticPaths() {
             primaryData: lang !== defaultLang ? langsMap[defaultLang]?.data : undefined,
           },
         });
-      } else if (fallbackPost) {
+      } else if (publishedFallbackPost) {
         paths.push({
           params: { lang: routeLang, slug },
           props: {
-            post: fallbackPost, slug, isFallback: true, currentLang: lang, fallbackLang: defaultLang, otherLangs: availableLangs,
+            post: publishedFallbackPost, slug, isFallback: true, currentLang: lang, fallbackLang: defaultLang, otherLangs: availableLangs,
             primaryData: undefined,
           },
         });
@@ -102,7 +106,7 @@ const fallbackLangName = isFallback && fallbackLang ? languageNames[currentLang]
 const fallbackDesc = t('alert.fallback.desc').replace('{lang}', fallbackLangName);
 
 const getLangLink = (l: string) =>
-  l === defaultLang ? `/posts/${slug}` : `/${l}/posts/${slug}`;
+  l === defaultLang ? `/post/${slug}` : `/${l}/post/${slug}`;
 const otherLanguageLinks = otherLangs.map(l => ({
   href: getLangLink(l),
   label: languages[l as Lang],
@@ -144,7 +148,7 @@ const homeHref = currentLang === defaultLang ? '/' : `/${currentLang}/`;
         {data.date && (
           <span class="inline-flex items-center gap-1">
             <HugeIcon name="calendar" className="size-3.5" size={14} />
-            <time datetime={data.date.toISOString()}>{formatDateTime(data.date, currentLang)}</time>
+            <time data-local-datetime datetime={data.date.toISOString()}>{formatDateTime(data.date, currentLang)}</time>
           </span>
         )}
         {data.category && (
@@ -205,7 +209,7 @@ const homeHref = currentLang === defaultLang ? '/' : `/${currentLang}/`;
       <WeixinNotice name={data.weixinName} href={data.weixinLink} />
     )}
 
-    <div class="prose dark:prose-invert max-w-none prose-a:text-primary prose-a:no-underline hover:prose-a:underline">
+    <div class="prose dark:prose-invert max-w-none prose-a:text-primary prose-a:no-underline">
       <Content />
     </div>
 

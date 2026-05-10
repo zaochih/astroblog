@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content';
 import Layout from '@/layouts/Layout.astro';
 import { siteConfig } from '@/config';
 import { useTranslations, languages, defaultLang, type Lang } from '@/i18n/ui';
-import { localizeAndSortPosts, getPostHref, formatDate, formatTime } from '@/lib/content';
+import { localizeAndSortPosts, getPostHref, formatDate, formatTime, getPostYear } from '@/lib/content';
 
 export async function getStaticPaths() {
   return Object.keys(languages).map(lang => ({
@@ -20,7 +20,7 @@ const localizedPosts = localizeAndSortPosts(allPosts, lang);
 
 // Group posts by year, newest first
 const postsByYear = localizedPosts.reduce<Record<number, typeof localizedPosts>>((acc, p) => {
-  const year = p.post.data.date?.getFullYear() ?? 0;
+  const year = p.post.data.date ? getPostYear(p.post.data.date, lang) : 0;
   if (!acc[year]) acc[year] = [];
   acc[year].push(p);
   return acc;
@@ -55,8 +55,8 @@ const years = Object.keys(postsByYear).map(Number).sort((a, b) => b - a);
                       datetime={post.data.date.toISOString()}
                       class="shrink-0 text-xs text-muted-foreground flex flex-col items-end w-[6rem]"
                     >
-                      <span class="whitespace-nowrap">{formatDate(post.data.date, lang)}</span>
-                      <span class="whitespace-nowrap">{formatTime(post.data.date, lang)}</span>
+                      <span data-local-date class="whitespace-nowrap">{formatDate(post.data.date, lang)}</span>
+                      <span data-local-time class="whitespace-nowrap">{formatTime(post.data.date, lang)}</span>
                     </time>
                   )}
                   <a
