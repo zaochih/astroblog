@@ -8,17 +8,21 @@ import type { Lang } from './ui';
 
 export const tagNames: Record<string, Partial<Record<Lang, string>>> = {
   intro: { 'zh-cn': '入门', 'en-us': 'Intro' },
-  '生活': { 'zh-cn': '生活', 'en-us': 'Life' },
+  'life': { 'zh-cn': '生活', 'en-us': 'Life' },
   'windows-11': { 'zh-cn': 'Windows 11', 'en-us': 'Windows 11' },
-  '上海': { 'zh-cn': '上海', 'en-us': 'Shanghai' },
-  '济南': { 'zh-cn': '济南', 'en-us': 'Jinan' },
-  '游记': { 'zh-cn': '游记', 'en-us': 'Travel Log' },
+  'shanghai': { 'zh-cn': '上海', 'en-us': 'Shanghai' },
+  'jinan': { 'zh-cn': '济南', 'en-us': 'Jinan' },
+  'travel-log': { 'zh-cn': '游记', 'en-us': 'Travel Log' },
+  ctf: { 'zh-cn': 'CTF', 'en-us': 'CTF' },
+  geekgame: { 'zh-cn': 'GeekGame', 'en-us': 'GeekGame' },
+  'write-up': { 'zh-cn': 'Write Up', 'en-us': 'Write Up' },
 };
 
 export const categoryNames: Record<string, Partial<Record<Lang, string>>> = {
   general: { 'zh-cn': '通用', 'en-us': 'General' },
-  '生活': { 'zh-cn': '生活', 'en-us': 'Life' },
-  'Windows': { 'zh-cn': 'Windows', 'en-us': 'Windows' },
+  'life': { 'zh-cn': '生活', 'en-us': 'Life' },
+  windows: { 'zh-cn': 'Windows', 'en-us': 'Windows' },
+  ctf: { 'zh-cn': 'CTF', 'en-us': 'CTF' },
 };
 
 export function getTagName(slug: string, lang: Lang): string {

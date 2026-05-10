@@ -28,6 +28,10 @@
       return document.getElementById('site-header');
     }
 
+    function isEnabled(header = getHeader()) {
+      return header?.dataset.hideOnScroll === 'true';
+    }
+
     function getScrollY() {
       return Math.max(0, window.scrollY || window.pageYOffset || 0);
     }
@@ -37,7 +41,6 @@
       if (height === state.headerHeight) return;
       state.headerHeight = height;
       document.documentElement.style.setProperty('--site-header-height', value);
-      document.body?.style.setProperty('padding-top', value);
     }
 
     function observeHeader() {
@@ -56,6 +59,14 @@
     function update() {
       const header = getHeader();
       if (!header) {
+        state.ticking = false;
+        return;
+      }
+
+      if (!isEnabled(header)) {
+        state.upwardDistance = 0;
+        header.dataset.state = 'visible';
+        state.lastY = getScrollY();
         state.ticking = false;
         return;
       }

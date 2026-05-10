@@ -23,6 +23,7 @@ interface Props {
   image?: string;
   canonicalUrl?: string;
   math?: boolean;
+  hideHeaderOnScroll?: boolean;
 }
 
 const {
@@ -34,6 +35,7 @@ const {
   image,
   canonicalUrl: canonicalUrlProp,
   math = false,
+  hideHeaderOnScroll = false,
 } = Astro.props as Props;
 
 const t = useTranslations(lang as Lang);
@@ -114,6 +116,7 @@ function getLangHref(targetLang: string): string {
         <header
           id="site-header"
           data-state="visible"
+          data-hide-on-scroll={hideHeaderOnScroll ? 'true' : 'false'}
           class="fixed top-0 left-0 right-0 z-50 w-full border-b border-border/60 bg-background shadow-fluent-sm transition-transform duration-200 ease-out data-[state=hidden]:-translate-y-full"
         >
           <div class="max-w-6xl mx-auto px-3 sm:px-4 min-h-14 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 py-2">

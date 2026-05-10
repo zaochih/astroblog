@@ -132,6 +132,7 @@ const homeHref = currentLang === defaultLang ? '/' : `/${currentLang}/`;
   image={data.cover}
   canonicalUrl={data.canonicalUrl}
   math={data.math}
+  hideHeaderOnScroll
 >
   <div class={hasToc ? "max-w-5xl mx-auto mt-6 sm:mt-10 xl:grid xl:grid-cols-[1fr_220px] xl:gap-10 xl:items-start" : "max-w-3xl mx-auto mt-6 sm:mt-10"}>
   <article transition:name={`post-${slug}`} class="min-w-0">
