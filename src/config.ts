@@ -52,11 +52,11 @@ export const siteConfig = {
   },
   comments: {
     provider: 'giscus',
-    enabled: false,
-    repo: '',
-    repoId: '',
-    category: 'General',
-    categoryId: '',
+    enabled: true,
+    repo: 'zaochih/astroblog',
+    repoId: 'R_kgDOSCecoA',
+    category: 'Comments',
+    categoryId: 'DIC_kwDOSCecoM4C8sfm',
     privacyUrl: 'https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement',
   },
 } as const;
