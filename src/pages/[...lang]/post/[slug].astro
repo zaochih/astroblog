@@ -8,7 +8,7 @@ import { getCategoryHref, getPostHref, countWords, readingMinutes, formatDateTim
 import { getCategoryName } from '@/i18n/taxonomy';
 import HugeIcon from '@/components/HugeIcon';
 import LanguageNotice from '@/components/LanguageNotice.astro';
-import WeixinNotice from '@/components/WeixinNotice.astro';
+import CrossPostNotice from '@/components/CrossPostNotice.astro';
 import ExternalPostRedirect from '@/components/ExternalPostRedirect.astro';
 import Comments from '@/components/Comments.astro';
 
@@ -206,8 +206,11 @@ const homeHref = currentLang === defaultLang ? '/' : `/${currentLang}/`;
       <LanguageNotice type="available" availableLabel={t('alert.available')} languages={otherLanguageLinks} />
     )}
 
-    {currentLang === 'zh-cn' && data.weixinName && data.weixinLink && (
-      <WeixinNotice name={data.weixinName} href={data.weixinLink} />
+    {!isFallback && currentLang === 'zh-cn' && data.weixinName && data.weixinLink && (
+      <CrossPostNotice platform="weixin" name={data.weixinName} href={data.weixinLink} lang={currentLang} />
+    )}
+    {!isFallback && data.msftLink && (
+      <CrossPostNotice platform="msft" href={data.msftLink} lang={currentLang} />
     )}
 
     <div class="prose dark:prose-invert max-w-none prose-a:text-primary prose-a:no-underline">

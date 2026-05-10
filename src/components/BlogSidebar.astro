@@ -3,7 +3,7 @@ import HugeIcon from '@/components/HugeIcon';
 import { siteConfig } from '@/config';
 import type { CollectionEntry } from 'astro:content';
 import { getTagHref, getCategoryHref, countWords, formatWordCount } from '@/lib/content';
-import { getTagName, getCategoryName } from '@/i18n/taxonomy';
+import { getTagName, getCategoryName, resolveCategoryKey, resolveTagKey } from '@/i18n/taxonomy';
 import { useTranslations, type Lang } from '@/i18n/ui';
 
 interface Props {
@@ -15,8 +15,16 @@ interface Props {
 const { posts, lang, side } = Astro.props;
 const t = useTranslations(lang as Lang);
 const bio = siteConfig.author.bio[lang as keyof typeof siteConfig.author.bio] ?? siteConfig.author.bio[siteConfig.defaultLang];
-const allTags = [...new Set(posts.flatMap(({ post }) => post.data.tags ?? []))].sort();
-const allCategories = [...new Set(posts.map(({ post }) => post.data.category).filter((category): category is string => Boolean(category)))].sort();
+const allTags = [...new Set(posts.flatMap(({ post }) => post.data.tags ?? []).map(resolveTagKey))]
+  .sort((a, b) => getTagName(a, lang as Lang).localeCompare(getTagName(b, lang as Lang), lang));
+const categoryCounts = posts.reduce((counts, { post }) => {
+  if (!post.data.category) return counts;
+  const category = resolveCategoryKey(post.data.category);
+  counts.set(category, (counts.get(category) ?? 0) + 1);
+  return counts;
+}, new Map<string, number>());
+const allCategories = [...categoryCounts.keys()]
+  .sort((a, b) => getCategoryName(a, lang as Lang).localeCompare(getCategoryName(b, lang as Lang), lang));
 const totalWords = posts.reduce((sum, { post }) => sum + countWords(post.body ?? ''), 0);
 const totalWordsFormatted = formatWordCount(totalWords, lang);
 const [wordTotal, ...wordUnit] = totalWordsFormatted.split(' ');
@@ -89,14 +97,18 @@ const [wordTotal, ...wordUnit] = totalWordsFormatted.split(' ');
         {t('sidebar.categories')}
       </summary>
       <div class="details-content">
-        <div class="mt-3 flex flex-wrap gap-1.5 lg:mt-0 lg:flex-col">
+        <div class="mt-3 flex flex-wrap gap-1.5 lg:mt-0 lg:flex-col lg:gap-0.5">
           {allCategories.map(category => (
             <a
               href={getCategoryHref(category, lang)}
               aria-label={t('aria.category').replace('{name}', getCategoryName(category, lang as Lang))}
-              class="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary lg:bg-transparent lg:px-0 lg:py-0"
+              class="group relative flex items-center gap-3 rounded-md bg-muted px-2.5 py-1 text-xs leading-6 text-muted-foreground transition-colors hover:bg-muted/80 hover:text-foreground lg:bg-transparent lg:py-0.5 lg:pl-3 lg:pr-2"
             >
-              {getCategoryName(category, lang as Lang)}
+              <span class="absolute left-1 top-1/2 hidden h-4 w-0.5 -translate-y-1/2 rounded-full bg-primary opacity-0 transition-opacity group-hover:opacity-100 lg:block"></span>
+              <span class="min-w-0 flex-1 truncate">{getCategoryName(category, lang as Lang)}</span>
+              <span class="rounded-full bg-background/70 px-1.5 py-0.5 text-[10px] font-medium leading-none text-muted-foreground transition-colors group-hover:text-foreground">
+                {categoryCounts.get(category)}
+              </span>
             </a>
           ))}
         </div>

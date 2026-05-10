@@ -1,5 +1,7 @@
 import type { CollectionEntry } from 'astro:content';
 import { defaultLang } from '@/i18n/ui';
+import { getCategoryPathSegment, getTagPathSegment } from '@/i18n/taxonomy';
+import type { Lang } from '@/i18n/ui';
 
 const defaultTimeZones: Record<string, string> = {
   'zh-cn': 'Asia/Shanghai',
@@ -67,11 +69,13 @@ export function getPostHref(slug: string, lang: string): string {
 }
 
 export function getTagHref(tag: string, lang: string): string {
-  return lang === defaultLang ? `/tags/${tag}` : `/${lang}/tags/${tag}`;
+  const segment = getTagPathSegment(tag, lang as Lang);
+  return lang === defaultLang ? `/tags/${segment}` : `/${lang}/tags/${segment}`;
 }
 
 export function getCategoryHref(category: string, lang: string): string {
-  return lang === defaultLang ? `/categories/${category}` : `/${lang}/categories/${category}`;
+  const segment = getCategoryPathSegment(category, lang as Lang);
+  return lang === defaultLang ? `/categories/${segment}` : `/${lang}/categories/${segment}`;
 }
 
 export function getArchiveHref(lang: string): string {

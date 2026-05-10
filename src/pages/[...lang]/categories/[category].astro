@@ -4,17 +4,21 @@ import Layout from '@/layouts/Layout.astro';
 import { siteConfig } from '@/config';
 import { useTranslations, languages, defaultLang, type Lang } from '@/i18n/ui';
 import { localizeAndSortPosts, isPublishedEntry } from '@/lib/content';
-import { getCategoryName } from '@/i18n/taxonomy';
+import { getCategoryName, getCategoryPathSegment, resolveCategoryKey } from '@/i18n/taxonomy';
 import TaxonomyPostList from '@/components/TaxonomyPostList.astro';
 
 export async function getStaticPaths() {
   const allPosts = await getCollection('blog');
   const locales = Object.keys(languages) as Lang[];
-  const allCategories = [...new Set(allPosts.filter(isPublishedEntry).map(p => p.data.category).filter((c): c is string => !!c))];
+  const allCategories = [...new Set(allPosts
+    .filter(isPublishedEntry)
+    .map(p => p.data.category)
+    .filter((c): c is string => !!c)
+    .map(resolveCategoryKey))];
 
   return locales.flatMap(lang =>
     allCategories.map(category => ({
-      params: { lang: lang === defaultLang ? undefined : lang, category },
+      params: { lang: lang === defaultLang ? undefined : lang, category: getCategoryPathSegment(category, lang) },
       props: { lang, category },
     })),
   );
@@ -25,7 +29,7 @@ const t = useTranslations(lang as Lang);
 
 const allPosts = await getCollection('blog');
 const localizedPosts = localizeAndSortPosts(allPosts, lang)
-  .filter(({ post }) => post.data.category === category);
+  .filter(({ post }) => post.data.category && resolveCategoryKey(post.data.category) === category);
 
 const pageHeading = t('category.title').replace('{category}', getCategoryName(category, lang as Lang));
 ---

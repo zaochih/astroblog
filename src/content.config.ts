@@ -1,9 +1,9 @@
-import { defineCollection } from 'astro:content';
-import { glob } from 'astro/loaders';
-import { z } from 'astro/zod';
+import { defineCollection } from "astro:content";
+import { glob } from "astro/loaders";
+import { z } from "astro/zod";
 
 const blog = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/data/posts' }),
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/data/posts" }),
   schema: z.object({
     title: z.string(),
     date: z.coerce.date().optional(),
@@ -21,12 +21,13 @@ const blog = defineCollection({
     comments: z.boolean().optional(),
     weixinName: z.string().optional(),
     weixinLink: z.url().optional(),
+    msftLink: z.url().optional(),
     draft: z.boolean().optional().default(false),
   }),
 });
 
 const pages = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/data/pages' }),
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/data/pages" }),
   schema: z.object({
     title: z.string(),
     navTitle: z.string().optional(),
