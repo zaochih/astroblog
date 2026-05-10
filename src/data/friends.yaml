@@ -5,6 +5,7 @@
 # url:         主链接
 # pinned:      可选，true 时置顶显示
 # sponsored:   可选，true 时标记为赞助链接，并输出 rel="sponsored"
+# sortKey:     可选，用于混排英文和中文拼音字典序
 # i18n:        可选，按语言覆盖 name / description / url / links
 #   en-us:
 #     name: Localized Name
@@ -13,11 +14,46 @@
 #   - icon: HugeIcon 名称 (home / image / globe / link / paperclip / rss / github / mail / pen)
 #     url:  子链接地址
 
+- name: 晨鹤部落格
+  sortKey: chenhe buluoge
+  description: 「一个菜但爱冒险的家伙」
+  url: https://chenhe.me/
+
+- name: 等待明天
+  sortKey: dengdai mingtian
+  description: 「一切从简」
+  url: https://blog.ddmt.top/
+
+- name: 豆腐蒸锅
+  sortKey: doufu zhengguo
+  description: 强强！不太熟，但是是大佬！
+  url: https://blog.tofu.icu/
+  links:
+    - icon: globe
+      url: https://tofu.icu/
+
 - name: Eltrac
+  sortKey: eltrac
   description: 比我早两届的学长
   url: https://www.geedea.pro/
 
+- name: GuCATs'摸鱼站
+  sortKey: gucats moyuzhan
+  description: 「海納百川，有容乃大」
+  url: https://blog.gucats.com
+
+- name: 烤鱼鱼鱼鱼鱼
+  sortKey: kaoyu yuyuyuyu
+  description: 好朋友！
+  url: https://blog.grilledfish9.xyz/
+
+- name: 麻雀小窝
+  sortKey: maque xiaowo
+  description: 谁能不喜欢又可爱又强的 Sparrow 老师呢？
+  url: https://blog.sparrowhe.top
+
 - name: Microsoft 问答社区
+  sortKey: microsoft wenda shequ
   description: 在这里找到 Microsoft 产品技术问题的解决方案。
   url: https://learn.microsoft.com/zh-cn/answers/?WT.mc_id=studentamb_203301
   sponsored: true
@@ -27,15 +63,28 @@
       description: The home for technical questions and answers at Microsoft.
       url: https://learn.microsoft.com/en-us/answers/?WT.mc_id=studentamb_203301
 
-- name: 云藉
-  description: 「记录滴滴点点，穿梭片片汪洋」
-  url: https://kumosya.top/
+- name: 木皆之森
+  sortKey: mujiezhi sen
+  description: 「自闭社恐彩笔死宅的自娱自乐」
+  url: https://www.raobee.com
 
-- name: 小理の小窝
-  description: 「一个普通学生的普通生活」
-  url: https://xiaolii.com
+- name: 祈星海
+  sortKey: qixinghai
+  description: 「慢热喜静，往哪走，都是往前走。」
+  url: https://www.zzzzhi.com/
+  links:
+    - icon: home
+      url: https://home.zzzzhi.com/
+    - icon: image
+      url: https://photo.zzzzhi.com/
+
+- name: 曙光小破站
+  sortKey: shuguang xiaopozhan
+  description: 「路是是崎岖的，可灯永远亮着。」
+  url: https://www.dawnteam.cn/
 
 - name: 微软电脑管家
+  sortKey: weiruan diannao guanjia
   description: 简单勿打扰，安全又安心。
   url: https://pcmanager.microsoft.com/zh-cn
   sponsored: true
@@ -45,50 +94,17 @@
       description: Safeguard your PC in a quiet and reliable way
       url: https://pcmanager.microsoft.com/en-us
 
+- name: 小理の小窝
+  sortKey: xiaoli no xiaowo
+  description: 「一个普通学生的普通生活」
+  url: https://xiaolii.com
+
 - name: 晓白博客
+  sortKey: xiaobai boke
   description: 「冀以尘雾之微补益山海，荧烛末光增辉日月。」
   url: https://blog.chs.pub/
 
-- name: 晨鹤部落格
-  description: 「一个菜但爱冒险的家伙」
-  url: https://chenhe.me/
-
-- name: 曙光小破站
-  description: 「路是是崎岖的，可灯永远亮着。」
-  url: https://www.dawnteam.cn/
-
-- name: 木皆之森
-  description: 「自闭社恐彩笔死宅的自娱自乐」
-  url: https://www.raobee.com
-
-- name: 烤鱼鱼鱼鱼鱼
-  description: 好朋友！
-  url: https://blog.grilledfish9.xyz/
-
-- name: 祈星海
-  description: 「慢热喜静，往哪走，都是往前走。」
-  url: https://www.zzzzhi.com/
-  links:
-    - icon: home
-      url: https://home.zzzzhi.com/
-    - icon: image
-      url: https://photo.zzzzhi.com/
-
-- name: 等待明天
-  description: 「一切从简」
-  url: https://blog.ddmt.top/
-
-- name: 豆腐蒸锅
-  description: 强强！不太熟，但是是大佬！
-  url: https://blog.tofu.icu/
-  links:
-    - icon: globe
-      url: https://tofu.icu/
-
-- name: 麻雀小窝
-  description: 谁能不喜欢又可爱又强的 Sparrow 老师呢？
-  url: https://blog.sparrowhe.top
-
-- name: GuCATs'摸鱼站
-  description: 「海納百川，有容乃大」
-  url: https://blog.gucats.com
+- name: 云藉
+  sortKey: yunji
+  description: 「记录滴滴点点，穿梭片片汪洋」
+  url: https://kumosya.top/
