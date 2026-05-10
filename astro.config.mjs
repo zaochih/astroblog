@@ -1,12 +1,13 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
-import react from '@astrojs/react';
-import tailwindcss from '@tailwindcss/vite';
-import mdx from '@astrojs/mdx';
+import { defineConfig } from "astro/config";
+import react from "@astrojs/react";
+import tailwindcss from "@tailwindcss/vite";
+import mdx from "@astrojs/mdx";
 
-import remarkMath from 'remark-math';
-import rehypeKatex from 'rehype-katex';
-import rehypeImageSize from './src/lib/rehype-image-size.mjs';
+import remarkMath from "remark-math";
+import remarkCustomHeaderId from "remark-custom-header-id";
+import rehypeKatex from "rehype-katex";
+import rehypeImageSize from "./src/lib/rehype-image-size.mjs";
 
 /**
  * @typedef {object} HastNode
@@ -28,8 +29,8 @@ function rehypeRemoveFootnoteLabel() {
     if (!node.children) return;
     node.children = node.children.filter((child) => {
       if (
-        child.type === 'element' &&
-        child.properties?.id === 'footnote-label'
+        child.type === "element" &&
+        child.properties?.id === "footnote-label"
       ) {
         return false;
       }
@@ -62,16 +63,16 @@ function rehypeTaskListA11y() {
   /** @param {HastNode} node */
   function isTaskCheckbox(node) {
     return (
-      node.type === 'element' &&
-      node.tagName === 'input' &&
-      String(node.properties?.type) === 'checkbox'
+      node.type === "element" &&
+      node.tagName === "input" &&
+      String(node.properties?.type) === "checkbox"
     );
   }
 
   /** @param {HastNode} node */
   function getTaskLabel(node) {
-    const text = collectText(node).trim().replace(/\s+/g, ' ');
-    return text ? `Task: ${text}` : 'Task list item';
+    const text = collectText(node).trim().replace(/\s+/g, " ");
+    return text ? `Task: ${text}` : "Task list item";
   }
 
   /**
@@ -79,45 +80,47 @@ function rehypeTaskListA11y() {
    * @returns {string}
    */
   function collectText(node) {
-    if (node.type === 'text') return node.value ?? '';
-    if (!node.children) return '';
+    if (node.type === "text") return node.value ?? "";
+    if (!node.children) return "";
     return node.children
       .filter((child) => !isTaskCheckbox(child))
       .map(collectText)
-      .join('');
+      .join("");
   }
 }
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [
-    react(), 
-    mdx()
-  ],
+  integrations: [react(), mdx()],
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
   },
   image: {
-    layout: 'constrained',
+    layout: "constrained",
     responsiveStyles: true,
   },
   markdown: {
     shikiConfig: {
-      theme: 'github-dark',
+      theme: "github-dark",
       wrap: true,
       transformers: [
         {
-          name: 'lang-label',
+          name: "lang-label",
           pre(node) {
             const lang = this.options.lang;
-            if (lang && lang !== 'text' && lang !== 'plaintext') {
-              node.properties['data-lang'] = lang;
+            if (lang && lang !== "text" && lang !== "plaintext") {
+              node.properties["data-lang"] = lang;
             }
           },
         },
       ],
     },
-    remarkPlugins: [remarkMath],
-    rehypePlugins: [rehypeRemoveFootnoteLabel, rehypeTaskListA11y, [rehypeKatex, {}], rehypeImageSize],
+    remarkPlugins: [remarkMath, remarkCustomHeaderId],
+    rehypePlugins: [
+      rehypeRemoveFootnoteLabel,
+      rehypeTaskListA11y,
+      [rehypeKatex, {}],
+      rehypeImageSize,
+    ],
   },
 });
