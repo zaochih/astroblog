@@ -4,9 +4,9 @@
  *
  * For images whose `src` starts with "/" (i.e. files served from `public/`):
  *   1. Read actual pixel dimensions via sharp.
- *   2. If the width exceeds MAX_CONTENT_WIDTH, resize the image to that width,
+ *   2. If the width exceeds OPTIMIZED_IMAGE_WIDTH, resize the image to that width,
  *      convert it to WebP, save it to `public/optimized/...`, and update `src`.
- *   3. Cap the declared width to MAX_CONTENT_WIDTH so the browser reserves
+ *   3. Cap the declared width to CONTENT_DISPLAY_WIDTH so the browser reserves
  *      a sensible amount of space (the CSS `max-width: 100%; height: auto`
  *      rule takes care of smaller viewports).
  *   4. Add `loading="lazy"` and `decoding="async"` for performance.
@@ -19,8 +19,11 @@ import sharp from 'sharp';
 import { resolve, parse } from 'node:path';
 import { mkdir, stat } from 'node:fs/promises';
 
-/** prose area max-width (px). Matches Tailwind's `max-w-3xl` = 48rem ≈ 768px. */
-const MAX_CONTENT_WIDTH = 768;
+/** prose area max-width (px). Matches Tailwind's `max-w-3xl` = 48rem ~= 768px. */
+const CONTENT_DISPLAY_WIDTH = 768;
+/** Generate larger images than the display slot so high-DPR screens stay sharp. */
+const OPTIMIZED_IMAGE_WIDTH = Math.round(CONTENT_DISPLAY_WIDTH * 1.5);
+const PHOTO_WEBP_QUALITY = 100;
 
 /**
  * Determine whether a src string refers to a local (public/) asset.
@@ -45,6 +48,27 @@ function altFromFilename(src) {
   return name.replace(/[-_]/g, ' ');
 }
 
+/**
+ * Safely decode Markdown URLs before mapping them to the local filesystem.
+ * Static servers decode request paths, so generated files must use decoded
+ * directory names even though the emitted HTML URL remains encoded.
+ * @param {string} path
+ */
+function decodePath(path) {
+  try {
+    return decodeURIComponent(path);
+  } catch {
+    return path;
+  }
+}
+
+/**
+ * @param {string} relPath
+ */
+function publicFilePath(relPath) {
+  return resolve(process.cwd(), 'public', relPath);
+}
+
 /** @returns {import('unified').Plugin} */
 export default function rehypeImageSize() {
   /**
@@ -66,26 +90,42 @@ export default function rehypeImageSize() {
     await Promise.all(
       localImages.map(async ({ node }) => {
         let src = /** @type {string} */ (node.properties.src);
+        const originalSrc = src;
         const relPath = src.replace(/^\//, '');
-        const filePath = resolve(process.cwd(), 'public', relPath);
+        const decodedRelPath = decodePath(relPath);
+        let filePath = publicFilePath(decodedRelPath);
 
         try {
+          try {
+            await stat(filePath);
+          } catch {
+            if (decodedRelPath !== relPath) {
+              const encodedFilePath = publicFilePath(relPath);
+              await stat(encodedFilePath);
+              filePath = encodedFilePath;
+            } else {
+              throw new Error(`Input file is missing: ${filePath}`);
+            }
+          }
+
           const metadata = await sharp(filePath).metadata();
           if (!metadata.width || !metadata.height) return;
 
-          let w = metadata.width;
-          let h = metadata.height;
+          const sourceWidth = metadata.width;
+          const sourceHeight = metadata.height;
+          const displayWidth = Math.min(sourceWidth, CONTENT_DISPLAY_WIDTH);
+          const displayHeight = Math.round(sourceHeight * (displayWidth / sourceWidth));
 
-          // Cap to content area max-width, keeping aspect ratio, and physically resize.
-          if (w > MAX_CONTENT_WIDTH) {
-            h = Math.round(h * (MAX_CONTENT_WIDTH / w));
-            w = MAX_CONTENT_WIDTH;
+          if (sourceWidth > OPTIMIZED_IMAGE_WIDTH) {
+            const optimizedHeight = Math.round(sourceHeight * (OPTIMIZED_IMAGE_WIDTH / sourceWidth));
 
-            const parsed = parse(relPath);
+            const parsed = parse(decodedRelPath);
+            const ext = parsed.ext.toLowerCase();
             const outDir = resolve(process.cwd(), 'public', 'optimized', parsed.dir);
             await mkdir(outDir, { recursive: true });
 
-            const outName = `${parsed.name}-${MAX_CONTENT_WIDTH}w.webp`;
+            const qualitySuffix = ext === '.png' ? 'lossless' : `q${PHOTO_WEBP_QUALITY}`;
+            const outName = `${parsed.name}-${OPTIMIZED_IMAGE_WIDTH}w-${qualitySuffix}.webp`;
             const outPath = resolve(outDir, outName);
 
             let needsOptimization = true;
@@ -100,26 +140,33 @@ export default function rehypeImageSize() {
             }
 
             if (needsOptimization) {
-              await sharp(filePath)
-                .resize({ width: MAX_CONTENT_WIDTH, withoutEnlargement: true })
-                .webp({ quality: 80 })
-                .toFile(outPath);
+              const pipeline = sharp(filePath).resize({
+                width: OPTIMIZED_IMAGE_WIDTH,
+                height: optimizedHeight,
+                withoutEnlargement: true,
+              });
+
+              if (ext === '.png') {
+                await pipeline.webp({ lossless: true }).toFile(outPath);
+              } else {
+                await pipeline.webp({ quality: PHOTO_WEBP_QUALITY, smartSubsample: true }).toFile(outPath);
+              }
             }
 
             // Update src to the optimized image
             const optimizedSrcPath = parsed.dir ? `${parsed.dir}/${outName}` : outName;
-            src = `/optimized/${optimizedSrcPath}`;
+            src = encodeURI(`/optimized/${optimizedSrcPath}`);
             node.properties.src = src;
           }
 
-          node.properties.width = w;
-          node.properties.height = h;
+          node.properties.width = displayWidth;
+          node.properties.height = displayHeight;
           node.properties.loading ??= 'lazy';
           node.properties.decoding ??= 'async';
 
           // Accessibility: ensure non-empty alt.
           if (!node.properties.alt) {
-            node.properties.alt = altFromFilename(src);
+            node.properties.alt = altFromFilename(originalSrc);
           }
         } catch (err) {
           // Non-fatal: the image will simply render without explicit dimensions.

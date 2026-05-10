@@ -92,6 +92,53 @@ function rehypeTaskListA11y() {
   }
 }
 
+/** Mark paragraphs that contain only a standalone image or image link. */
+function rehypeImageParagraphs() {
+  /** @param {HastNode} tree */
+  return function (tree) {
+    visit(tree);
+  };
+
+  /** @param {HastNode} node */
+  function visit(node) {
+    if (node.type === "element" && node.tagName === "p" && isImageOnlyParagraph(node)) {
+      node.properties ??= {};
+      const className = node.properties.className;
+      node.properties.className = Array.isArray(className)
+        ? [...className, "image-block"]
+        : className
+          ? [String(className), "image-block"]
+          : ["image-block"];
+    }
+
+    if (!node.children) return;
+    for (const child of node.children) {
+      visit(child);
+    }
+  }
+
+  /** @param {HastNode} node */
+  function isImageOnlyParagraph(node) {
+    const meaningfulChildren = (node.children ?? []).filter((child) => {
+      return child.type !== "text" || (child.value ?? "").trim() !== "";
+    });
+
+    return meaningfulChildren.length === 1 && isImageOrImageLink(meaningfulChildren[0]);
+  }
+
+  /** @param {HastNode} node */
+  function isImageOrImageLink(node) {
+    if (node.type !== "element") return false;
+    if (node.tagName === "img") return true;
+    if (node.tagName !== "a") return false;
+
+    const meaningfulChildren = (node.children ?? []).filter((child) => {
+      return child.type !== "text" || (child.value ?? "").trim() !== "";
+    });
+    return meaningfulChildren.length === 1 && meaningfulChildren[0].tagName === "img";
+  }
+}
+
 // https://astro.build/config
 export default defineConfig({
   integrations: [react(), mdx()],
@@ -130,6 +177,7 @@ export default defineConfig({
       rehypeRemoveFootnoteLabel,
       rehypeTaskListA11y,
       [rehypeKatex, {}],
+      rehypeImageParagraphs,
       rehypeImageSize,
     ],
   },

@@ -6,6 +6,7 @@ tags: ["intro"]
 category: "general"
 weixinName: "公众号名称"
 weixinLink: "https://..."
+draft: true
 ---
 
 你好世界！这是第一篇博客文章。

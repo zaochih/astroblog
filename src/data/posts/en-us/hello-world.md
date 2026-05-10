@@ -1,6 +1,7 @@
 ---
 title: "Hello World"
 description: "First blog post"
+draft: true
 ---
 
 Hello World! This is the first blog post.
@@ -16,7 +17,7 @@ Hello World! This is the first blog post.
 ## Emphasis
 
 *This text will be italic*  
-_This will also be italic_
+_This will also be "italic"_
 
 **This text will be bold**  
 __This will also be bold__

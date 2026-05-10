@@ -54,7 +54,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
     const categoryName = post.data.category ? getCategoryName(post.data.category, lang as Lang) : '';
     return (
       <div class="group relative" transition:name={`post-${slug}`}>
-        <Card className="flex flex-col border-border/50 bg-card overflow-hidden">
+        <Card className={`flex flex-col border-border/50 bg-card overflow-hidden ${post.data.cover ? 'pt-0' : ''}`}>
           {post.data.cover && (
             <div class="h-52 w-full overflow-hidden border-b border-border/30">
               <img src={post.data.cover} alt={post.data.coverAlt ?? post.data.title} class="w-full h-full object-cover" />
