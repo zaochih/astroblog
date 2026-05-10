@@ -185,7 +185,7 @@ function getLangHref(targetLang: string): string {
             const htmlLang = document.documentElement.lang || navigator.language || 'en-US';
             const isZh = htmlLang.toLowerCase().startsWith('zh');
 
-            const partsFor = (date) => {
+            const partsFor = (date: Date) => {
               const parts = new Intl.DateTimeFormat(isZh ? 'zh-CN' : 'en-US', {
                 year: 'numeric',
                 month: isZh ? '2-digit' : 'short',
@@ -194,7 +194,7 @@ function getLangHref(targetLang: string): string {
                 minute: '2-digit',
                 hour12: !isZh,
               }).formatToParts(date);
-              const value = (type) => parts.find(part => part.type === type)?.value ?? '';
+              const value = (type: Intl.DateTimeFormatPartTypes) => parts.find(part => part.type === type)?.value ?? '';
               const hour = value('hour') === '24' ? '00' : value('hour');
               return {
                 year: value('year'),
@@ -206,7 +206,7 @@ function getLangHref(targetLang: string): string {
               };
             };
 
-            const formatDate = (date) => {
+            const formatDate = (date: Date) => {
               if (isZh) {
                 const { year, month, day } = partsFor(date);
                 return `${year}年${month}月${day}日`;
@@ -218,7 +218,7 @@ function getLangHref(targetLang: string): string {
               });
             };
 
-            const formatTime = (date) => {
+            const formatTime = (date: Date) => {
               if (isZh) {
                 const { hour, minute } = partsFor(date);
                 return `${hour}:${minute}`;
