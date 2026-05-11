@@ -30,6 +30,8 @@ interface FriendLocale {
   backgroundIcon?: string;
 }
 
+type FriendTime = string | Date;
+
 interface Friend {
   name: string;
   description: string;
@@ -38,11 +40,15 @@ interface Friend {
   pinned?: boolean;
   sponsored?: boolean;
   referral?: boolean;
+  startAt?: FriendTime;
+  endAt?: FriendTime;
   links?: FriendLink[];
   i18n?: Partial<Record<Lang, FriendLocale>>;
 }
 
 const friends = yaml.load(friendsRaw) as Friend[];
+const buildTime = Date.now();
+
 function localizeFriend(friend: Friend, lang: Lang): Friend {
   const localized = friend.i18n?.[lang];
   if (!localized) return friend;
@@ -58,6 +64,42 @@ function localizeFriend(friend: Friend, lang: Lang): Friend {
   };
 }
 
+function parseFriendTime(value?: FriendTime): number | undefined {
+  if (!value) return undefined;
+  if (value instanceof Date) {
+    const time = value.getTime();
+    return Number.isNaN(time) ? undefined : time;
+  }
+  const time = Date.parse(value);
+  return Number.isNaN(time) ? undefined : time;
+}
+
+function getFriendTimeAttribute(value?: FriendTime): string | undefined {
+  if (!value) return undefined;
+  if (value instanceof Date) {
+    const time = value.getTime();
+    return Number.isNaN(time) ? undefined : value.toISOString();
+  }
+  return value;
+}
+
+function isTimedFriend(friend: Friend): boolean {
+  return Boolean((friend.sponsored || friend.referral) && (friend.startAt || friend.endAt));
+}
+
+function isFriendActiveAt(friend: Friend, now: number): boolean {
+  if (!isTimedFriend(friend)) return true;
+  const startAt = parseFriendTime(friend.startAt);
+  const endAt = parseFriendTime(friend.endAt);
+  return (startAt === undefined || now >= startAt) && (endAt === undefined || now < endAt);
+}
+
+function shouldIncludeFriendAtBuild(friend: Friend, now: number): boolean {
+  if (!isTimedFriend(friend)) return true;
+  const endAt = parseFriendTime(friend.endAt);
+  return endAt === undefined || now < endAt;
+}
+
 function getFriendSortKey(friend: Friend): string {
   return pinyin(friend.name, {
     toneType: 'none',
@@ -69,7 +111,7 @@ function getFriendSortKey(friend: Friend): string {
 const localizedFriends = friends.map((friend, index) => ({
   friend: localizeFriend(friend, lang as Lang),
   index,
-}));
+})).filter(({ friend }) => shouldIncludeFriendAtBuild(friend, buildTime));
 
 const regularFriends = localizedFriends
   .filter(({ friend }) => !friend.sponsored && !friend.referral)
@@ -99,7 +141,7 @@ const sortedFriends = [...sponsoredFriends, ...regularFriends, ...referralFriend
   <div class="max-w-4xl mx-auto">
     <h1 class="text-3xl font-bold tracking-tight text-foreground mb-6">{t('friends.title')}</h1>
 
-    {friends.length === 0 ? (
+    {sortedFriends.length === 0 ? (
       <div class="text-center py-20 text-muted-foreground border border-dashed border-border/60 rounded-md">
         {t('friends.empty')}
       </div>
@@ -107,6 +149,8 @@ const sortedFriends = [...sponsoredFriends, ...regularFriends, ...referralFriend
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {sortedFriends.map(friend => {
           const rel = friend.sponsored ? 'noopener noreferrer sponsored' : 'noopener noreferrer';
+          const isTimeLimited = isTimedFriend(friend);
+          const isActiveAtBuild = isFriendActiveAt(friend, buildTime);
           const cardClass = friend.sponsored
             ? 'border-amber-300/55 bg-[#120906] shadow-[0_0_0_1px_rgba(252,211,77,0.16),0_10px_30px_rgba(217,119,6,0.16)] dark:border-amber-300/55 dark:bg-amber-950/20 dark:shadow-[0_0_0_1px_rgba(252,211,77,0.16),0_10px_30px_rgba(217,119,6,0.16)]'
             : friend.referral
@@ -134,8 +178,11 @@ const sortedFriends = [...sponsoredFriends, ...regularFriends, ...referralFriend
               : 'text-muted-foreground/50 hover:text-primary';
           return (
           <div
-            class={`group relative isolate flex min-h-[140px] flex-col justify-between overflow-hidden rounded-lg border p-5 transition-colors ${cardClass}`}
+            class={`group relative isolate flex min-h-[140px] flex-col justify-between overflow-hidden rounded-lg border p-5 transition-colors ${isTimeLimited ? isActiveAtBuild ? 'friend-card-pending' : 'friend-card-waiting' : ''} ${cardClass}`}
             data-friend-glow-card={friend.backgroundIcon ? true : undefined}
+            data-friend-time-limited={isTimeLimited ? true : undefined}
+            data-friend-start-at={isTimeLimited ? getFriendTimeAttribute(friend.startAt) : undefined}
+            data-friend-end-at={isTimeLimited ? getFriendTimeAttribute(friend.endAt) : undefined}
           >
             {friend.backgroundIcon && (
               <div class="friend-glow" aria-hidden="true">
@@ -152,7 +199,7 @@ const sortedFriends = [...sponsoredFriends, ...regularFriends, ...referralFriend
             />
 
             {/* Name */}
-            <div class="relative z-20 pointer-events-none">
+            <div class="friend-card-main relative z-20 pointer-events-none">
               <div class="mb-1.5 flex flex-wrap items-center gap-2">
                 <h2 class={`friend-card-title text-base font-semibold ${titleClass}`}>{friend.name}</h2>
                 {friend.pinned && (
@@ -168,6 +215,11 @@ const sortedFriends = [...sponsoredFriends, ...regularFriends, ...referralFriend
                 {friend.referral && (
                   <span class="rounded-md border border-sky-300/45 bg-sky-100/70 px-1.5 py-0.5 text-[10px] font-semibold text-sky-700 shadow-sm shadow-sky-500/10 dark:border-sky-300/35 dark:bg-sky-300/15 dark:text-sky-100">
                     {t('friends.referral')}
+                  </span>
+                )}
+                {isTimeLimited && (
+                  <span class="rounded-md border border-violet-300/35 bg-violet-300/15 px-1.5 py-0.5 text-[10px] font-semibold text-violet-100 shadow-sm shadow-violet-500/10">
+                    {t('friends.timeLimited')}
                   </span>
                 )}
               </div>
@@ -221,6 +273,45 @@ const sortedFriends = [...sponsoredFriends, ...regularFriends, ...referralFriend
 
   .group:is(:hover, :focus-within) .friend-card-title {
     background-size: 100% 1px;
+  }
+
+  .friend-card-retired {
+    display: none;
+  }
+
+  .friend-card-pending:not(.friend-card-revealed),
+  .friend-card-waiting:not(.friend-card-revealed) {
+    pointer-events: none;
+  }
+
+  .friend-card-pending:not(.friend-card-revealed) .friend-card-main,
+  .friend-card-waiting:not(.friend-card-revealed) .friend-card-main,
+  .friend-card-pending:not(.friend-card-revealed) .friend-glow,
+  .friend-card-waiting:not(.friend-card-revealed) .friend-glow {
+    opacity: 0;
+  }
+
+  .friend-card-pending:not(.friend-card-revealed)::before,
+  .friend-card-waiting:not(.friend-card-revealed)::before {
+    --friend-card-skeleton: rgba(245, 158, 11, 0.18);
+    --friend-card-skeleton-strong: rgba(252, 211, 77, 0.28);
+    content: "";
+    position: absolute;
+    inset: 1.25rem;
+    z-index: 30;
+    background-image:
+      linear-gradient(var(--friend-card-skeleton-strong), var(--friend-card-skeleton-strong)),
+      linear-gradient(var(--friend-card-skeleton), var(--friend-card-skeleton)),
+      linear-gradient(var(--friend-card-skeleton), var(--friend-card-skeleton));
+    background-position:
+      0 0,
+      0 1.9rem,
+      0 3.15rem;
+    background-repeat: no-repeat;
+    background-size:
+      min(12rem, 56%) 1rem,
+      min(8rem, 38%) 0.65rem,
+      78% 0.65rem;
   }
 
   .friend-glow {
@@ -285,6 +376,28 @@ const sortedFriends = [...sponsoredFriends, ...regularFriends, ...referralFriend
 
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
+    const parseTime = (value: string | undefined) => {
+      if (!value) return undefined;
+      const time = Date.parse(value);
+      return Number.isNaN(time) ? undefined : time;
+    };
+
+    const isTimeLimitedCardActive = (card: HTMLElement, now: number) => {
+      const startAt = parseTime(card.dataset.friendStartAt);
+      const endAt = parseTime(card.dataset.friendEndAt);
+      return (startAt === undefined || now >= startAt) && (endAt === undefined || now < endAt);
+    };
+
+    const revealTimeLimitedCards = () => {
+      if (new URLSearchParams(window.location.search).has('friendSkeleton')) return;
+      const now = Date.now();
+      document.querySelectorAll<HTMLElement>('[data-friend-time-limited]').forEach(card => {
+        const isActive = isTimeLimitedCardActive(card, now);
+        card.classList.toggle('friend-card-revealed', isActive);
+        card.classList.toggle('friend-card-retired', !isActive);
+      });
+    };
+
     const state = {
       boundCards: new WeakSet<HTMLElement>(),
       pending: new Map<HTMLElement, FriendGlowPosition>(),
@@ -325,6 +438,7 @@ const sortedFriends = [...sponsoredFriends, ...regularFriends, ...referralFriend
     };
 
     const init = () => {
+      revealTimeLimitedCards();
       if (motionQuery.matches) return;
       document.querySelectorAll<HTMLElement>('[data-friend-glow-card]').forEach(bindCard);
     };

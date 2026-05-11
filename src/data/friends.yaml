@@ -6,6 +6,8 @@
 # pinned:      可选，true 时置顶显示
 # sponsored:   可选，true 时标记为赞助链接，并输出 rel="sponsored"
 # referral:    可选，true 时标记为推介链接，并按书写顺序显示在最后
+# startAt:     可选，仅 sponsored/referral 生效；ISO 8601 开始时间，开始前隐藏
+# endAt:       可选，仅 sponsored/referral 生效；ISO 8601 结束时间，结束后隐藏
 # backgroundIcon:
 #              可选，装饰用图片 URL；只用于卡片背景模糊光晕，不作为可见 icon 显示
 # i18n:        可选，按语言覆盖 name / description / url / links / backgroundIcon
@@ -80,6 +82,16 @@
   url: https://kumosya.top/
 
 ### Sponsored Links Part ###
+
+- name: Microsoft Build 2026 大会
+  description: 在 Microsoft Build 大会上，您将深入了解构建和扩展 AI 的团队的真实代码、真实系统和真实工作流程。两天时间。动手实践课程。没有废话。
+  url: https://build.microsoft.com/home?WT.mc_id=studentamb_203301
+  sponsored: true
+  endAt: "2026-06-04T01:00:00.000Z"
+  i18n:
+    en-us:
+      name: Microsoft Build 2026
+      description: At Microsoft Build, you'll go deep on real code, real systems, and real workflows with the teams building and scaling AI. Two days. Hands-on sessions. No fluff.
 
 ### Referrals Part ###
 
