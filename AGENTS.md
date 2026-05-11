@@ -13,3 +13,4 @@
 - The 404 page is intentionally Chinese-only at `src/pages/404.astro`; keep the footer language switcher hidden there.
 - Shadcn is configured with Hugeicons. Prefer `src/components/HugeIcon.tsx` for UI icons before adding inline SVG.
 - Explicit language switches write `localStorage["lang-preference"]`; pages with a stored preference should redirect to the preferred language without showing the toast again.
+- Avoid `any` in TypeScript. Prefer explicit interfaces, generics, `unknown` with narrowing, or local type aliases; only use `any` when a boundary cannot be typed more precisely and document why.
