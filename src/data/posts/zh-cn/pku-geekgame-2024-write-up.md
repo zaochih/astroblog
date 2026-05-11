@@ -12,7 +12,7 @@ canonicalUrl: https://blog.licaoz.com/post/pku-geekgame-2024-write-up/
 
 我 来 丢 人 辣！
 
-![](/uploads/2024/10/image.png)
+![](/assets/images/2024/10/image.png)
 
 2024 年 10 月 19 日，**[2024“京华杯”信息安全综合能力竞赛](https://geekgame.pku.edu.cn/)**（aka. GeekGame 2024）圆满结束，撒花 🎉！苯人误打误撞解出了签到、清北问答（部分解出）、大模型和验证码，喜提 #338 的水排名，相较于第一届时连签到都不会做取得了长足进展，可喜可贺！
 
@@ -113,7 +113,7 @@ canonicalUrl: https://blog.licaoz.com/post/pku-geekgame-2024-write-up/
 
 询问万能的 GH Copylot，可得答案为 12.
 
-![](/uploads/2024/10/image-1.png)
+![](/assets/images/2024/10/image-1.png)
 
 > #4 比赛平台的排行榜顶部的图表是基于 `@antv/g2` 这个库渲染的。实际使用的版本号是多少？
 > 
@@ -121,19 +121,19 @@ canonicalUrl: https://blog.licaoz.com/post/pku-geekgame-2024-write-up/
 
 劳选手都知道比赛平台 **Guiding Star** 事开源的，在 [这里](https://github.com/PKU-GeekGame/gs-frontend) 可以找到比赛平台的前端源码，在 `package.json` 里搜索 `@antv/g2` 即可找到其 version 为 5.2.1。
 
-![](/uploads/2024/10/image-2.png)
+![](/assets/images/2024/10/image-2.png)
 
 > 某人最开始在 GitHub 中搜索 `repo:PKU-GeekGame/gs-frontend @antv/g2` 得到了 `^5.1.18`，发现错误后想起来此处意为依赖最低版本号为 5.1.18 并非实际依赖 5118……GitHub 全局搜索你害人不浅！！！
 > 
-> ![](/uploads/2024/10/image-3.png)
+> ![](/assets/images/2024/10/image-3.png)
 
 > #5 在全新安装的 Ubuntu Desktop 22.04 系统中，把音量从 75% 调整到 25% 会使声音减小多少分贝？（保留一位小数）
 
 同样是询问 GH Copylot，得其煞有介事计算得 9.5，然后成功为 [提交数最多的错误答案](https://github.com/PKU-GeekGame/geekgame-4th/tree/master/official_writeup/misc-trivia#%E8%8A%B1%E7%B5%AE) 添砖加瓦……
 
-![](/uploads/2024/10/image-4.png)
+![](/assets/images/2024/10/image-4.png)
 
-二阶段提示「*第 5 题：PulseAudio 的 `pactl get-sink-volume` 命令可以看当前音量的分贝值。当然你也可以看源码。*」后苯人拿出了珍藏多年的 Ubuntu 22.04 Live CD ISO 文件启动了虚拟机，通过手动拖动音量条的方式得到了答案为 ![](/uploads/2024/10/image-5.png)，成功贡献了又一错误答案。
+二阶段提示「*第 5 题：PulseAudio 的 `pactl get-sink-volume` 命令可以看当前音量的分贝值。当然你也可以看源码。*」后苯人拿出了珍藏多年的 Ubuntu 22.04 Live CD ISO 文件启动了虚拟机，通过手动拖动音量条的方式得到了答案为 ![](/assets/images/2024/10/image-5.png)，成功贡献了又一错误答案。
 
 > #6 [这张照片](https://github.com/PKU-GeekGame/geekgame-4th/blob/master/official_writeup/misc-trivia/game/static/osint-challenge.webp) 用红框圈出了一个建筑。离它最近的已开通地铁站是什么？
 > 
@@ -180,7 +180,7 @@ canonicalUrl: https://blog.licaoz.com/post/pku-geekgame-2024-write-up/
 
 ### 验证码
 
-![](/uploads/2024/10/image-6.png)
+![](/assets/images/2024/10/image-6.png)
 
 ↑ 图四取自某 TOP2 高校内部系统
 
@@ -297,7 +297,7 @@ print(long_string)
 
 按 F12 打不开 Dev Tools？试试浏览器右上角仨点 - 更多工具 - 开发者工具，包可以的。
 
-![](/uploads/2024/10/image-7.png)
+![](/assets/images/2024/10/image-7.png)
 
 打开后断点跳转有嗨客也不要慌，使用 CTRL + SHIFT + P 禁用掉 breakpoints 或者在 Sources 页点击关闭断点或者按 CTRL + F8 就可以禁用断点了，包可以的！
 

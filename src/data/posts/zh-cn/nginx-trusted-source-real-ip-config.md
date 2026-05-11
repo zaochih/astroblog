@@ -37,7 +37,7 @@ set_real_ip_from 101.71.hidden.0/24;
 set_real_ip_from 43.140.hidden.0/24;
 ```
 
-![](/uploads/2024/08/image-13.png)
+![](/assets/images/2024/08/image-13.png)
 
 在腾讯云 CDN 控制面板 **回源节点查询** 功能中可以查询到特定加速域名的回源 IP 段，点击右侧下载即可导出为文件，按上方形式书写即可。记得行末的分号。
 

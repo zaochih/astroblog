@@ -5,7 +5,7 @@ updated: "2025-10-03T16:05:07Z"
 tags:
   - "life"
 category: "life"
-cover: /uploads/2025/10/IMG_0652.jpeg
+cover: /assets/images/2025/10/IMG_0652.jpeg
 canonicalUrl: https://blog.licaoz.com/post/when-the-moon-is-bright-again/
 weixinName: 草纸
 weixinLink: https://mp.weixin.qq.com/s/Nsc7P0nfYhafv24pEQW8WQ
@@ -31,7 +31,7 @@ weixinLink: https://mp.weixin.qq.com/s/Nsc7P0nfYhafv24pEQW8WQ
 
 尽管三明这座城市并没有惹我什么，但初来此处的我对其 **位于沿海省份的内陆地区** 极为不满，亦对探索和了解这座城市毫无兴趣；这即是我所说的『恨乌及屋』。我甚至还未在三明登录过我的公众号——我不想我的 IP 属地变成福建；它似乎和我的桌面壁纸一样，成为了我对重庆为数不多的念想。
 
-![我的桌面背景，摄于江北嘴，图中是千厮门嘉陵江大桥和外墙正在显示“重庆母城、人文渝中”字样的 WFC。](/uploads/2025/10/Pasted-image-20251003223254-2.png)
+![我的桌面背景，摄于江北嘴，图中是千厮门嘉陵江大桥和外墙正在显示“重庆母城、人文渝中”字样的 WFC。](/assets/images/2025/10/Pasted-image-20251003223254-2.png)
 
 _我的桌面背景，摄于江北嘴，图中是千厮门嘉陵江大桥和外墙正在显示“重庆母城、人文渝中”字样的 WFC。_
 

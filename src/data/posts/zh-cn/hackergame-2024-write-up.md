@@ -12,7 +12,7 @@ canonicalUrl: https://blog.licaoz.com/post/hackergame-2024-write-up/
 
 我事 500 名分界线）[hidden]明明昨天晚上还是 484，我恨泥萌 😭😭😭[/hidden]
 
-![image](/uploads/external/s21-ax1x-com/2024/11/09/pA6nLIP.png)
+![image](/assets/images/external/s21-ax1x-com/2024/11/09/pA6nLIP.png)
 
 2024 年 11 月 8 日，[中国科学技术大学第十一届信息安全大赛](https://hack.lug.ustc.edu.cn/)（aka. Hackergame 2024）圆满结束，撒花 🎉！苯人误打误撞解出了签到、喜欢做签到的 CTFer 你们好呀、猫咪问答（Hackergame 十周年纪念版）、打不开的盒、比大小王、旅行照片 4.0（部分解出）、PaoluGPT（部分解出）、惜字如金 3.0（部分解出）和零知识数独，[hidden]似乎[/hidden] 成为了苯人在历届 Hackergame 中得分最高的一次，可喜可贺！[hidden]还是太菜了，大学再历练罢 😭[/hidden]
 
@@ -55,7 +55,7 @@ canonicalUrl: https://blog.licaoz.com/post/hackergame-2024-write-up/
 
 感觉签到题用简单的 GET 请求放水已经是历届 Hackergame 惯例了……这届也一样。无视上面的框，直接点击 \[等不及了，马上启动！\] 就会跳转到一个新页面，仔细观察地址栏就会发现后面多了个 `?pass=false`，改成 `true` 就能过了。[hidden]倒不如说某种意义上是一道英语题？[/hidden]
 
-![](/uploads/2024/11/image.png)
+![](/assets/images/2024/11/image.png)
 
 得到 flag 为 `flag{WeLcOMe-TO-H@ckeRg@m3-@nD-EnJ0Y-HAckiNG-ZoZ4}`。
 
@@ -67,7 +67,7 @@ canonicalUrl: https://blog.licaoz.com/post/hackergame-2024-write-up/
 
 ### 喜欢做签到的 CTFer 你们好呀
 
-![](/uploads/external/s21-ax1x-com/2024/11/09/pA6Pd6P.png)
+![](/assets/images/external/s21-ax1x-com/2024/11/09/pA6Pd6P.png)
 
 喜欢做签到的 CTFer 你们好呀，我是一道更**典型**的 checkin：有两个 flag 就藏在中国科学技术大学校内 CTF 战队的招新主页里！
 
@@ -75,15 +75,15 @@ canonicalUrl: https://blog.licaoz.com/post/hackergame-2024-write-up/
 
 中国科学技术大学校内 CTF 战队，即 [中国科学技术大学 NEBULA 战队（USTC NEBULA）](https://www.nebuu.la/)，为此次比赛的承办方之一。直接在比赛平台首页就能找到他们官网的链接。
 
-![](/uploads/external/s21-ax1x-com/2024/11/09/pA6PwOf.png)
+![](/assets/images/external/s21-ax1x-com/2024/11/09/pA6PwOf.png)
 
 其实我最开始通过 `repo` 找到了 [Nebula-CTFTeam/Recruitment-2024: USTC NEBULA 2024 招新安排](https://github.com/Nebula-CTFTeam/Recruitment-2024)，还考虑了 Markdown 文件注释藏 flag 的可能性，无果[hidden]，寻病终[/hidden]。
 
 在 Terminal 里嘛，当然要 `ls` 一下。发现了两个可疑目录。尝试 cd，提示 root needed。
 
-![image](/uploads/external/s21-ax1x-com/2024/11/09/pA6P6Yj.png)
+![image](/assets/images/external/s21-ax1x-com/2024/11/09/pA6P6Yj.png)
 
-那当然是尝试 sudo 辣。然后…… ![image](/uploads/external/s21-ax1x-com/2024/11/09/pA6Pcfs.png) 奶龙好，爱看多看（
+那当然是尝试 sudo 辣。然后…… ![image](/assets/images/external/s21-ax1x-com/2024/11/09/pA6Pcfs.png) 奶龙好，爱看多看（
 
 继续在 NebuTerm 探索，发现 `help` 命令列出了所有可供执行的指令。挨个试试，在 `env` 下面得到 FLAG 1：
 
@@ -99,11 +99,11 @@ REQUIREMENTS=1. you must come from USTC; 2. you must be interested in security!
 
 FLAG 2 我其实试了 cat flag，但忘记了 Linux 中隐藏文件是以点开头的……后面红温了，直接去翻它的 index.js，搜 `flag` 搜到俩 `atob(***)`。
 
-![image](/uploads/external/s21-ax1x-com/2024/11/09/pA6PI7F.png)
+![image](/assets/images/external/s21-ax1x-com/2024/11/09/pA6PI7F.png)
 
 我一看咦嘻这么刻意的 base64 一定是有什么不可告人的秘密！去 console 里跑一下，果然是另一个 flag。
 
-![image](/uploads/external/s21-ax1x-com/2024/11/09/pA6P50U.png)
+![image](/assets/images/external/s21-ax1x-com/2024/11/09/pA6P50U.png)
 
 当然，也可以用预期解在 NabuTerm 进行一个 `cat .flag`，得到：
 
@@ -131,7 +131,7 @@ flag{0k_175_a_h1dd3n_s3c3rt_f14g___please_join_us_ustc_nebula_anD_two_maJor_requ
 
 最 搞 笑 的 一 点 是各位选手在各大搜索引擎搜索的时候也进了我的 Impressions 里……Google Search Console 有图为证：
 
-![image](/uploads/external/s21-ax1x-com/2024/11/09/pA6PHh9.png)
+![image](/assets/images/external/s21-ax1x-com/2024/11/09/pA6PHh9.png)
 
 其实这个问题我起初也搜了半天……在 LUG 的活动日历上也没找到。最后在 [信息安全大赛 Hackergame - LUG @ USTC](https://lug.ustc.edu.cn/wiki/lug/events/hackergame/) 找到了存档：[contest \[SEC@USTC\]](https://lug.ustc.edu.cn/wiki/sec/contest.html)
 
@@ -140,7 +140,7 @@ flag{0k_175_a_h1dd3n_s3c3rt_f14g___please_join_us_ustc_nebula_anD_two_maJor_requ
 2\. 众所周知，Hackergame 共约 25 道题目。近五年（不含今年）举办的 Hackergame 中，题目数量最接近这个数字的那一届比赛里有多少人注册参加？**（30 分）**  
 提示：是一个非负整数。
 
-![8c65083908a35a747eae44731ed75b6b](/uploads/external/s21-ax1x-com/2024/11/09/pA6PL11.png)
+![8c65083908a35a747eae44731ed75b6b](/assets/images/external/s21-ax1x-com/2024/11/09/pA6PL11.png)
 
 找到近五年的仓库在 Excel 拉个表即可得到最接近 25 的是 19 年的 29。在 [中国科学技术大学第六届信息安全大赛圆满结束 - LUG @ USTC](https://lug.ustc.edu.cn/news/2019/12/hackergame-2019/) 可以得知注册人数为 2682 人。
 
@@ -156,7 +156,7 @@ flag{0k_175_a_h1dd3n_s3c3rt_f14g___please_join_us_ustc_nebula_anD_two_maJor_requ
 
 在 [USENIXSecurity2024-FakeBehalf-Final-Version.pdf](https://www.usenix.org/system/files/usenixsecurity24-ma-jinrui.pdf)，16 个 providers 和 20 个 clients，排列组合一下我懒得算所以问 Copilot 得答案为 336。
 
-![6d7cca3e07e49af24270287ddbd7cb90](/uploads/external/s21-ax1x-com/2024/11/09/pA6KxBj.png)
+![6d7cca3e07e49af24270287ddbd7cb90](/assets/images/external/s21-ax1x-com/2024/11/09/pA6KxBj.png)
 
 5\. 10 月 18 日 Greg Kroah-Hartman 向 Linux 邮件列表提交的一个 patch 把大量开发者从 MAINTAINERS 文件中移除。这个 patch 被合并进 Linux mainline 的 commit id 是多少？**（5 分）**  
 提示：id 前 6 位，字母小写，如 c1e939。
@@ -178,7 +178,7 @@ requirements.") in v6.12-rc4.
 
 在 [Model catalog - Azure AI Studio](https://ai.azure.com/explore/models/Meta-Llama-3-70B/version/6/registry/azureml-meta) 可以下到它的 Tokenizer.Json，丢到 Python 算一下就好了。
 
-![](/uploads/2024/11/image-1.png)
+![](/assets/images/2024/11/image-1.png)
 
 这是我的码：
 
@@ -390,7 +390,7 @@ print(f"Token 数量: {len(encoded.ids)}")
 
 现在，你遇到了同样的情况：这里有一个密封盒子的设计文件，透过镂空的表面你看到里面有些东西……
 
-![image](/uploads/external/s21-ax1x-com/2024/11/09/pA6i3j0.png)
+![image](/assets/images/external/s21-ax1x-com/2024/11/09/pA6i3j0.png)
 
 那只要把它 3D 打印出来之后砸开不就解决了？用网上的制造服务的话，可能还没收到东西比赛就结束了，所以难道真的要去买一台 3D 打印机才能够看到里面的东西吗？
 
@@ -398,7 +398,7 @@ print(f"Token 数量: {len(encoded.ids)}")
 
 下载下来是一个 `.stl` 文件，不认识。不要紧，随便找个在线查看器就行了。
 
-![7a00d4f9e2ba7db61cd1a4fb5d0ad4fa](/uploads/external/s21-ax1x-com/2024/11/09/pA6ucQg.png)
+![7a00d4f9e2ba7db61cd1a4fb5d0ad4fa](/assets/images/external/s21-ax1x-com/2024/11/09/pA6ucQg.png)
 
 瞪眼法可得 FLAG 为 `flag{Dr4W_Us!nG_fR3E_C4D!!w0W}`。
 
@@ -414,7 +414,7 @@ print(f"Token 数量: {len(encoded.ids)}")
 
 * * *
 
-![image](/uploads/external/s21-ax1x-com/2024/11/09/pA6u2Lj.png)
+![image](/assets/images/external/s21-ax1x-com/2024/11/09/pA6u2Lj.png)
 
 简单地使用现代浏览器的 `view-source:` 发现所有 JS 都是直接写在 `<script>` 里的，直接在 Burp Suite 进行一个 Intercept response 即可。
 
@@ -480,7 +480,7 @@ function loadGame() {
 
 > > 你们的生活到底真的假的呀？每天要么就是看漫展看偶像看 live 喝酒吃烧烤，要么就是这里那里旅游。阵容一宣，说冲就冲，群一拉，机票一买，钱就像大风刮来的，时间好像一直有。c\*\*4 你们也去，mu\*\*ca 你们也去，m\*\*o 你们也去，to\*ea\*i 你们也去。我怎么一天到晚都在上班啊，你们那到底是怎么弄的呀？教教我行不行
 > 
-> [![](</uploads/external/github-com/USTC-Hackergame/hackergame2024-writeups/raw/master/official/旅行照片 4.0/photos/klkq.jpg>)](<https://github.com/USTC-Hackergame/hackergame2024-writeups/raw/master/official/旅行照片 4.0/photos/klkq.jpg>)
+> [![](</assets/images/external/github-com/USTC-Hackergame/hackergame2024-writeups/raw/master/official/旅行照片 4.0/photos/klkq.jpg>)](<https://github.com/USTC-Hackergame/hackergame2024-writeups/raw/master/official/旅行照片 4.0/photos/klkq.jpg>)
 
 出去玩的最多的难道不就是您自己吗？
 
@@ -490,7 +490,7 @@ function loadGame() {
 
 搜索 科大硅谷 科里科气科创驿站 可以找到 [在”科大硅谷“观科创未来|界面新闻](https://www.jiemian.com/article/9569413.html)，在其中可以看到这张图片：
 
-![image](/uploads/external/s21-ax1x-com/2024/11/09/pA6KiOH.png)
+![image](/assets/images/external/s21-ax1x-com/2024/11/09/pA6KiOH.png)
 
 然后去某个很有道德的地图软件搜索可以找到「科里科气科创驿站（科大站）」，通过瞪眼法可得最近的校门为本部东校区的西门，故答案为东校区西门。
 
@@ -506,9 +506,9 @@ function loadGame() {
 
 这样想着，你打开自己的相册翻找，「我记得之前保存了几个还不错的地方……」
 
-[![](</uploads/external/github-com/USTC-Hackergame/hackergame2024-writeups/raw/master/official/旅行照片 4.0/photos/image01.jpg>)](<https://github.com/USTC-Hackergame/hackergame2024-writeups/raw/master/official/旅行照片 4.0/photos/image01.jpg>)
+[![](</assets/images/external/github-com/USTC-Hackergame/hackergame2024-writeups/raw/master/official/旅行照片 4.0/photos/image01.jpg>)](<https://github.com/USTC-Hackergame/hackergame2024-writeups/raw/master/official/旅行照片 4.0/photos/image01.jpg>)
 
-[![](</uploads/external/github-com/USTC-Hackergame/hackergame2024-writeups/raw/master/official/旅行照片 4.0/photos/image04.jpg>)](<https://github.com/USTC-Hackergame/hackergame2024-writeups/raw/master/official/旅行照片 4.0/photos/image04.jpg>)
+[![](</assets/images/external/github-com/USTC-Hackergame/hackergame2024-writeups/raw/master/official/旅行照片 4.0/photos/image04.jpg>)](<https://github.com/USTC-Hackergame/hackergame2024-writeups/raw/master/official/旅行照片 4.0/photos/image04.jpg>)
 
 嗯？奇怪的记忆增加了。诶，我到过这些地方吗？
 
@@ -524,7 +524,7 @@ function loadGame() {
 
 调查自己还是头一回，多新鲜啊。不过，还没来得及理清头绪，你突然收到了来自学长的信息：
 
-> [![](</uploads/external/github-com/USTC-Hackergame/hackergame2024-writeups/raw/master/official/旅行照片 4.0/photos/image06.jpg>)](<https://github.com/USTC-Hackergame/hackergame2024-writeups/raw/master/official/旅行照片 4.0/photos/image06.jpg>)
+> [![](</assets/images/external/github-com/USTC-Hackergame/hackergame2024-writeups/raw/master/official/旅行照片 4.0/photos/image06.jpg>)](<https://github.com/USTC-Hackergame/hackergame2024-writeups/raw/master/official/旅行照片 4.0/photos/image06.jpg>)
 > 
 > 来练练手，看看能挖出什么有趣的东西。
 
@@ -671,7 +671,7 @@ $ snarkjs groth16 verify verification\_key.json public.json proof.json
 
 看不懂，但是解完四个数独游戏就可以拿到第一个 FLAG。
 
-![a861f96eda4d17521898fe4bed892caa](/uploads/external/s21-ax1x-com/2024/11/09/pA6MDxS.png)
+![a861f96eda4d17521898fe4bed892caa](/assets/images/external/s21-ax1x-com/2024/11/09/pA6MDxS.png)
 
 很好游戏，唤起我对数独的兴趣（不过最后还是直接用了 [数独解算器 - Sudoku.com 上的谜题解答](https://sudoku.com/zh/sudoku-solver) 解算。
 
@@ -679,6 +679,6 @@ $ snarkjs groth16 verify verification\_key.json public.json proof.json
 
 ## 虚假的总结
 
-![](/uploads/external/s21-ax1x-com/2024/11/09/pA6M42T.png)
+![](/assets/images/external/s21-ax1x-com/2024/11/09/pA6M42T.png)
 
 很好 Hackergame，使我凌晨两点半配 Rust 环境提交 flag。算是很充实的一周！~~对了！如果你感兴趣的话，欢迎了解一下我的新项目：[MSDocsCHS](https://msdc.licaoz.com/)，该项目旨在通过对 MS Learn 所有公开的文档仓库进行镜像来维护自己的一套简体中文翻译——如果你有兴趣维护某个产品的。~~ **UPDATED 05/11 2026：该项目已经死了很久了 😭**

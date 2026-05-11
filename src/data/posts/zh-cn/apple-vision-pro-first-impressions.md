@@ -12,13 +12,13 @@ canonicalUrl: https://blog.licaoz.com/post/apple-vision-pro-first-impressions/
 
 25 日闪击了几小时中心城区与 [小猫](https://blog.shanmaoy.com/) 和 [鱼鱼](https://blog.grilledfish.icu/) 过三人世界面基，虽然因为太热光速折返，但本着「来都来了」的精神，我还是摸了一下 Vision Pro :)
 
-![来自 Apple 的电子邮件。它的主题是：“你在 Apple 重庆北城天街的选购回顾”](/uploads/2024/08/image-10.png)
+![来自 Apple 的电子邮件。它的主题是：“你在 Apple 重庆北城天街的选购回顾”](/assets/images/2024/08/image-10.png)
 
 稍显怪异的是，Apple 重庆北城天街似乎并没有很多人预约 Vision Pro 展示，以至于店员在询问完是否需要帮助并得到否定答复后直接邀请我们进行体验。
 
 在预约时，系统会询问是否佩戴眼镜。我的情况是处方框架眼镜[hidden]人话：有度数的近视框架眼镜[/hidden]。在这种情况下，仅需带着眼镜前往即可。Specialist 会暂时取走眼镜以测量度数，并装配对应度数的临时的磁吸蔡司光学插片。
 
-![来自 Apple 官网的截图，指出 Vision Pro 售价 29,999 人民币，蔡司光学插片 - 处方版售价 1061 元。](/uploads/2024/08/image-11.png)
+![来自 Apple 官网的截图，指出 Vision Pro 售价 29,999 人民币，蔡司光学插片 - 处方版售价 1061 元。](/assets/images/2024/08/image-11.png)
 
 嗯，价值 1061 元的光学插片。
 
