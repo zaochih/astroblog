@@ -11,6 +11,7 @@ import LanguageNotice from '@/components/LanguageNotice.astro';
 import CrossPostNotice from '@/components/CrossPostNotice.astro';
 import ExternalPostRedirect from '@/components/ExternalPostRedirect.astro';
 import Comments from '@/components/Comments.astro';
+import { optimizeLocalImage } from '@/lib/rehype-image-size.mjs';
 
 export async function getStaticPaths() {
   // Helper: "zh/hello-world" → ["zh", "hello-world"]
@@ -101,6 +102,7 @@ const seriesPosts = data.series
 const seriesIndex = seriesPosts.findIndex(seriesPost => seriesPost.slug === slug);
 const previousSeriesPost = seriesIndex > 0 ? seriesPosts[seriesIndex - 1] : null;
 const nextSeriesPost = seriesIndex >= 0 && seriesIndex < seriesPosts.length - 1 ? seriesPosts[seriesIndex + 1] : null;
+const coverImage = data.cover ? (await optimizeLocalImage(data.cover, { force: true })).src : undefined;
 
 const fallbackLangName = isFallback && fallbackLang ? languageNames[currentLang][fallbackLang] : '';
 const fallbackDesc = t('alert.fallback.desc').replace('{lang}', fallbackLangName);
@@ -129,7 +131,7 @@ const homeHref = currentLang === defaultLang ? '/' : `/${currentLang}/`;
   title={`${data.title} | ${siteConfig.name}`}
   description={data.description}
   lang={currentLang}
-  image={data.cover}
+  image={coverImage}
   canonicalUrl={data.canonicalUrl}
   math={data.math}
   hideHeaderOnScroll

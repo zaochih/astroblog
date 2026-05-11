@@ -4,6 +4,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { getPostHref, getTagHref, getCategoryHref, countWords, readingMinutes, formatDateTime } from '@/lib/content';
 import { getTagName, getCategoryName } from '@/i18n/taxonomy';
 import { useTranslations, type Lang } from '@/i18n/ui';
+import { optimizeLocalImage } from '@/lib/rehype-image-size.mjs';
 
 interface Props {
   posts: Array<{ post: CollectionEntry<'blog'>; slug: string }>;
@@ -16,6 +17,14 @@ interface Props {
 
 const { posts, lang, currentPage, totalPages, baseHref } = Astro.props;
 const t = useTranslations(lang as Lang);
+const coverSrcBySlug = new Map(
+  await Promise.all(
+    posts.map(async ({ post, slug }) => [
+      slug,
+      post.data.cover ? (await optimizeLocalImage(post.data.cover, { force: true })).src : undefined,
+    ]),
+  ),
+);
 
 function pageHref(n: number) {
   return n === 1 ? baseHref : `${baseHref}page/${n}/`;
@@ -52,12 +61,13 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
     const timeStr = t('post.readingTime').replace('{min}', String(mins));
     const postHref = getPostHref(slug, lang);
     const categoryName = post.data.category ? getCategoryName(post.data.category, lang as Lang) : '';
+    const coverSrc = coverSrcBySlug.get(slug);
     return (
       <div class="group relative" transition:name={`post-${slug}`}>
-        <Card className={`flex flex-col border-border/50 bg-card overflow-hidden ${post.data.cover ? 'pt-0' : ''}`}>
-          {post.data.cover && (
+        <Card className={`flex flex-col border-border/50 bg-card overflow-hidden ${coverSrc ? 'pt-0' : ''}`}>
+          {coverSrc && (
             <div class="h-52 w-full overflow-hidden border-b border-border/30">
-              <img src={post.data.cover} alt={post.data.coverAlt ?? post.data.title} class="w-full h-full object-cover" />
+              <img src={coverSrc} alt={post.data.coverAlt ?? post.data.title} class="w-full h-full object-cover" />
             </div>
           )}
 
