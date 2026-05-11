@@ -85,7 +85,7 @@
 
 - name: 微软电脑管家
   sortKey: weiruan diannao guanjia
-  description: 简单勿打扰，安全又安心。
+  description: 简单无打扰，安全又安心
   url: https://pcmanager.microsoft.com/zh-cn
   sponsored: true
   i18n:
