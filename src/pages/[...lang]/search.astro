@@ -52,18 +52,51 @@ const labels = {
   </section>
 
   <script>
-    const pagefindState = {
+    interface SearchLabels {
+      idle: string;
+      loading: string;
+      empty: string;
+      error: string;
+      devUnavailable: string;
+      results: string;
+    }
+
+    interface PagefindResultData {
+      url: string;
+      excerpt?: string;
+      meta?: {
+        title?: string;
+      };
+    }
+
+    interface PagefindSearchResult {
+      data(): Promise<PagefindResultData>;
+    }
+
+    interface PagefindSearchResponse {
+      results: PagefindSearchResult[];
+    }
+
+    interface PagefindModule {
+      init(): Promise<void>;
+      search(query: string, options: { filters: { lang: string } }): Promise<PagefindSearchResponse>;
+    }
+
+    const pagefindState: {
+      module: PagefindModule | null;
+      promise: Promise<PagefindModule> | null;
+    } = {
       module: null,
       promise: null,
     };
 
-    async function loadPagefind(status, labels) {
+    async function loadPagefind(status: HTMLElement, labels: SearchLabels) {
       if (pagefindState.module) return pagefindState.module;
       if (!pagefindState.promise) {
         status.textContent = labels.loading;
         const pagefindUrl = '/pagefind/pagefind.js';
         pagefindState.promise = import(/* @vite-ignore */ pagefindUrl)
-          .then(async (pagefind) => {
+          .then(async (pagefind: PagefindModule) => {
             await pagefind.init();
             pagefindState.module = pagefind;
             return pagefind;
@@ -76,21 +109,23 @@ const labels = {
       return pagefindState.promise;
     }
 
-    function escapeHtml(value) {
-      return value.replace(/[&<>"']/g, (char) => ({
+    function escapeHtml(value: string) {
+      const entities: Record<string, string> = {
         '&': '&amp;',
         '<': '&lt;',
         '>': '&gt;',
         '"': '&quot;',
         "'": '&#39;',
-      }[char]));
+      };
+
+      return value.replace(/[&<>"']/g, (char) => entities[char] ?? char);
     }
 
-    function resultCountLabel(template, count) {
+    function resultCountLabel(template: string, count: number) {
       return template.replace('{count}', String(count));
     }
 
-    function renderResults(container, results) {
+    function renderResults(container: HTMLOListElement, results: PagefindResultData[]) {
       container.innerHTML = results.map((result) => {
         const title = escapeHtml(result.meta?.title || result.url);
         const excerpt = result.excerpt || '';
@@ -108,15 +143,21 @@ const labels = {
     }
 
     function initSearchPage() {
-      const root = document.querySelector('[data-search-root]');
+      const root = document.querySelector<HTMLElement & { __searchReady?: boolean }>('[data-search-root]');
       if (!root || root.__searchReady) return;
-      root.__searchReady = true;
 
-      const input = root.querySelector('[data-search-input]');
-      const status = root.querySelector('[data-search-status]');
-      const resultsContainer = root.querySelector('[data-search-results]');
+      const input = root.querySelector<HTMLInputElement>('[data-search-input]');
+      const status = root.querySelector<HTMLElement>('[data-search-status]');
+      const resultsContainer = root.querySelector<HTMLOListElement>('[data-search-results]');
       const lang = root.dataset.lang;
-      const labels = JSON.parse(root.dataset.labels || '{}');
+      const labels = JSON.parse(root.dataset.labels || '{}') as SearchLabels;
+      if (!input || !status || !resultsContainer || !lang) return;
+
+      root.__searchReady = true;
+      const searchInput = input;
+      const searchStatus = status;
+      const searchResultsContainer = resultsContainer;
+      const searchLang = lang;
       let runId = 0;
 
       function isLikelyAstroDev() {
@@ -124,41 +165,41 @@ const labels = {
       }
 
       async function runSearch() {
-        const query = input.value.trim();
+        const query = searchInput.value.trim();
         const currentRun = ++runId;
 
         if (!query) {
-          status.textContent = labels.idle;
-          resultsContainer.innerHTML = '';
+          searchStatus.textContent = labels.idle;
+          searchResultsContainer.innerHTML = '';
           return;
         }
 
         try {
-          const pagefind = await loadPagefind(status, labels);
-          const search = await pagefind.search(query, { filters: { lang } });
+          const pagefind = await loadPagefind(searchStatus, labels);
+          const search = await pagefind.search(query, { filters: { lang: searchLang } });
           if (currentRun !== runId) return;
 
           const results = await Promise.all(search.results.slice(0, 12).map((result) => result.data()));
           if (currentRun !== runId) return;
 
-          status.textContent = results.length
+          searchStatus.textContent = results.length
             ? resultCountLabel(labels.results, search.results.length)
             : labels.empty;
-          renderResults(resultsContainer, results);
+          renderResults(searchResultsContainer, results);
         } catch (error) {
           console.error(error);
           if (currentRun !== runId) return;
-          status.textContent = isLikelyAstroDev() ? labels.devUnavailable : labels.error;
-          resultsContainer.innerHTML = '';
+          searchStatus.textContent = isLikelyAstroDev() ? labels.devUnavailable : labels.error;
+          searchResultsContainer.innerHTML = '';
         }
       }
 
-      input.addEventListener('input', runSearch);
+      searchInput.addEventListener('input', runSearch);
 
       const url = new URL(window.location.href);
       const query = url.searchParams.get('q');
       if (query) {
-        input.value = query;
+        searchInput.value = query;
         runSearch();
       }
     }

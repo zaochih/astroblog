@@ -17,12 +17,12 @@ interface Props {
 
 const { posts, lang, currentPage, totalPages, baseHref } = Astro.props;
 const t = useTranslations(lang as Lang);
-const coverSrcBySlug = new Map(
+const coverSrcBySlug = new Map<string, string | undefined>(
   await Promise.all(
     posts.map(async ({ post, slug }) => [
       slug,
       post.data.cover ? (await optimizeLocalImage(post.data.cover, { force: true })).src : undefined,
-    ]),
+    ] as const),
   ),
 );
 
