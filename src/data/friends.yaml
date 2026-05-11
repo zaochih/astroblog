@@ -6,10 +6,13 @@
 # pinned:      可选，true 时置顶显示
 # sponsored:   可选，true 时标记为赞助链接，并输出 rel="sponsored"
 # referral:    可选，true 时标记为推介链接，并按书写顺序显示在最后
-# i18n:        可选，按语言覆盖 name / description / url / links
+# backgroundIcon:
+#              可选，装饰用图片 URL；只用于卡片背景模糊光晕，不作为可见 icon 显示
+# i18n:        可选，按语言覆盖 name / description / url / links / backgroundIcon
 #   en-us:
 #     name: Localized Name
 #     description: Localized description
+#     backgroundIcon: /path/to/localized-icon.png
 # links:       可选，子链接列表
 #   - icon: HugeIcon 名称 (home / image / globe / link / paperclip / rss / github / mail / pen)
 #     url:  子链接地址
@@ -83,6 +86,7 @@
 - name: Microsoft 问答社区
   description: 在这里找到 Microsoft 产品技术问题的解决方案。
   url: https://learn.microsoft.com/zh-cn/answers/?WT.mc_id=studentamb_203301
+  backgroundIcon: /assets/images/friends/learn-qna-logo.png
   referral: true
   i18n:
     en-us:
@@ -93,9 +97,20 @@
 - name: 微软电脑管家
   description: 简单无打扰，安全又安心
   url: https://pcmanager.microsoft.com/zh-cn
+  backgroundIcon: /assets/images/friends/pcmanager-logo.png
   referral: true
   i18n:
     en-us:
       name: Microsoft PC Manager
       description: Safeguard your PC in a quiet and reliable way
       url: https://pcmanager.microsoft.com/en-us
+
+- name: 微软积分商城
+  description: 通过 Microsoft Rewards 赚取免费积分，您可以将其兑换为礼品卡、用于参与抽奖，或捐赠给非营利组织。
+  url: https://rewards.microsoft.com/
+  backgroundIcon: /assets/images/friends/bing-color.png
+  referral: true
+  i18n:
+    en-us:
+      name: Microsoft Rewards
+      description: Earn free points with Microsoft Rewards and redeem them for gift cards, sweepstakes entries, or donations to nonprofit organizations.

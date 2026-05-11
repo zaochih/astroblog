@@ -27,12 +27,14 @@ interface FriendLocale {
   description?: string;
   url?: string;
   links?: FriendLink[];
+  backgroundIcon?: string;
 }
 
 interface Friend {
   name: string;
   description: string;
   url: string;
+  backgroundIcon?: string;
   pinned?: boolean;
   sponsored?: boolean;
   referral?: boolean;
@@ -51,6 +53,7 @@ function localizeFriend(friend: Friend, lang: Lang): Friend {
     description: localized.description ?? friend.description,
     url: localized.url ?? friend.url,
     links: localized.links ?? friend.links,
+    backgroundIcon: localized.backgroundIcon ?? friend.backgroundIcon,
     i18n: friend.i18n,
   };
 }
@@ -131,12 +134,27 @@ const sortedFriends = [...sponsoredFriends, ...regularFriends, ...referralFriend
               : 'text-muted-foreground/50 hover:text-primary';
           return (
           <div
-            class={`group relative flex flex-col justify-between rounded-lg border p-5 min-h-[140px] ${cardClass}`}
+            class={`group relative isolate flex min-h-[140px] flex-col justify-between overflow-hidden rounded-lg border p-5 transition-colors ${cardClass}`}
+            data-friend-glow-card={friend.backgroundIcon ? true : undefined}
           >
+            {friend.backgroundIcon && (
+              <div class="friend-glow" aria-hidden="true">
+                <img src={friend.backgroundIcon} alt="" loading="lazy" decoding="async" />
+              </div>
+            )}
+
+            <a
+              href={friend.url}
+              target="_blank"
+              rel={rel}
+              class="absolute inset-0 z-10"
+              aria-label={t('aria.friendSite').replace('{name}', friend.name)}
+            />
+
             {/* Name */}
-            <div>
+            <div class="relative z-20 pointer-events-none">
               <div class="mb-1.5 flex flex-wrap items-center gap-2">
-                <h2 class={`text-base font-semibold ${titleClass}`}>{friend.name}</h2>
+                <h2 class={`friend-card-title text-base font-semibold ${titleClass}`}>{friend.name}</h2>
                 {friend.pinned && (
                   <span class="rounded-md border border-border bg-background px-1.5 py-0.5 text-[10px] font-medium text-foreground">
                     {t('friends.pinned')}
@@ -157,14 +175,14 @@ const sortedFriends = [...sponsoredFriends, ...regularFriends, ...referralFriend
             </div>
 
             {/* Bottom row: sub-link icons left, arrow right */}
-            <div class="flex items-center justify-between mt-4">
+            <div class="relative z-20 flex items-center justify-between mt-4 pointer-events-none">
               <div class="flex items-center gap-2">
                 {friend.links?.map(link => (
                   <a
                     href={link.url}
                     target="_blank"
                     rel={rel}
-                    class={`relative z-10 transition-colors ${iconClass}`}
+                    class={`relative z-30 pointer-events-auto transition-colors ${iconClass}`}
                     aria-label={t('aria.friendLink').replace('{name}', friend.name).replace('{type}', link.icon)}
                     title={link.icon}
                   >
@@ -172,15 +190,9 @@ const sortedFriends = [...sponsoredFriends, ...regularFriends, ...referralFriend
                   </a>
                 ))}
               </div>
-              <a
-                href={friend.url}
-                target="_blank"
-                rel={rel}
-                class={`transition-colors after:absolute after:inset-0 after:content-[''] ${arrowClass}`}
-                aria-label={t('aria.friendSite').replace('{name}', friend.name)}
-              >
+              <span class={`transition-colors ${arrowClass}`} aria-hidden="true">
                 <HugeIcon name="arrowRight" className="size-5" size={20} />
-              </a>
+              </span>
             </div>
           </div>
         )})}
@@ -188,3 +200,139 @@ const sortedFriends = [...sponsoredFriends, ...regularFriends, ...referralFriend
     )}
   </div>
 </Layout>
+
+<style>
+  /* Pointer glow adapted from Jhey Tompkins' CodePen: https://codepen.io/jh3y/pen/WbwZaNa */
+  [data-friend-glow-card] {
+    --friend-glow-x: 0;
+    --friend-glow-y: 0;
+  }
+
+  .friend-card-title {
+    display: inline;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    background-size: 0 1px;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    transition: background-size 180ms ease;
+  }
+
+  .group:is(:hover, :focus-within) .friend-card-title {
+    background-size: 100% 1px;
+  }
+
+  .friend-glow {
+    position: absolute;
+    inset: -34%;
+    z-index: 0;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+    opacity: 0.16;
+    transform: translate(
+      calc(var(--friend-glow-x) * 18%),
+      calc(var(--friend-glow-y) * 18%)
+    );
+    transition:
+      opacity 180ms ease,
+      transform 220ms ease-out;
+  }
+
+  [data-friend-glow-card]:is(:hover, :focus-within) .friend-glow {
+    opacity: 0.28;
+  }
+
+  .friend-glow img {
+    width: min(46%, 9rem);
+    aspect-ratio: 1;
+    object-fit: contain;
+    filter: blur(24px) saturate(1.8) brightness(1.12);
+    opacity: 0.92;
+    transform: scale(2.2);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .friend-glow {
+      transform: none;
+      transition: opacity 180ms ease;
+    }
+  }
+</style>
+
+<script>
+  (() => {
+    interface FriendGlowController {
+      init: () => void;
+    }
+
+    interface FriendGlowWindow extends Window {
+      __lczFriendGlow?: FriendGlowController;
+    }
+
+    type FriendGlowPosition = {
+      x: number;
+      y: number;
+    };
+
+    const friendGlowWindow = window as FriendGlowWindow;
+    const existing = friendGlowWindow.__lczFriendGlow;
+    if (existing) {
+      existing.init();
+      return;
+    }
+
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
+    const state = {
+      boundCards: new WeakSet<HTMLElement>(),
+      pending: new Map<HTMLElement, FriendGlowPosition>(),
+      frame: 0,
+    };
+
+    const flush = () => {
+      state.pending.forEach(({ x, y }, card) => {
+        card.style.setProperty('--friend-glow-x', x.toFixed(3));
+        card.style.setProperty('--friend-glow-y', y.toFixed(3));
+      });
+      state.pending.clear();
+      state.frame = 0;
+    };
+
+    const schedule = (card: HTMLElement, x: number, y: number) => {
+      state.pending.set(card, { x, y });
+      if (state.frame === 0) {
+        state.frame = window.requestAnimationFrame(flush);
+      }
+    };
+
+    const bindCard = (card: HTMLElement) => {
+      if (state.boundCards.has(card)) return;
+      state.boundCards.add(card);
+
+      card.addEventListener('pointermove', (event: PointerEvent) => {
+        const rect = card.getBoundingClientRect();
+        const x = (event.clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
+        const y = (event.clientY - (rect.top + rect.height / 2)) / (rect.height / 2);
+
+        schedule(card, clamp(x, -1, 1), clamp(y, -1, 1));
+      });
+
+      card.addEventListener('pointerleave', () => {
+        schedule(card, 0, 0);
+      });
+    };
+
+    const init = () => {
+      if (motionQuery.matches) return;
+      document.querySelectorAll<HTMLElement>('[data-friend-glow-card]').forEach(bindCard);
+    };
+
+    document.addEventListener('astro:page-load', init);
+    document.addEventListener('astro:after-swap', () => requestAnimationFrame(init));
+
+    friendGlowWindow.__lczFriendGlow = { init };
+    init();
+  })();
+</script>
