@@ -24,6 +24,14 @@ const toastConfig = JSON.stringify({
     const PREFERENCE_KEY = 'lang-preference';
     const DISMISSED_KEY = 'lang-toast-dismissed';
     const supported = Object.keys(languages);
+    const setStoredPreference = (lang) => {
+      if (!supported.includes(lang)) return;
+      try {
+        localStorage.setItem(PREFERENCE_KEY, lang);
+      } catch {
+        // Ignore storage failures; the UI action should still complete.
+      }
+    };
     const storedPreference = (() => {
       try {
         const value = localStorage.getItem(PREFERENCE_KEY);
@@ -105,11 +113,7 @@ const toastConfig = JSON.stringify({
     document.body.appendChild(toast);
 
     switchBtn.addEventListener('click', () => {
-      try {
-        localStorage.setItem(PREFERENCE_KEY, preferred);
-      } catch {
-        // Ignore storage failures; the link navigation should still work.
-      }
+      setStoredPreference(preferred);
     });
 
     requestAnimationFrame(() => {
@@ -118,7 +122,12 @@ const toastConfig = JSON.stringify({
     });
 
     dismissBtn.addEventListener('click', () => {
-      sessionStorage.setItem(DISMISSED_KEY, 'true');
+      setStoredPreference(currentLang);
+      try {
+        sessionStorage.setItem(DISMISSED_KEY, 'true');
+      } catch {
+        // Ignore storage failures; the toast is already being dismissed.
+      }
       toast.style.opacity = '0';
       toast.style.transform = 'translateY(1rem)';
       setTimeout(() => toast.remove(), 300);
