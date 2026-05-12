@@ -15,6 +15,8 @@
       upwardDistance: 0,
       observedHeader: null,
       headerHeight: 0,
+      headerState: 'visible',
+      anchorLocked: false,
     };
 
     const resizeObserver = new ResizeObserver((entries) => {
@@ -36,11 +38,62 @@
       return Math.max(0, window.scrollY || window.pageYOffset || 0);
     }
 
+    function getHashTarget(hash) {
+      if (!hash || hash === '#') return null;
+      const rawId = hash.slice(1);
+      try {
+        return document.getElementById(decodeURIComponent(rawId)) ?? document.getElementById(rawId);
+      } catch {
+        return document.getElementById(rawId);
+      }
+    }
+
+    function isSamePageHashHref(href) {
+      let url;
+      try {
+        url = new URL(href, window.location.href);
+      } catch {
+        return false;
+      }
+
+      return (
+        url.origin === window.location.origin &&
+        url.pathname === window.location.pathname &&
+        url.search === window.location.search &&
+        Boolean(getHashTarget(url.hash))
+      );
+    }
+
+    function lockHeaderForAnchorNavigation() {
+      state.anchorLocked = true;
+      setHeaderState('visible');
+      state.lastY = getScrollY();
+      state.upwardDistance = 0;
+    }
+
+    function releaseAnchorNavigationLock() {
+      if (!state.anchorLocked) return;
+      state.anchorLocked = false;
+      state.lastY = getScrollY();
+      state.upwardDistance = 0;
+      requestUpdate();
+    }
+
+    function isAnchorNavigationLocked() {
+      return state.anchorLocked;
+    }
+
     function syncHeaderHeight(height) {
       const value = `${height}px`;
       if (height === state.headerHeight) return;
       state.headerHeight = height;
       document.documentElement.style.setProperty('--site-header-height', value);
+      syncVisibleHeaderHeight(state.headerState);
+    }
+
+    function syncVisibleHeaderHeight(value = state.headerState) {
+      const visibleHeight = value === 'hidden' ? '0px' : `${state.headerHeight}px`;
+      document.documentElement.style.setProperty('--site-header-visible-height', visibleHeight);
     }
 
     function observeHeader() {
@@ -53,7 +106,9 @@
 
     function setHeaderState(value) {
       const header = getHeader();
+      state.headerState = value;
       if (header) header.dataset.state = value;
+      syncVisibleHeaderHeight(value);
     }
 
     function update() {
@@ -65,7 +120,15 @@
 
       if (!isEnabled(header)) {
         state.upwardDistance = 0;
-        header.dataset.state = 'visible';
+        setHeaderState('visible');
+        state.lastY = getScrollY();
+        state.ticking = false;
+        return;
+      }
+
+      if (isAnchorNavigationLocked()) {
+        state.upwardDistance = 0;
+        setHeaderState('visible');
         state.lastY = getScrollY();
         state.ticking = false;
         return;
@@ -76,21 +139,21 @@
 
       if (currentY <= 8) {
         state.upwardDistance = 0;
-        header.dataset.state = 'visible';
+        setHeaderState('visible');
       } else if (delta > state.directionThreshold && currentY > state.hideAfter) {
         state.upwardDistance = 0;
-        header.dataset.state = 'hidden';
+        setHeaderState('hidden');
       } else if (delta < 0) {
         state.upwardDistance += Math.abs(delta);
         if (state.upwardDistance >= state.showAfterUp) {
-          header.dataset.state = 'visible';
+          setHeaderState('visible');
         }
       } else if (delta > 0) {
         state.upwardDistance = 0;
       }
 
       if (delta < -state.directionThreshold && currentY <= state.hideAfter) {
-        header.dataset.state = 'visible';
+        setHeaderState('visible');
       }
 
       state.lastY = currentY;
@@ -111,6 +174,19 @@
       setHeaderState('visible');
     }
 
+    function handleAnchorClick(event) {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+        return;
+      }
+
+      const link = event.target instanceof Element
+        ? event.target.closest('a[href]')
+        : null;
+      if (!link || !isSamePageHashHref(link.href)) return;
+
+      lockHeaderForAnchorNavigation();
+    }
+
     function refreshAfterLayout() {
       refresh();
       requestAnimationFrame(refresh);
@@ -119,10 +195,30 @@
     window.addEventListener('scroll', requestUpdate, { passive: true });
     window.addEventListener('resize', refreshAfterLayout, { passive: true });
     window.addEventListener('pageshow', refreshAfterLayout);
+    window.addEventListener('hashchange', lockHeaderForAnchorNavigation);
+    window.addEventListener('wheel', releaseAnchorNavigationLock, { passive: true });
+    window.addEventListener('touchstart', releaseAnchorNavigationLock, { passive: true });
+    window.addEventListener('keydown', releaseAnchorNavigationLock);
+    document.addEventListener('click', handleAnchorClick, true);
     document.addEventListener('astro:page-load', refreshAfterLayout);
     document.addEventListener('astro:after-swap', refreshAfterLayout);
 
-    window.__lczSmartHeader = { refresh: refreshAfterLayout };
+    window.__lczSmartHeader = {
+      refresh: refreshAfterLayout,
+      setState(value) {
+        const header = getHeader();
+        if (!header) return;
+        setHeaderState(value === 'hidden' && isEnabled(header) ? 'hidden' : 'visible');
+        state.lastY = getScrollY();
+        state.upwardDistance = 0;
+      },
+      getHeight() {
+        return state.headerHeight;
+      },
+      isHideEnabled() {
+        return isEnabled();
+      },
+    };
     refreshAfterLayout();
   })();
 </script>

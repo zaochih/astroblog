@@ -170,12 +170,17 @@
     @apply font-sans;
     overflow-y: scroll;
     scrollbar-gutter: stable;
+    --site-header-height: 3.5rem;
+    --site-header-visible-height: var(--site-header-height);
+    --content-anchor-offset: calc(var(--site-header-height, 3.5rem) + 1.5rem);
+    --sticky-header-offset: var(--site-header-visible-height, var(--site-header-height, 3.5rem));
+    --toc-sticky-top: calc(var(--sticky-header-offset) + 1.5rem);
   }
 }
 
-/* Heading scroll offset: compensate for sticky navbar (h-14 = 3.5rem) */
-.prose :is(h1, h2, h3, h4, h5, h6) {
-  scroll-margin-top: 5rem;
+/* Anchor scroll offset: compensate for the fixed header across headings and generated footnote anchors. */
+.prose [id] {
+  scroll-margin-top: var(--content-anchor-offset);
 }
 
 .prose a:not(:has(img)):not([data-footnote-backref]) {

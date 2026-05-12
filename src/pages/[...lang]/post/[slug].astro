@@ -252,7 +252,7 @@ const homeHref = currentLang === defaultLang ? '/' : `/${currentLang}/`;
   </article>
 
   {hasToc && (
-    <aside class="hidden xl:block sticky top-24 self-start">
+    <aside class="hidden xl:block sticky top-[var(--toc-sticky-top)] self-start transition-[top] duration-200 ease-out">
       <div class="rounded-lg border border-border/50 bg-card p-4">
         <p class="text-xs font-semibold text-foreground/70 uppercase tracking-wider mb-3">
           {t('post.toc')}
