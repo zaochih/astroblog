@@ -218,7 +218,7 @@ const sortedFriends = [...sponsoredFriends, ...regularFriends, ...referralFriend
                   </span>
                 )}
                 {isTimeLimited && (
-                  <span class="rounded-md border border-violet-300/35 bg-violet-300/15 px-1.5 py-0.5 text-[10px] font-semibold text-violet-100 shadow-sm shadow-violet-500/10">
+                  <span class="rounded-md border border-mist-300/35 bg-mist-300/15 px-1.5 py-0.5 text-[10px] font-semibold text-mist-100 shadow-sm shadow-mist-500/10">
                     {t('friends.timeLimited')}
                   </span>
                 )}
@@ -340,8 +340,10 @@ const sortedFriends = [...sponsoredFriends, ...regularFriends, ...referralFriend
     aspect-ratio: 1;
     object-fit: contain;
     filter: blur(24px) saturate(1.8) brightness(1.12);
+    mask-image: radial-gradient(circle, #000 0 42%, transparent 74%);
     opacity: 0.92;
     transform: scale(2.2);
+    -webkit-mask-image: radial-gradient(circle, #000 0 42%, transparent 74%);
   }
 
   @media (prefers-reduced-motion: reduce) {
