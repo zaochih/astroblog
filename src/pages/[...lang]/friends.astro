@@ -337,7 +337,7 @@ const sortedFriends = [...sponsoredFriends, ...regularFriends, ...referralFriend
       transform 220ms ease-out;
   }
 
-  [data-friend-glow-card]:is(:hover, :focus-within, :active) .friend-glow {
+  [data-friend-glow-card]:is(:hover, :focus-within) .friend-glow {
     opacity: 0.28;
   }
 
@@ -346,10 +346,8 @@ const sortedFriends = [...sponsoredFriends, ...regularFriends, ...referralFriend
     aspect-ratio: 1;
     object-fit: contain;
     filter: blur(24px) saturate(1.8) brightness(1.12);
-    mask-image: radial-gradient(circle, #000 0 42%, transparent 74%);
     opacity: 0.92;
-    transform: scale(2.2);
-    -webkit-mask-image: radial-gradient(circle, #000 0 42%, transparent 74%);
+    transform: scaleX(2.9) scaleY(2.2);
   }
 
   @media (prefers-reduced-motion: reduce) {
