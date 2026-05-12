@@ -22,6 +22,14 @@ export const Tags: Record<string, LocalizedTaxonomy> = {
     name: { 'zh-cn': '技术向', 'en-us': 'Tech' },
     slug: { 'zh-cn': '技术向', 'en-us': 'tech' },
   },
+  apple: {
+    name: { 'zh-cn': 'Apple', 'en-us': 'Apple' },
+    slug: { 'zh-cn': 'apple', 'en-us': 'apple' },
+  },
+  'apple-vision-pro': {
+    name: { 'zh-cn': 'Apple Vision Pro', 'en-us': 'Apple Vision Pro' },
+    slug: { 'zh-cn': 'apple-vision-pro', 'en-us': 'apple-vision-pro' },
+  },
   'google-chrome': {
     name: { 'zh-cn': 'Google Chrome', 'en-us': 'Google Chrome' },
     slug: { 'zh-cn': 'google-chrome', 'en-us': 'google-chrome' },
@@ -33,6 +41,14 @@ export const Tags: Record<string, LocalizedTaxonomy> = {
   gpg: {
     name: { 'zh-cn': 'GPG', 'en-us': 'GPG' },
     slug: { 'zh-cn': 'gpg', 'en-us': 'gpg' },
+  },
+  nginx: {
+    name: { 'zh-cn': 'NGINX', 'en-us': 'NGINX' },
+    slug: { 'zh-cn': 'nginx', 'en-us': 'nginx' },
+  },
+  windows: {
+    name: { 'zh-cn': 'Windows', 'en-us': 'Windows' },
+    slug: { 'zh-cn': 'windows', 'en-us': 'windows' },
   },
   'windows-11': {
     name: { 'zh-cn': 'Windows 11', 'en-us': 'Windows 11' },
@@ -69,6 +85,10 @@ export const Tags: Record<string, LocalizedTaxonomy> = {
   geekgame: {
     name: { 'zh-cn': 'GeekGame', 'en-us': 'GeekGame' },
     slug: { 'zh-cn': 'geekgame', 'en-us': 'geekgame' },
+  },
+  hackergame: {
+    name: { 'zh-cn': 'Hackergame', 'en-us': 'Hackergame' },
+    slug: { 'zh-cn': 'hackergame', 'en-us': 'hackergame' },
   },
   'write-up': {
     name: { 'zh-cn': 'Write Up', 'en-us': 'Write Up' },
