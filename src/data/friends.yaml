@@ -84,14 +84,14 @@
 ### Sponsored Links Part ###
 
 - name: Microsoft Build 2026 大会
-  description: 在 Microsoft Build 大会上，您将深入了解构建和扩展 AI 的团队的真实代码、真实系统和真实工作流程。两天时间。动手实践课程。没有废话。
+  description: 深入探讨真实代码和真实系统，参加 6 月 2 日至 3 日在旧金山举行的 Microsoft Build 2026，以及线上活动
   url: https://build.microsoft.com/home?WT.mc_id=studentamb_203301
   sponsored: true
   endAt: "2026-06-04T01:00:00.000Z"
   i18n:
     en-us:
       name: Microsoft Build 2026
-      description: At Microsoft Build, you'll go deep on real code, real systems, and real workflows with the teams building and scaling AI. Two days. Hands-on sessions. No fluff.
+      description: Go deep on real code and real systems at Microsoft Build 2026, June 2-3 in San Francisco and online
 
 ### Referrals Part ###
 
