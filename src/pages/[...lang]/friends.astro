@@ -260,6 +260,12 @@ const sortedFriends = [...sponsoredFriends, ...regularFriends, ...referralFriend
     --friend-glow-y: 0;
   }
 
+  @media (pointer: coarse) {
+    [data-friend-glow-card] {
+      touch-action: none;
+    }
+  }
+
   .friend-card-title {
     display: inline;
     background-image: linear-gradient(currentColor, currentColor);
@@ -331,7 +337,7 @@ const sortedFriends = [...sponsoredFriends, ...regularFriends, ...referralFriend
       transform 220ms ease-out;
   }
 
-  [data-friend-glow-card]:is(:hover, :focus-within) .friend-glow {
+  [data-friend-glow-card]:is(:hover, :focus-within, :active) .friend-glow {
     opacity: 0.28;
   }
 
@@ -369,6 +375,16 @@ const sortedFriends = [...sponsoredFriends, ...regularFriends, ...referralFriend
       y: number;
     };
 
+    type FriendGlowTouchState = {
+      identifier: number;
+      startX: number;
+      startY: number;
+      cardTop: number;
+      cardBottom: number;
+      lastY: number;
+      scrolling: boolean;
+    };
+
     const friendGlowWindow = window as FriendGlowWindow;
     const existing = friendGlowWindow.__lczFriendGlow;
     if (existing) {
@@ -377,6 +393,7 @@ const sortedFriends = [...sponsoredFriends, ...regularFriends, ...referralFriend
     }
 
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const touchScrollEdgePadding = 12;
     const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
     const parseTime = (value: string | undefined) => {
       if (!value) return undefined;
@@ -403,6 +420,8 @@ const sortedFriends = [...sponsoredFriends, ...regularFriends, ...referralFriend
     const state = {
       boundCards: new WeakSet<HTMLElement>(),
       pending: new Map<HTMLElement, FriendGlowPosition>(),
+      touchState: new WeakMap<HTMLElement, FriendGlowTouchState>(),
+      suppressClick: new WeakSet<HTMLElement>(),
       frame: 0,
     };
 
@@ -422,21 +441,146 @@ const sortedFriends = [...sponsoredFriends, ...regularFriends, ...referralFriend
       }
     };
 
+    const scheduleFromClientPoint = (card: HTMLElement, clientX: number, clientY: number) => {
+      const rect = card.getBoundingClientRect();
+      const x = (clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
+      const y = (clientY - (rect.top + rect.height / 2)) / (rect.height / 2);
+
+      schedule(card, clamp(x, -1, 1), clamp(y, -1, 1));
+    };
+
+    const scheduleFromPointer = (card: HTMLElement, event: PointerEvent) => {
+      scheduleFromClientPoint(card, event.clientX, event.clientY);
+    };
+
+    const releasePointerCapture = (card: HTMLElement, pointerId: number) => {
+      if (card.hasPointerCapture(pointerId)) {
+        card.releasePointerCapture(pointerId);
+      }
+    };
+
+    const finishPointer = (card: HTMLElement, event: PointerEvent) => {
+      releasePointerCapture(card, event.pointerId);
+      schedule(card, 0, 0);
+    };
+
+    const getChangedTouch = (event: TouchEvent) => event.changedTouches.item(0);
+
+    const getTrackedTouch = (event: TouchEvent, touch: FriendGlowTouchState) => {
+      for (let index = 0; index < event.touches.length; index += 1) {
+        const candidate = event.touches.item(index);
+        if (candidate?.identifier === touch.identifier) return candidate;
+      }
+      return undefined;
+    };
+
+    const isTouchPastCardY = (touch: Touch, touchState: FriendGlowTouchState) => (
+      touch.clientY < touchState.cardTop - touchScrollEdgePadding
+      || touch.clientY > touchState.cardBottom + touchScrollEdgePadding
+    );
+
+    const finishTrackedTouch = (card: HTMLElement) => {
+      const touch = state.touchState.get(card);
+      state.touchState.delete(card);
+      schedule(card, 0, 0);
+
+      if (!touch?.scrolling) return;
+      state.suppressClick.add(card);
+      window.setTimeout(() => state.suppressClick.delete(card), 450);
+    };
+
     const bindCard = (card: HTMLElement) => {
       if (state.boundCards.has(card)) return;
       state.boundCards.add(card);
 
       card.addEventListener('pointermove', (event: PointerEvent) => {
-        const rect = card.getBoundingClientRect();
-        const x = (event.clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
-        const y = (event.clientY - (rect.top + rect.height / 2)) / (rect.height / 2);
-
-        schedule(card, clamp(x, -1, 1), clamp(y, -1, 1));
+        if (event.pointerType === 'touch') return;
+        scheduleFromPointer(card, event);
       });
+
+      card.addEventListener('pointerdown', (event: PointerEvent) => {
+        if (event.pointerType === 'touch') return;
+        if (event.pointerType !== 'mouse') {
+          card.setPointerCapture(event.pointerId);
+        }
+        scheduleFromPointer(card, event);
+      });
+
+      card.addEventListener('touchstart', (event: TouchEvent) => {
+        if (event.touches.length !== 1) return;
+        const touch = getChangedTouch(event);
+        if (!touch) return;
+
+        const rect = card.getBoundingClientRect();
+        state.touchState.set(card, {
+          identifier: touch.identifier,
+          startX: touch.clientX,
+          startY: touch.clientY,
+          cardTop: rect.top,
+          cardBottom: rect.bottom,
+          lastY: touch.clientY,
+          scrolling: false,
+        });
+        scheduleFromClientPoint(card, touch.clientX, touch.clientY);
+      }, { passive: true });
+
+      card.addEventListener('touchmove', (event: TouchEvent) => {
+        const touchState = state.touchState.get(card);
+        if (!touchState) return;
+
+        const touch = getTrackedTouch(event, touchState);
+        if (!touch) return;
+
+        if (!touchState.scrolling && isTouchPastCardY(touch, touchState)) {
+          touchState.scrolling = true;
+          touchState.lastY = touch.clientY;
+          schedule(card, 0, 0);
+        }
+
+        if (event.cancelable) {
+          event.preventDefault();
+        }
+
+        if (touchState.scrolling) {
+          const scrollDelta = touch.clientY - touchState.lastY;
+          touchState.lastY = touch.clientY;
+          window.scrollBy(0, -scrollDelta);
+          return;
+        }
+
+        scheduleFromClientPoint(card, touch.clientX, touch.clientY);
+      }, { passive: false });
+
+      card.addEventListener('touchend', () => {
+        finishTrackedTouch(card);
+      }, { passive: true });
+
+      card.addEventListener('touchcancel', () => {
+        finishTrackedTouch(card);
+      }, { passive: true });
 
       card.addEventListener('pointerleave', () => {
         schedule(card, 0, 0);
       });
+
+      card.addEventListener('pointerup', (event: PointerEvent) => {
+        if (event.pointerType === 'touch') return;
+        finishPointer(card, event);
+      });
+
+      card.addEventListener('pointercancel', (event: PointerEvent) => {
+        if (event.pointerType === 'touch') return;
+        finishPointer(card, event);
+      });
+
+      card.addEventListener('click', (event: MouseEvent) => {
+        if (!state.suppressClick.has(card)) {
+          return;
+        }
+        event.preventDefault();
+        event.stopPropagation();
+        state.suppressClick.delete(card);
+      }, true);
     };
 
     const init = () => {
