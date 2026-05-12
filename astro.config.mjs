@@ -145,6 +145,20 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
+  server: {
+    allowedHosts: true,
+    headers: {
+      "Access-Control-Allow-Origin": "https://giscus.app",
+    },
+  },
+  security: {
+    allowedDomains: [
+      {
+        protocol: "https",
+        hostname: "giscus.app",
+      },
+    ],
+  },
   image: {
     layout: "constrained",
     responsiveStyles: true,
