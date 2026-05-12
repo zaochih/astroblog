@@ -54,18 +54,32 @@ const giscusConfig = JSON.stringify({
       </p>
     </div>
 
-    <div data-giscus-host></div>
+    <div class="relative min-h-24" data-giscus-host>
+      <div
+        class="rounded-lg border border-border/60 bg-background p-4 text-sm text-muted-foreground shadow-sm"
+        aria-live="polite"
+        data-giscus-placeholder
+      >
+        <div class="space-y-1">
+          <p class="font-medium text-foreground">{t('comments.loadingTitle')}</p>
+          <p class="leading-relaxed">{t('comments.loadingDescription')}</p>
+        </div>
+      </div>
+      <div data-giscus-mount></div>
+    </div>
 
     <script is:inline>
       (() => {
         function loadGiscus(container) {
           const host = container.querySelector('[data-giscus-host]');
           if (!host || host.dataset.loaded === 'true') return;
+          const mount = host.querySelector('[data-giscus-mount]');
+          if (!mount) return;
 
           const config = JSON.parse(container.dataset.giscusConfig || '{}');
           if (!config.repo || !config.repoId || !config.category || !config.categoryId || !config.term) return;
 
-          host.textContent = '';
+          const placeholder = host.querySelector('[data-giscus-placeholder]');
           const script = document.createElement('script');
           script.src = 'https://giscus.app/client.js';
           script.async = true;
@@ -83,7 +97,46 @@ const giscusConfig = JSON.stringify({
           const themeUrl = new URL('/giscus-theme.css', window.location.origin).href;
           script.setAttribute('data-theme', themeUrl);
           script.setAttribute('data-lang', config.lang || 'en');
-          host.append(script);
+
+          let frame = null;
+          let fallbackTimer = 0;
+
+          const hidePlaceholder = () => {
+            if (!placeholder || host.dataset.ready === 'true') return;
+
+            host.dataset.ready = 'true';
+            observer.disconnect();
+            window.removeEventListener('message', handleGiscusMessage);
+            window.clearTimeout(fallbackTimer);
+            setTimeout(() => {
+              placeholder.hidden = true;
+            }, 240);
+          };
+
+          const handleGiscusMessage = (event) => {
+            if (event.origin !== 'https://giscus.app') return;
+            if (!frame || event.source !== frame.contentWindow) return;
+            if (!event.data || typeof event.data !== 'object' || !event.data.giscus) return;
+
+            const height = Number(event.data.giscus.resizeHeight);
+            if (!Number.isFinite(height) || height <= 0) return;
+
+            hidePlaceholder();
+          };
+
+          const bindFrameLoad = () => {
+            frame = mount.querySelector('iframe.giscus-frame, iframe[src*="giscus.app"]');
+            if (!frame || frame.dataset.placeholderBound === 'true') return;
+
+            frame.dataset.placeholderBound = 'true';
+            window.addEventListener('message', handleGiscusMessage);
+            frame.addEventListener('load', () => window.setTimeout(hidePlaceholder, 500), { once: true });
+            fallbackTimer = window.setTimeout(hidePlaceholder, 8000);
+          };
+          const observer = new MutationObserver(bindFrameLoad);
+          observer.observe(mount, { childList: true, subtree: true });
+
+          mount.append(script);
           host.dataset.loaded = 'true';
         }
 
@@ -100,5 +153,69 @@ const giscusConfig = JSON.stringify({
         initGiscus();
       })();
     </script>
+
+    <style is:global>
+      [data-giscus-placeholder] {
+        transition:
+          opacity 180ms ease,
+          visibility 180ms ease,
+          display 180ms allow-discrete;
+        transition-behavior: allow-discrete;
+      }
+
+      [data-giscus-host][data-ready='true'] [data-giscus-placeholder] {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        z-index: 10;
+        opacity: 0;
+        pointer-events: none;
+        visibility: hidden;
+      }
+
+      [data-giscus-mount] {
+        transition:
+          opacity 220ms ease,
+          visibility 220ms ease;
+      }
+
+      [data-giscus-host] iframe.giscus-frame {
+        transition: opacity 220ms ease;
+      }
+
+      [data-giscus-host]:not([data-ready='true']) [data-giscus-mount] {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        opacity: 0;
+        pointer-events: none;
+        visibility: hidden;
+      }
+
+      [data-giscus-host]:not([data-ready='true']) iframe.giscus-frame {
+        opacity: 0 !important;
+      }
+
+      [data-giscus-host][data-ready='true'] {
+        min-height: 0;
+      }
+
+      [data-giscus-host][data-ready='true'] [data-giscus-mount] {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      [data-giscus-host][data-ready='true'] iframe.giscus-frame {
+        opacity: 1 !important;
+      }
+
+      @starting-style {
+        [data-giscus-host][data-ready='true'] [data-giscus-mount] {
+          opacity: 0;
+        }
+      }
+    </style>
   </section>
 )}

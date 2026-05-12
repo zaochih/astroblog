@@ -99,6 +99,8 @@ export const ui = {
     'comments.title': '评论',
     'comments.description': '评论由 GitHub Discussions 提供。参与讨论会受到 GitHub 隐私声明约束。',
     'comments.privacy': 'GitHub 隐私声明',
+    'comments.loadingTitle': '正在加载评论区',
+    'comments.loadingDescription': '评论区由 giscus 提供，稍等片刻即可查看和参与讨论。',
   },
   'en-us': {
     'nav.home': 'Articles',
@@ -180,6 +182,8 @@ export const ui = {
     'comments.title': 'Comments',
     'comments.description': 'Comments are powered by GitHub Discussions. Joining the discussion is subject to GitHub’s privacy statement.',
     'comments.privacy': 'GitHub Privacy Statement',
+    'comments.loadingTitle': 'Loading comments',
+    'comments.loadingDescription': 'The discussion is provided by giscus and should be ready in a moment.',
   },
 } as const;
 
