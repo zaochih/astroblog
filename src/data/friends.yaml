@@ -108,18 +108,18 @@
 
 - name: 微软电脑管家
   description: 简单无打扰，安全又安心
-  url: https://pcmanager.microsoft.com/zh-cn
+  url: https://pcmanager.microsoft.com/zh-cn?WT.mc_id=studentamb_203301
   backgroundIcon: /assets/images/friends/pcmanager-logo.png
   referral: true
   i18n:
     en-us:
       name: Microsoft PC Manager
       description: Safeguard your PC in a quiet and reliable way
-      url: https://pcmanager.microsoft.com/en-us
+      url: https://pcmanager.microsoft.com/en-us?WT.mc_id=studentamb_203301
 
-- name: 微软积分商城
+- name: Microsoft Rewards
   description: 通过 Microsoft Rewards 赚取免费积分，您可以将其兑换为礼品卡、用于参与抽奖，或捐赠给非营利组织。
-  url: https://rewards.microsoft.com/
+  url: https://rewards.microsoft.com/?WT.mc_id=studentamb_203301
   backgroundIcon: /assets/images/friends/bing-color.png
   referral: true
   i18n:
