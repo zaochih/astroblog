@@ -11,6 +11,7 @@ import LanguageToast from '@/components/LanguageToast.astro';
 import LanguagePreference from '@/components/LanguagePreference.astro';
 import SmartHeader from '@/components/SmartHeader.astro';
 import DetailsAnimator from '@/components/DetailsAnimator.astro';
+import SiteAnnouncement from '@/components/SiteAnnouncement.astro';
 import HugeIcon from '@/components/HugeIcon';
 import { ClientRouter } from 'astro:transitions';
 
@@ -116,13 +117,15 @@ function getLangHref(targetLang: string): string {
           : <link rel="alternate" type="application/rss+xml" title={`${siteConfig.name} (EN)`} href="/en-us/rss.xml" />
         }
     </head>
-    <body class="flex flex-col">
+    <body class="flex min-h-screen flex-col">
+        <SiteAnnouncement lang={lang} />
+
         <header
           data-pagefind-ignore
           id="site-header"
           data-state="visible"
           data-hide-on-scroll={hideHeaderOnScroll ? 'true' : 'false'}
-          class="fixed top-0 left-0 right-0 z-50 w-full border-b border-border/60 bg-background shadow-fluent-sm transition-transform duration-200 ease-out data-[state=hidden]:-translate-y-full"
+          class="sticky top-0 z-50 w-full border-b border-border/60 bg-background shadow-fluent-sm transition-transform duration-200 ease-out data-[state=hidden]:-translate-y-full"
         >
           <div class="max-w-6xl mx-auto px-3 sm:px-4 min-h-14 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 py-2">
             <a href={homeHref} aria-label={t('aria.nav.home')} class="shrink-0 font-semibold text-primary tracking-tight hover:opacity-80 transition-opacity">
@@ -290,10 +293,15 @@ function getLangHref(targetLang: string): string {
 </html>
 
 <style>
-    html,
+    html {
+        margin: 0;
+        width: 100%;
+        min-height: 100%;
+    }
+
     body {
         margin: 0;
         width: 100%;
-        height: 100%;
+        min-height: 100vh;
     }
 </style>

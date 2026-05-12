@@ -1,0 +1,245 @@
+---
+import yaml from 'js-yaml';
+import HugeIcon from '@/components/HugeIcon';
+import { defaultLang, type Lang } from '@/i18n/ui';
+import announcementsRaw from '@/data/announcements.yaml?raw';
+
+type AnnouncementVariant = 'info' | 'holiday' | 'maintenance' | 'event';
+
+interface AnnouncementAction {
+  icon?: string;
+  text: string;
+  url: string;
+}
+
+interface AnnouncementLocalization {
+  icon?: string;
+  title?: string;
+  body?: string;
+  action?: AnnouncementAction;
+}
+
+interface Announcement {
+  enabled?: boolean;
+  variant?: AnnouncementVariant;
+  icon?: string;
+  title: string;
+  body: string;
+  action?: AnnouncementAction;
+  startAt?: string;
+  endAt?: string;
+  i18n?: Partial<Record<Lang, AnnouncementLocalization>>;
+}
+
+interface Props {
+  lang?: string;
+}
+
+const { lang = defaultLang } = Astro.props as Props;
+const buildTime = Date.now();
+const announcements = (yaml.load(announcementsRaw) as Announcement[] | null) ?? [];
+
+function localizeAnnouncement(announcement: Announcement, currentLang: Lang): Announcement {
+  const localized = announcement.i18n?.[currentLang];
+  if (!localized) return announcement;
+
+  return {
+    ...announcement,
+    icon: localized.icon ?? announcement.icon,
+    title: localized.title ?? announcement.title,
+    body: localized.body ?? announcement.body,
+    action: localized.action ?? announcement.action,
+    i18n: announcement.i18n,
+  };
+}
+
+function parseTime(value: string | undefined): number | null {
+  if (!value) return null;
+  const timestamp = Date.parse(value);
+  return Number.isNaN(timestamp) ? null : timestamp;
+}
+
+function isActive(announcement: Announcement, now: number): boolean {
+  if (announcement.enabled === false) return false;
+
+  const startAt = parseTime(announcement.startAt);
+  const endAt = parseTime(announcement.endAt);
+
+  if (startAt !== null && now < startAt) return false;
+  if (endAt !== null && now >= endAt) return false;
+  return true;
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function isSafeHref(href: string): boolean {
+  return /^(https?:\/\/|mailto:|\/|#)/i.test(href);
+}
+
+function renderInlineMarkdown(value: string): string {
+  const linkPattern = /\[([^\]]+)\]\(([^)\s]+)\)/g;
+  let rendered = '';
+  let lastIndex = 0;
+
+  for (const match of value.matchAll(linkPattern)) {
+    const index = match.index ?? 0;
+    const [source, label, href] = match;
+    rendered += escapeHtml(value.slice(lastIndex, index));
+    rendered += isSafeHref(href)
+      ? `<a href="${escapeHtml(href)}" class="font-medium underline underline-offset-2 decoration-current/40 transition-colors hover:decoration-current">${escapeHtml(label)}</a>`
+      : escapeHtml(source);
+    lastIndex = index + source.length;
+  }
+
+  rendered += escapeHtml(value.slice(lastIndex));
+  return rendered;
+}
+
+const activeAnnouncements = announcements
+  .filter((announcement) => isActive(announcement, buildTime))
+  .map((announcement) => localizeAnnouncement(announcement, lang as Lang));
+---
+
+{activeAnnouncements.length > 0 && (
+  <aside data-pagefind-ignore class="site-announcements" aria-label={lang === 'zh-cn' ? '全站公告' : 'Site announcements'}>
+    <div class="mx-auto flex max-w-6xl flex-col gap-1.5 px-3 py-1.5 sm:px-4">
+      {activeAnnouncements.map((announcement) => {
+        const variant = announcement.variant ?? 'info';
+
+        return (
+          <section class={`site-announcement site-announcement-${variant}`}>
+            <div class="site-announcement-icon" aria-hidden="true">
+              <HugeIcon name={announcement.icon ?? 'megaphone'} className="size-4" size={16} />
+            </div>
+
+            <p class="site-announcement-text">
+              <strong>{announcement.title}</strong>
+              {' '}
+              <span set:html={renderInlineMarkdown(announcement.body)} />
+            </p>
+
+            {announcement.action && (
+              <a href={announcement.action.url} class="site-announcement-action">
+                <HugeIcon name={announcement.action.icon ?? 'arrowRight'} className="size-4" size={16} />
+                <span>{announcement.action.text}</span>
+              </a>
+            )}
+          </section>
+        );
+      })}
+    </div>
+  </aside>
+)}
+
+<style>
+  .site-announcements {
+    --announcement-bg: color-mix(in oklab, var(--primary) 9%, var(--background));
+    --announcement-fg: var(--foreground);
+    --announcement-accent: var(--primary);
+    --announcement-action-border: color-mix(in oklab, var(--primary) 40%, transparent);
+    --announcement-action-hover-border: color-mix(in oklab, var(--primary) 62%, transparent);
+    --announcement-action-hover-bg: color-mix(in oklab, var(--primary) 10%, transparent);
+    background: color-mix(in oklab, var(--background) 91%, var(--primary));
+  }
+
+  .site-announcement {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.35rem 0.625rem;
+    background: var(--announcement-bg);
+    color: var(--announcement-fg);
+    padding: 0.375rem 0.625rem;
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+
+  .site-announcement-holiday {
+    --announcement-bg: color-mix(in oklab, #16a34a 11%, var(--background));
+    --announcement-accent: #15803d;
+    --announcement-action-border: rgb(22 101 52 / 0.4);
+    --announcement-action-hover-border: rgb(20 83 45 / 0.6);
+    --announcement-action-hover-bg: rgb(21 128 61 / 0.1);
+  }
+
+  .site-announcement-maintenance {
+    --announcement-bg: color-mix(in oklab, #f59e0b 13%, var(--background));
+    --announcement-accent: #b45309;
+    --announcement-action-border: rgb(146 64 14 / 0.4);
+    --announcement-action-hover-border: rgb(120 53 15 / 0.6);
+    --announcement-action-hover-bg: rgb(180 83 9 / 0.1);
+  }
+
+  .site-announcement-event {
+    --announcement-bg: color-mix(in oklab, #dc2626 9%, var(--background));
+    --announcement-accent: #b91c1c;
+    --announcement-action-border: rgb(153 27 27 / 0.4);
+    --announcement-action-hover-border: rgb(127 29 29 / 0.6);
+    --announcement-action-hover-bg: rgb(185 28 28 / 0.1);
+  }
+
+  .site-announcement-icon {
+    display: inline-flex;
+    width: 1.5rem;
+    height: 1.5rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    background: color-mix(in oklab, var(--announcement-accent) 14%, transparent);
+    color: var(--announcement-accent);
+  }
+
+  .site-announcement-text {
+    min-width: 0;
+  }
+
+  .site-announcement-text strong {
+    font-weight: 700;
+  }
+
+  .site-announcement-action {
+    grid-column: 2;
+    display: inline-flex;
+    width: fit-content;
+    max-width: 100%;
+    align-items: center;
+    gap: 0.35rem;
+    justify-self: end;
+    flex-shrink: 0;
+    border: 1px solid var(--announcement-action-border);
+    border-radius: var(--radius-lg);
+    color: var(--announcement-accent);
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.2;
+    padding: 0.25rem 0.625rem;
+    text-decoration: none;
+    transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+  }
+
+  .site-announcement-action:hover,
+  .site-announcement-action:focus-visible {
+    border-color: var(--announcement-action-hover-border);
+    background: var(--announcement-action-hover-bg);
+  }
+
+  @media (min-width: 640px) {
+    .site-announcement {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      padding-inline: 0.75rem;
+    }
+
+    .site-announcement-action {
+      grid-column: auto;
+      justify-self: end;
+      white-space: nowrap;
+    }
+  }
+</style>

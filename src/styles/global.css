@@ -163,7 +163,6 @@
 
   body {
     @apply bg-background text-foreground;
-    padding-top: var(--site-header-height, 3.5rem);
   }
 
   html {

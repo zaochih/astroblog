@@ -1,0 +1,35 @@
+# 全站公告 / Site announcements
+# ─────────────────────────
+# enabled:   可选，false 时隐藏
+# variant:   可选，info / holiday / maintenance / event；默认 info
+# icon:      可选，HugeIcon 名称，例如 megaphone / info / fireworks / wrench / gift / party
+# title:     标题，会加粗显示在正文前
+# body:      正文；支持安全的行内链接语法 [文本](https://example.com)、[文本](/path)、[文本](#hash)
+# action:    可选，右侧链接按钮
+#   icon:    可选，HugeIcon 名称
+#   text:    按钮文本
+#   url:     链接地址
+# startAt:   可选，ISO 8601 开始时间；开始前不显示
+# endAt:     可选，ISO 8601 结束时间；结束后不显示
+# i18n:      可选，按语言覆盖 icon / title / body / action；未覆盖字段回退到默认值
+#   en-us:
+#     title: Localized title
+#     body: Localized body with [links](/about)
+
+- enabled: true
+  variant: info
+  icon: wrench
+  title: 平台更新
+  body: LCZBlog 已由 WordPress 迁移到基于 Astro 的自建平台。该平台正在快速演进阶段，欢迎与 [platform (at) zaochih.com](mailto:platform@zaochih.com) 分享反馈。
+  # action:
+  #   icon: arrowRight
+  #   text: 了解更多
+  #   url: /about
+  i18n:
+    en-us:
+      title: Platform Update
+      body: LCZBlog has migrated to 1st-party platform based on Astro from WordPress. This plarform is moving fast forward and we welcome your feedback to [platform (at) zaochih.com](mailto:platform@zaochih.com).
+      # action:
+      #   icon: arrowRight
+      #   text: Learn more
+      #   url: /en-us/about

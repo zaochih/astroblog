@@ -6,6 +6,8 @@ import {
   AttachmentIcon,
   BookOpen01Icon,
   Calendar03Icon,
+  FireworksIcon,
+  GiftIcon,
   Clock01Icon,
   Folder01Icon,
   GithubIcon,
@@ -21,7 +23,12 @@ import {
   XVariableIcon,
   WechatIcon,
   LanguageCircleIcon,
+  Megaphone01Icon,
   MicrosoftIcon,
+  PartyIcon,
+  SparklesIcon,
+  ToolsIcon,
+  Wrench01Icon,
 } from "@hugeicons/core-free-icons";
 
 const icons = {
@@ -32,7 +39,9 @@ const icons = {
   book: BookOpen01Icon,
   calendar: Calendar03Icon,
   clock: Clock01Icon,
+  fireworks: FireworksIcon,
   folder: Folder01Icon,
+  gift: GiftIcon,
   github: GithubIcon,
   globe: Globe02Icon,
   home: Home01Icon,
@@ -46,7 +55,12 @@ const icons = {
   x: XVariableIcon,
   wechat: WechatIcon,
   lang: LanguageCircleIcon,
+  megaphone: Megaphone01Icon,
   microsoft: MicrosoftIcon,
+  party: PartyIcon,
+  sparkles: SparklesIcon,
+  tools: ToolsIcon,
+  wrench: Wrench01Icon,
 } as const;
 
 export type HugeIconName = keyof typeof icons;
