@@ -120,7 +120,7 @@ const activeAnnouncements = announcements
             </div>
 
             <p class="site-announcement-text">
-              <strong>{announcement.title}</strong>
+              <strong>{'['}{announcement.title}{']'}</strong>
               {' '}
               <span set:html={renderInlineMarkdown(announcement.body)} />
             </p>
