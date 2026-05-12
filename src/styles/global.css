@@ -1,6 +1,7 @@
 @import "./fluent-emoji.css";
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
+@config "../../tailwind.config.mjs";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
@@ -251,14 +252,6 @@ pre[data-lang]::before {
 .animated-details[open] .details-content {
   height: auto;
   opacity: 1;
-}
-
-/* Disable Tailwind Typography default quotes for blockquote and inline code */
-.prose blockquote p:first-of-type::before,
-.prose blockquote p:last-of-type::after,
-.prose code::before,
-.prose code::after {
-  content: none !important;
 }
 
 /* Hidden / spoiler text */
