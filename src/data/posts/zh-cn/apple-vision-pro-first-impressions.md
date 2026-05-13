@@ -1,5 +1,6 @@
 ---
 title: Apple Vision Pro 初体验
+description: 记录一次在 Apple 重庆北城天街体验 Vision Pro 的过程，以及对佩戴、交互、沉浸观影和输入体验的直观感受。
 date: "2024-08-27T15:41:07Z"
 updated: "2024-08-27T15:41:10Z"
 tags:

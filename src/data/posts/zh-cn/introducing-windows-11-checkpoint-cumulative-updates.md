@@ -1,5 +1,6 @@
 ---
 title: 介绍 Windows 11 检查点累积更新
+description: 介绍 Windows 11 检查点累积更新如何通过更小的增量差异包改进更新交付效率。
 date: "2024-08-06T08:56:13Z"
 updated: "2024-08-06T08:56:14Z"
 tags:
@@ -11,7 +12,7 @@ canonicalUrl: https://blog.licaoz.com/post/introducing-windows-11-checkpoint-cum
 
 \[\*\* 本文的原文是位于 Windows IT 专业人员博客的 [Introducing Windows 11 checkpoint cumulative updates](https://techcommunity.microsoft.com/t5/windows-it-pro-blog/introducing-windows-11-checkpoint-cumulative-updates/ba-p/4182552?wt.mc_id=studentamb_203301) \*\*\]
 
-我们很高兴能在 Windows 11 中通过新的检查点累积更新进一步优化持续创新的交付。[1](#e1f85dab-45e1-4775-ad41-015a1fae9b0b)最早在 2024 年底，运行 Windows 11 24H2 或更高版本的任何设备以及 Windows Server 2025 都将能够自动获得这一优化。更小、更快和更可持续的更新使您的组织保持最新与安全，而不需要您采取任何行动。阅读 [Windows 预览体验版本 26120.1252](https://blogs.windows.com/windows-insider/2024/07/15/announcing-windows-11-insider-preview-build-26120-1252-dev-channel/?wt.mc_id=studentamb_203301)（Dev 频道）以了解您可如何预览这一体验。
+我们很高兴能在 Windows 11 中通过新的检查点累积更新进一步优化持续创新的交付。[^1]最早在 2024 年底，运行 Windows 11 24H2 或更高版本的任何设备以及 Windows Server 2025 都将能够自动获得这一优化。更小、更快和更可持续的更新使您的组织保持最新与安全，而不需要您采取任何行动。阅读 [Windows 预览体验版本 26120.1252](https://blogs.windows.com/windows-insider/2024/07/15/announcing-windows-11-insider-preview-build-26120-1252-dev-channel/?wt.mc_id=studentamb_203301)（Dev 频道）以了解您可如何预览这一体验。
 
 > **更新于 2024 年 7 月 31 日**：
 > 
@@ -23,7 +24,7 @@ canonicalUrl: https://blog.licaoz.com/post/introducing-windows-11-checkpoint-cum
 
 Windows 11 质量更新采用服务技术，并从新的 Windows 操作系统「正式发布」（released to manufacturing，RTM）时起进行累积构建。这些每月更新包含自 RTM 以来的所有变更，以初始版本二进制文件的差异形式呈现。
 
-> **提示**：您可在 [解释 Windows 月度更新](https://techcommunity.microsoft.com/t5/windows-it-pro-blog/windows-monthly-updates-explained/ba-p/3773544#:~:text=Monthly%20updates%20are%20cumulative%20and%20include%20all%20previously,the%20reliability%20and%20quality%20of%20the%20Windows%20platform.) 中了解质量更新如何工作。[2](#cbfd34b9-470a-4d73-914b-225f2b134c33)
+> **提示**：您可在 [解释 Windows 月度更新](https://techcommunity.microsoft.com/t5/windows-it-pro-blog/windows-monthly-updates-explained/ba-p/3773544#:~:text=Monthly%20updates%20are%20cumulative%20and%20include%20all%20previously,the%20reliability%20and%20quality%20of%20the%20Windows%20platform.) 中了解质量更新如何工作。[^2]
 
 在 Windows 11 24H2 版本中，我们引入了检查点累积更新这一全新概念。这将允许您通过最新的累积更新获取功能和安全增强，而这些更新是通过更小、增量式的差异文件实现的，仅包含自上一个检查点累积更新以来的变更。这意味着您可以节省时间、带宽和硬盘空间。
 
@@ -63,7 +64,7 @@ Windows 11 质量更新采用服务技术，并从新的 Windows 操作系统「
 
 ## 通过启用包优化和持续的功能更新交付
 
-当年度功能更新通过服务技术和启用包交付时，这个新版本与前一个版本共享相同的核心操作系统。[3](#a1d82299-b5b8-43e6-8c3d-419ba4dd5073)这意味着它们也共享相同的月度更新。结果是，单个更新文件随着每个具有自己服务生命周期的新版本发布而变得越来越大，影响也越来越大。
+当年度功能更新通过服务技术和启用包交付时，这个新版本与前一个版本共享相同的核心操作系统。[^3]这意味着它们也共享相同的月度更新。结果是，单个更新文件随着每个具有自己服务生命周期的新版本发布而变得越来越大，影响也越来越大。
 
 当引入的检查点与启用包功能更新的可用性保持一致时，这些版本的月度更新可以重新开始，且体积较小。这意味着 Microsoft 可以扩展更多用于功能更新的启用包，而您可以比传统功能更新更快、更容易、更高效地采用它们。
 
@@ -75,4 +76,6 @@ Windows 11 质量更新采用服务技术，并从新的 Windows 操作系统「
 
 我们致力于保护您的设备并提高其生产力。作为每月为您带来 Windows 更新的团队，我们已经采用了持续创新交付模式，并定期进行改进。我们对这项累积更新的最新创新感到兴奋，希望您能尽快尝试 Windows 11 检查点累积更新！
 
-* * *
+[^1]: 请阅读 [在 Windows 11 中实现持续创新](https://support.microsoft.com/zh-cn/windows/%E5%9C%A8windows-11%E4%B8%AD%E5%AE%9E%E7%8E%B0%E6%8C%81%E7%BB%AD%E5%88%9B%E6%96%B0-b0aa0a27-ea9a-4365-9224-cb155e517f12?wt.mc_id=studentamb_203301)
+[^2]: 「每月更新是累积性的，包含所有先前发布的修复程序，以确保操作系统版本的统一性。这有助于提高 Windows 平台的可靠性和质量。」
+[^3]: 如需了解启用包如何工作，请参阅 [Windows 11 版本 23H2 中为 IT 专业人员准备的新东西](https://techcommunity.microsoft.com/t5/windows-it-pro-blog/what-s-new-for-it-pros-in-windows-11-version-23h2/ba-p/3967814?wt.mc_id=studentamb_203301) 和 [KB5027397](https://support.microsoft.com/topic/kb5027397-feature-update-to-windows-11-version-23h2-by-using-an-enablement-package-b9e76726-3c94-40de-b40b-99decba3db9d?wt.mc_id=studentamb_203301).

@@ -1,5 +1,6 @@
 ---
 title: 中国科学技术大学第十一届信息安全大赛 Write Up
+description: 记录 Hackergame 2024 的参赛过程、解出的题目和部分题目的解题思路。
 date: "2024-11-09T07:56:25Z"
 updated: "2024-11-09T08:36:04Z"
 tags:

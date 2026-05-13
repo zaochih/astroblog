@@ -1,5 +1,6 @@
 ---
 title: 2024“京华杯”信息安全综合能力竞赛 Write Up
+description: 记录 2024 京华杯 GeekGame 的参赛体验、解题过程和部分题目的 Write Up。
 date: "2024-10-20T17:15:42Z"
 updated: "2024-11-08T15:51:44Z"
 tags:

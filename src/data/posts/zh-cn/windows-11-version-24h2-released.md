@@ -1,5 +1,6 @@
 ---
 title: Windows 11, 版本 24H2 现已面向公众可用！
+description: 汇总 Windows 11 版本 24H2 的正式发布信息、主要新功能、设备要求和已知问题。
 date: "2024-10-01T18:42:55Z"
 updated: "2025-09-02T04:35:21Z"
 tags:
