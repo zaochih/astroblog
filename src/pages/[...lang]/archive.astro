@@ -4,6 +4,7 @@ import Layout from '@/layouts/Layout.astro';
 import { siteConfig } from '@/config';
 import { useTranslations, languages, defaultLang, type Lang } from '@/i18n/ui';
 import { localizeAndSortPosts, getPostHref, formatDate, formatTime, getPostYear } from '@/lib/content';
+import { describeListingPage } from '@/lib/seo';
 
 export async function getStaticPaths() {
   return Object.keys(languages).map(lang => ({
@@ -30,6 +31,7 @@ const years = Object.keys(postsByYear).map(Number).sort((a, b) => b - a);
 
 <Layout
   title={`${t('archive.title')} | ${siteConfig.name}`}
+  description={describeListingPage({ kind: 'archive', lang })}
   lang={lang}
 >
   <div class="max-w-2xl mx-auto">

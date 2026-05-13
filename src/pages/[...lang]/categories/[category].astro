@@ -6,6 +6,7 @@ import { useTranslations, languages, defaultLang, type Lang } from '@/i18n/ui';
 import { localizeAndSortPosts, isPublishedEntry } from '@/lib/content';
 import { getCategoryName, getCategoryPathSegment, resolveCategoryKey } from '@/i18n/taxonomy';
 import TaxonomyPostList from '@/components/TaxonomyPostList.astro';
+import { describeListingPage } from '@/lib/seo';
 
 export async function getStaticPaths() {
   const allPosts = await getCollection('blog');
@@ -31,11 +32,13 @@ const allPosts = await getCollection('blog');
 const localizedPosts = localizeAndSortPosts(allPosts, lang)
   .filter(({ post }) => post.data.category && resolveCategoryKey(post.data.category) === category);
 
-const pageHeading = t('category.title').replace('{category}', getCategoryName(category, lang as Lang));
+const categoryName = getCategoryName(category, lang as Lang);
+const pageHeading = t('category.title').replace('{category}', categoryName);
 ---
 
 <Layout
   title={`${pageHeading} | ${siteConfig.name}`}
+  description={describeListingPage({ kind: 'category', lang, label: categoryName })}
   lang={lang}
 >
   <div class="max-w-2xl mx-auto">

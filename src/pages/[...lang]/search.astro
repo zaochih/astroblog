@@ -3,6 +3,7 @@ import Layout from '@/layouts/Layout.astro';
 import HugeIcon from '@/components/HugeIcon';
 import { siteConfig } from '@/config';
 import { useTranslations, languages, defaultLang, type Lang } from '@/i18n/ui';
+import { describeListingPage } from '@/lib/seo';
 
 export async function getStaticPaths() {
   return Object.keys(languages).map(lang => ({
@@ -27,7 +28,7 @@ const labels = {
 
 <Layout
   title={`${t('search.title')} | ${siteConfig.name}`}
-  description={t('search.placeholder')}
+  description={describeListingPage({ kind: 'search', lang })}
   lang={lang}
   searchable={false}
 >

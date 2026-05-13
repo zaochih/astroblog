@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import { siteConfig, licensePresets, type LicensePreset } from '@/config';
 import { useTranslations, languages, languageNames, defaultLang, type Lang } from '@/i18n/ui';
+import { descriptionFromTitle, getSiteDescription } from '@/lib/seo';
 
 /** Normalise BCP47 tag for HTML: 'zh-cn' → 'zh-CN', 'en-us' → 'en-US' */
 function toHtmlLang(tag: string) {
@@ -43,19 +44,28 @@ const {
 } = Astro.props as Props;
 
 const t = useTranslations(lang as Lang);
-const siteDesc = siteConfig.description[lang as keyof typeof siteConfig.description] ?? siteConfig.description[siteConfig.defaultLang];
 const pageTitle = title ?? siteConfig.name;
-const pageDescription = description ?? siteDesc;
 const homeHref = lang === defaultLang ? '/' : `/${lang}/`;
 const searchHref = lang === defaultLang ? '/search' : `/${lang}/search`;
 const canonicalUrl = canonicalUrlProp ?? `${siteConfig.siteUrl}${Astro.url.pathname}`;
+const pathname = Astro.url.pathname;
+const isHomeArticleList = pathname === '/' || pathname === `/${lang}/`;
+const pageDescription = description ?? (isHomeArticleList ? getSiteDescription(lang) : descriptionFromTitle(pageTitle, lang));
 
 // Footer: license
 const licenseKey = siteConfig.license as LicensePreset | null;
 const licenseInfo = licenseKey ? licensePresets[licenseKey] : null;
+const chinaFooterOptions = siteConfig.countrySpecificOptions.china;
+const miitIcpQueryUrl = 'https://beian.miit.gov.cn/#/Integrated/recordQuery';
+const mpsBeianQueryBaseUrl = 'https://www.beian.gov.cn/portal/registerSystemInfo';
+const miitIcpRecord = lang === 'zh-cn' ? chinaFooterOptions.miitIcp.recordNumber : null;
+const mpsBeianRecord = lang === 'zh-cn' ? chinaFooterOptions.mpsBeian.recordNumber : null;
+const mpsBeianRecordCode = mpsBeianRecord?.replace(/\D/g, '') || null;
+const mpsBeianUrl = mpsBeianRecordCode
+  ? `${mpsBeianQueryBaseUrl}?recordcode=${encodeURIComponent(mpsBeianRecordCode)}`
+  : null;
 
 // Footer: language switcher URL helper
-const pathname = Astro.url.pathname;
 function getLangHref(targetLang: string): string {
   if (targetLang === lang) return pathname;
   if (targetLang === defaultLang) {
@@ -150,13 +160,14 @@ function getLangHref(targetLang: string): string {
             <slot />
         </main>
 
-        <footer data-pagefind-ignore class="border-t border-border/40 bg-background mt-auto">
+        <footer data-pagefind-ignore data-site-footer class="border-t border-border/40 bg-background mt-auto">
           <div class="max-w-6xl mx-auto px-4 py-6 space-y-3 text-center text-xs text-muted-foreground">
             {showLanguageSwitcher && (
               <nav class="flex items-center justify-center gap-2" aria-label={t('aria.footer.language')}>
                 {Object.entries(languages).map(([l, name]) => (
                   <a
                     href={getLangHref(l)}
+                    data-footer-lang
                     data-lang-switch={l}
                     aria-label={t('aria.switchLanguage').replace('{lang}', languageNames[lang as Lang][l as Lang])}
                     aria-current={lang === l ? 'page' : undefined}
@@ -184,8 +195,33 @@ function getLangHref(targetLang: string): string {
 
             {/* Built-with + copyright */}
             <p>© {new Date().getFullYear()} {siteConfig.author.name}. <Fragment set:html={t('footer.builtWith')} /></p>
+
+            {(miitIcpRecord || (mpsBeianRecord && mpsBeianUrl)) && (
+              <p class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+                {miitIcpRecord && (
+                  <a href={miitIcpQueryUrl} target="_blank" rel="noopener noreferrer" class="hover:text-primary transition-colors">
+                    {miitIcpRecord}
+                  </a>
+                )}
+                {miitIcpRecord && mpsBeianRecord && mpsBeianUrl && <span aria-hidden="true">·</span>}
+                {mpsBeianRecord && mpsBeianUrl && (
+                  <a href={mpsBeianUrl} target="_blank" rel="noopener noreferrer" class="hover:text-primary transition-colors">
+                    {mpsBeianRecord}
+                  </a>
+                )}
+              </p>
+            )}
           </div>
         </footer>
+
+        <style>
+          :global([data-site-footer] a:not([data-footer-lang])) {
+            text-decoration-line: underline;
+            text-decoration-style: dotted;
+            text-decoration-thickness: 1px;
+            text-underline-offset: 0.22em;
+          }
+        </style>
 
         {showLanguageSwitcher && <LanguagePreference currentLang={lang} />}
 

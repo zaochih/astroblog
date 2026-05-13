@@ -6,6 +6,7 @@ import yaml from 'js-yaml';
 import friendsRaw from '@/data/friends.yaml?raw';
 import HugeIcon from '@/components/HugeIcon';
 import { pinyin } from 'pinyin-pro';
+import { describeListingPage } from '@/lib/seo';
 
 export async function getStaticPaths() {
   return Object.keys(languages).map(lang => ({
@@ -137,7 +138,11 @@ const referralFriends = localizedFriends
 const sortedFriends = [...sponsoredFriends, ...regularFriends, ...referralFriends];
 ---
 
-<Layout title={`${t('friends.title')} | ${siteConfig.name}`} lang={lang}>
+<Layout
+  title={`${t('friends.title')} | ${siteConfig.name}`}
+  description={describeListingPage({ kind: 'friends', lang })}
+  lang={lang}
+>
   <div class="max-w-4xl mx-auto">
     <h1 class="text-3xl font-bold tracking-tight text-foreground mb-6">{t('friends.title')}</h1>
 

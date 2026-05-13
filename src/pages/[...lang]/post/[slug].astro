@@ -12,6 +12,7 @@ import CrossPostNotice from '@/components/CrossPostNotice.astro';
 import ExternalPostRedirect from '@/components/ExternalPostRedirect.astro';
 import Comments from '@/components/Comments.astro';
 import { optimizeLocalImage } from '@/lib/rehype-image-size.mjs';
+import { resolveContentDescription } from '@/lib/seo';
 
 export async function getStaticPaths() {
   // Helper: "zh/hello-world" → ["zh", "hello-world"]
@@ -103,6 +104,13 @@ const seriesIndex = seriesPosts.findIndex(seriesPost => seriesPost.slug === slug
 const previousSeriesPost = seriesIndex > 0 ? seriesPosts[seriesIndex - 1] : null;
 const nextSeriesPost = seriesIndex >= 0 && seriesIndex < seriesPosts.length - 1 ? seriesPosts[seriesIndex + 1] : null;
 const coverImage = data.cover ? (await optimizeLocalImage(data.cover, { force: true })).src : undefined;
+const pageDescription = resolveContentDescription({
+  frontmatterDescription: data.description,
+  body: post.body,
+  title: data.title,
+  lang: currentLang,
+  kind: 'article',
+});
 
 const fallbackLangName = isFallback && fallbackLang ? languageNames[currentLang][fallbackLang] : '';
 const fallbackDesc = t('alert.fallback.desc').replace('{lang}', fallbackLangName);
@@ -122,14 +130,14 @@ const homeHref = currentLang === defaultLang ? '/' : `/${currentLang}/`;
 {data.redirectUrl ? (
   <ExternalPostRedirect
     title={data.title}
-    description={data.description}
+    description={pageDescription}
     lang={currentLang}
     redirectUrl={data.redirectUrl}
   />
 ) : (
 <Layout
   title={`${data.title} | ${siteConfig.name}`}
-  description={data.description}
+  description={pageDescription}
   lang={currentLang}
   image={coverImage}
   canonicalUrl={data.canonicalUrl}

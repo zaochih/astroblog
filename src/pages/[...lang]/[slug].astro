@@ -6,6 +6,7 @@ import { useTranslations, languages, languageNames, defaultLang, type Lang } fro
 import { isPublishedEntry } from '@/lib/content';
 import LanguageNotice from '@/components/LanguageNotice.astro';
 import Comments from '@/components/Comments.astro';
+import { resolveContentDescription } from '@/lib/seo';
 
 export async function getStaticPaths() {
   function parseEntryId(id: string) {
@@ -64,6 +65,13 @@ interface Props {
 
 const { page, slug, isFallback, currentLang, fallbackLang, otherLangs } = Astro.props;
 const { Content } = await render(page);
+const pageDescription = resolveContentDescription({
+  frontmatterDescription: page.data.description,
+  body: page.body,
+  title: page.data.title,
+  lang: currentLang,
+  kind: 'page',
+});
 
 const t = useTranslations(currentLang);
 
@@ -82,7 +90,7 @@ const otherLanguageLinks = otherLangs.map(l => ({
 
 <Layout
   title={`${page.data.title} | ${siteConfig.name}`}
-  description={page.data.description}
+  description={pageDescription}
   lang={currentLang}
   math={page.data.math}
   searchable

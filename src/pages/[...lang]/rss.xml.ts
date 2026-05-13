@@ -4,6 +4,7 @@ import type { APIContext } from 'astro';
 import { siteConfig } from '@/config';
 import { localizeAndSortPosts, getPostHref } from '@/lib/content';
 import { languages, defaultLang } from '@/i18n/ui';
+import { resolveContentDescription } from '@/lib/seo';
 
 export function getStaticPaths() {
   return Object.keys(languages).map(lang => ({
@@ -27,7 +28,13 @@ export async function GET(context: APIContext) {
       .map(({ post, slug }) => ({
         title: post.data.title,
         pubDate: post.data.date!,
-        description: post.data.description,
+        description: resolveContentDescription({
+          frontmatterDescription: post.data.description,
+          body: post.body,
+          title: post.data.title,
+          lang,
+          kind: 'article',
+        }),
         link: `${siteConfig.siteUrl}${getPostHref(slug, lang)}`,
     })),
     customData: `<language>${isZh ? 'zh-CN' : 'en-US'}</language>`,

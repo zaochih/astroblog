@@ -3,11 +3,17 @@ import Layout from '@/layouts/Layout.astro';
 import { buttonVariants } from '@/components/ui/button';
 import { siteConfig } from '@/config';
 import { useTranslations } from '@/i18n/ui';
+import { describeListingPage } from '@/lib/seo';
 
 const t = useTranslations('zh-cn');
 ---
 
-<Layout title={`404 — ${siteConfig.name}`} lang="zh-cn" showLanguageSwitcher={false}>
+<Layout
+  title={`404 — ${siteConfig.name}`}
+  description={describeListingPage({ kind: 'notFound', lang: 'zh-cn' })}
+  lang="zh-cn"
+  showLanguageSwitcher={false}
+>
   <div class="flex min-h-[calc(100vh-14rem)] flex-col items-center justify-center px-4 text-center">
     <p class="mb-6 select-none text-[clamp(10rem,35vw,22rem)] font-black leading-none tracking-tight text-muted-foreground/15">
       404

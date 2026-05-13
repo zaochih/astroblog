@@ -6,6 +6,7 @@ import { useTranslations, defaultLang, type Lang } from '@/i18n/ui';
 import { localizeAndSortPosts } from '@/lib/content';
 import PostFeed from '@/components/PostFeed.astro';
 import BlogSidebar from '@/components/BlogSidebar.astro';
+import { describeListingPage } from '@/lib/seo';
 
 const PAGE_SIZE = 10;
 
@@ -47,6 +48,7 @@ const baseHref = lang === defaultLang ? '/' : `/${lang}/`;
 
 <Layout
   title={`${t('nav.home')} — ${t('archive.title')} ${page} | ${siteConfig.name}`}
+  description={describeListingPage({ kind: 'paginatedArticles', lang, page })}
   lang={lang}
 >
   <div class="lg:grid lg:grid-cols-[220px_1fr_220px] lg:gap-8">
