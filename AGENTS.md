@@ -1,6 +1,7 @@
 # Repository Notes
 
 - Prefer `bun` for local commands. Use `bun install` for dependency updates and `bun run build` for validation.
+- When check for errors, use `bun astro check` instead of `bun run build` for faster feedback.
 - Content lives in `src/data/posts/<lang>/<slug>.md` and `src/data/pages/<lang>/<slug>.md`.
 - Short content commands:
   - `bun new:post zh-cn my-post "标题"`
