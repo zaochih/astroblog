@@ -2,6 +2,7 @@
 
 - Prefer `bun` for local commands. Use `bun install` for dependency updates and `bun run build` for validation.
 - When check for errors, use `bun astro check` instead of `bun run build` for faster feedback.
+- Before launching a local dev server, check if there's already one running in `127.0.0.1:4321` to avoid port conflicts. Use `bun run dev` to start the server.
 - Content lives in `src/data/posts/<lang>/<slug>.md` and `src/data/pages/<lang>/<slug>.md`.
 - Short content commands:
   - `bun new:post zh-cn my-post "标题"`
