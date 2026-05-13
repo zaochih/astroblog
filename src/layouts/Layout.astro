@@ -117,8 +117,7 @@ const localDatetimeConfig = JSON.stringify({
         {math && (
           <link
             rel="stylesheet"
-            href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
-            crossorigin="anonymous"
+            href="/lib/katex/katex.min.css"
           />
         )}
 
@@ -187,7 +186,7 @@ const localDatetimeConfig = JSON.stringify({
                   t('footer.license').replace(
                     '{license}',
                     licenseInfo.url
-                      ? `<a href="${licenseInfo.url}" target="_blank" rel="noopener license" class="hover:text-primary transition-colors underline underline-offset-2">${licenseInfo.name}</a>`
+                      ? `<a href="${licenseInfo.url}" target="_blank" rel="noopener license" class="hover:text-primary transition-colors">${licenseInfo.name}</a>`
                       : licenseInfo.name
                   )
                 } />
@@ -217,10 +216,13 @@ const localDatetimeConfig = JSON.stringify({
 
         <style>
           :global([data-site-footer] a:not([data-footer-lang])) {
+            font-weight: 500;
             text-decoration-line: underline;
-            text-decoration-style: dotted;
-            text-decoration-thickness: 1px;
-            text-underline-offset: 0.22em;
+            text-underline-offset: 2px;
+            text-decoration-color: color-mix(in oklab, currentColor 40%, transparent);
+          }
+          :global([data-site-footer] a:not([data-footer-lang]):hover) {
+            text-decoration-color: currentColor;
           }
         </style>
 
