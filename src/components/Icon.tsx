@@ -22,6 +22,7 @@ import {
   Search,
   Sparkles,
   Wrench,
+  AtSign,
   type LucideIcon,
 } from "lucide-react";
 
@@ -60,6 +61,7 @@ const lucideIcons = {
   sparkles: Sparkles,
   tools: Wrench,
   wrench: Wrench,
+  "at-sign": AtSign,
 } as const satisfies Record<string, LucideIcon>;
 
 // ── HugeIcons brand icon map ─────────────────────────────────────

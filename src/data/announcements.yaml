@@ -20,7 +20,7 @@
   variant: info
   icon: wrench
   title: 平台更新
-  body: LCZBlog 已由 WordPress 迁移到基于 Astro 的自建平台。该平台正在快速演进阶段，欢迎与 [platform (at) zaochih.com](mailto:platform@zaochih.com) 分享反馈。
+  body: LCZBlog 已由 WordPress 迁移到基于 Astro 的自建平台。该平台正在快速演进阶段，欢迎与 [platform(at)zaochih.com](mailto:platform@zaochih.com) 分享反馈。
   # action:
   #   icon: arrowRight
   #   text: 了解更多
@@ -28,7 +28,7 @@
   i18n:
     en-us:
       title: Platform Update
-      body: LCZBlog has migrated to 1st-party platform based on Astro from WordPress. This plarform is moving fast forward and we welcome your feedback to [platform (at) zaochih.com](mailto:platform@zaochih.com).
+      body: LCZBlog has migrated to 1st-party platform based on Astro from WordPress. This plarform is moving fast forward and we welcome your feedback to [platform(at)zaochih.com](mailto:platform@zaochih.com).
       # action:
       #   icon: arrowRight
       #   text: Learn more

@@ -70,36 +70,58 @@ function isActive(announcement: Announcement, now: number): boolean {
   return true;
 }
 
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
-}
-
 function isSafeHref(href: string): boolean {
   return /^(https?:\/\/|mailto:|\/|#)/i.test(href);
 }
 
-function renderInlineMarkdown(value: string): string {
+
+type InlineToken =
+  | { type: 'text'; value: string }
+  | { type: 'icon'; name: string }
+  | { type: 'link'; tokens: InlineToken[]; href: string };
+
+function parseTextTokens(value: string): InlineToken[] {
+  const tokens: InlineToken[] = [];
+  const regex = /\(at\)/g;
+  let lastIndex = 0;
+  for (const match of value.matchAll(regex)) {
+    const index = match.index ?? 0;
+    if (index > lastIndex) {
+      tokens.push({ type: 'text', value: value.slice(lastIndex, index) });
+    }
+    tokens.push({ type: 'icon', name: 'at-sign' });
+    lastIndex = index + match[0].length;
+  }
+  if (lastIndex < value.length) {
+    tokens.push({ type: 'text', value: value.slice(lastIndex) });
+  }
+  return tokens;
+}
+
+function parseInlineMarkdown(value: string): InlineToken[] {
   const linkPattern = /\[([^\]]+)\]\(([^)\s]+)\)/g;
-  let rendered = '';
+  const tokens: InlineToken[] = [];
   let lastIndex = 0;
 
   for (const match of value.matchAll(linkPattern)) {
     const index = match.index ?? 0;
-    const [source, label, href] = match;
-    rendered += escapeHtml(value.slice(lastIndex, index));
-    rendered += isSafeHref(href)
-      ? `<a href="${escapeHtml(href)}" class="font-medium underline underline-offset-2 decoration-current/40 transition-colors hover:decoration-current">${escapeHtml(label)}</a>`
-      : escapeHtml(source);
-    lastIndex = index + source.length;
+    if (index > lastIndex) {
+      tokens.push(...parseTextTokens(value.slice(lastIndex, index)));
+    }
+    const href = match[2];
+    if (isSafeHref(href)) {
+      tokens.push({ type: 'link', tokens: parseTextTokens(match[1]), href });
+    } else {
+      tokens.push(...parseTextTokens(match[0]));
+    }
+    lastIndex = index + match[0].length;
   }
 
-  rendered += escapeHtml(value.slice(lastIndex));
-  return rendered;
+  if (lastIndex < value.length) {
+    tokens.push(...parseTextTokens(value.slice(lastIndex)));
+  }
+
+  return tokens;
 }
 
 const activeAnnouncements = announcements
@@ -123,7 +145,28 @@ const t = useTranslations(lang as Lang);
             <p class="site-announcement-text">
               <strong>{'['}{announcement.title}{']'}</strong>
               {' '}
-              <span set:html={renderInlineMarkdown(announcement.body)} />
+              {parseInlineMarkdown(announcement.body).map((token) => (
+                <Fragment>
+                  {token.type === 'text' && token.value}
+                  {token.type === 'icon' && <Icon name={token.name} className="inline-block size-[1.1em] align-text-bottom" />}
+                  {token.type === 'link' && (
+                    <a 
+                      href={token.href} 
+                      class:list={[
+                        "font-medium underline underline-offset-2 decoration-current/40 transition-colors hover:decoration-current",
+                        token.href.startsWith('mailto:') && "site-announcement-email"
+                      ]}
+                    >
+                      {token.tokens.map((subToken) => (
+                        <Fragment>
+                          {subToken.type === 'text' && subToken.value}
+                          {subToken.type === 'icon' && <Icon name={subToken.name} className="inline-block size-[1.1em] align-text-bottom" />}
+                        </Fragment>
+                      ))}
+                    </a>
+                  )}
+                </Fragment>
+              ))}
             </p>
 
             {announcement.action && (
@@ -203,6 +246,12 @@ const t = useTranslations(lang as Lang);
 
   .site-announcement-text strong {
     font-weight: 700;
+  }
+
+  .site-announcement-email {
+    font-family: "Comic Neue", "Chalkboard SE", "Chalkboard", "Comic Sans MS", "Comic Sans", cursive;
+    font-weight: 700;
+    font-size: medium;
   }
 
   .site-announcement-action {
