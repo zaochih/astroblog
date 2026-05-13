@@ -3,3 +3,15 @@ https://:project.pages.dev/*
 
 https://:version.:project.pages.dev/*
   X-Robots-Tag: noindex, nofollow
+
+/rss.xml
+  Content-Type: application/rss+xml; charset=utf-8
+
+/feed
+  Content-Type: application/rss+xml; charset=utf-8
+
+/en-us/rss.xml
+  Content-Type: application/rss+xml; charset=utf-8
+
+/en-us/feed
+  Content-Type: application/rss+xml; charset=utf-8

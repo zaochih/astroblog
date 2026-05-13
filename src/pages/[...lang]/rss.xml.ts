@@ -18,7 +18,7 @@ export async function GET(context: APIContext) {
   const localizedPosts = localizeAndSortPosts(allPosts, lang);
   const isZh = lang === 'zh-cn';
 
-  return rss({
+  const response = await rss({
     title: isZh ? siteConfig.name : `${siteConfig.name} (EN)`,
     description: siteConfig.description[lang as keyof typeof siteConfig.description],
     site: siteConfig.siteUrl,
@@ -29,7 +29,9 @@ export async function GET(context: APIContext) {
         pubDate: post.data.date!,
         description: post.data.description,
         link: `${siteConfig.siteUrl}${getPostHref(slug, lang)}`,
-      })),
+    })),
     customData: `<language>${isZh ? 'zh-CN' : 'en-US'}</language>`,
   });
+  response.headers.set('Content-Type', 'application/rss+xml; charset=utf-8');
+  return response;
 }
