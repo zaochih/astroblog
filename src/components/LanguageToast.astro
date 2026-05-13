@@ -1,5 +1,5 @@
 ---
-import { languages, defaultLang, ui } from '@/i18n/ui';
+import { languages, defaultLang, getSupportedLangs, ui } from '@/i18n/ui';
 
 interface Props {
   lang: string;
@@ -12,6 +12,7 @@ const toastConfig = JSON.stringify({
   currentLang: lang,
   defaultLang,
   languages,
+  supportedLangs: getSupportedLangs(),
   ui,
 });
 ---
@@ -19,11 +20,11 @@ const toastConfig = JSON.stringify({
 <script is:inline define:vars={{ toastConfig }}>
   (() => {
     const config = JSON.parse(toastConfig);
-    const { currentLang, defaultLang, languages, ui } = config;
+    const { currentLang, defaultLang, languages, supportedLangs, ui } = config;
 
     const PREFERENCE_KEY = 'lang-preference';
     const DISMISSED_KEY = 'lang-toast-dismissed';
-    const supported = Object.keys(languages);
+    const supported = supportedLangs;
     const setStoredPreference = (lang) => {
       if (!supported.includes(lang)) return;
       try {

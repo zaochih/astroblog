@@ -3,11 +3,11 @@ import { getCollection } from 'astro:content';
 import type { APIContext } from 'astro';
 import { siteConfig } from '@/config';
 import { localizeAndSortPosts, getPostHref } from '@/lib/content';
-import { languages, defaultLang } from '@/i18n/ui';
-import { resolveContentDescription } from '@/lib/seo';
+import { defaultLang, getLangProfile, getSupportedLangs } from '@/i18n/ui';
+import { getSiteDescription, resolveContentDescription } from '@/lib/seo';
 
 export function getStaticPaths() {
-  return Object.keys(languages).map(lang => ({
+  return getSupportedLangs().map(lang => ({
     params: { lang: lang === defaultLang ? undefined : lang },
     props: { lang },
   }));
@@ -16,12 +16,12 @@ export function getStaticPaths() {
 export async function GET(context: APIContext) {
   const { lang } = context.props as { lang: string };
   const allPosts = await getCollection('blog');
-  const localizedPosts = localizeAndSortPosts(allPosts, lang);
-  const isZh = lang === 'zh-cn';
+  const localizedPosts = localizeAndSortPosts(allPosts, lang, { includeFallback: false });
+  const profile = getLangProfile(lang);
 
   const response = await rss({
-    title: isZh ? siteConfig.name : `${siteConfig.name} (EN)`,
-    description: siteConfig.description[lang as keyof typeof siteConfig.description],
+    title: lang === defaultLang ? siteConfig.name : `${siteConfig.name} (${profile.label})`,
+    description: getSiteDescription(lang),
     site: siteConfig.siteUrl,
     items: localizedPosts
       .filter(({ post }) => post.data.date)
@@ -37,7 +37,7 @@ export async function GET(context: APIContext) {
         }),
         link: `${siteConfig.siteUrl}${getPostHref(slug, lang)}`,
     })),
-    customData: `<language>${isZh ? 'zh-CN' : 'en-US'}</language>`,
+    customData: `<language>${profile.rssLanguage}</language>`,
   });
   response.headers.set('Content-Type', 'application/rss+xml; charset=utf-8');
   return response;

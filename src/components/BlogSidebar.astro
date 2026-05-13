@@ -4,7 +4,7 @@ import { siteConfig } from '@/config';
 import type { CollectionEntry } from 'astro:content';
 import { getTagHref, getCategoryHref, countWords, formatWordCount } from '@/lib/content';
 import { getTagName, getCategoryName, resolveCategoryKey, resolveTagKey } from '@/i18n/taxonomy';
-import { useTranslations, type Lang } from '@/i18n/ui';
+import { getLocalizedValue, useTranslations, type Lang } from '@/i18n/ui';
 
 interface Props {
   posts: Array<{ post: CollectionEntry<'blog'>; slug: string }>;
@@ -14,7 +14,7 @@ interface Props {
 
 const { posts, lang, side } = Astro.props;
 const t = useTranslations(lang as Lang);
-const bio = siteConfig.author.bio[lang as keyof typeof siteConfig.author.bio] ?? siteConfig.author.bio[siteConfig.defaultLang];
+const bio = getLocalizedValue(siteConfig.author.bio, lang) ?? siteConfig.author.bio[siteConfig.defaultLang];
 const allTags = [...new Set(posts.flatMap(({ post }) => post.data.tags ?? []).map(resolveTagKey))]
   .sort((a, b) => getTagName(a, lang as Lang).localeCompare(getTagName(b, lang as Lang), lang));
 const categoryCounts = posts.reduce((counts, { post }) => {

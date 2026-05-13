@@ -1,6 +1,6 @@
 ---
 import { siteConfig } from '@/config';
-import { useTranslations, type Lang } from '@/i18n/ui';
+import { getLangProfile, useTranslations, type Lang } from '@/i18n/ui';
 
 interface Props {
   lang: Lang;
@@ -18,14 +18,13 @@ const isConfigured = Boolean(
   comments.category &&
   comments.categoryId,
 );
-const giscusLang = lang === 'zh-cn' ? 'zh-CN' : 'en';
 const giscusConfig = JSON.stringify({
   repo: comments.repo,
   repoId: comments.repoId,
   category: comments.category,
   categoryId: comments.categoryId,
   term,
-  lang: giscusLang,
+  lang: getLangProfile(lang).giscusLang,
 });
 ---
 

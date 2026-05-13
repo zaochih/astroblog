@@ -1,25 +1,117 @@
 import { siteConfig } from '@/config';
 
-export const languages = {
-  'zh-cn': '简体中文',
-  'en-us': 'English',
+type WordCountStyle = 'cjk' | 'latin';
+
+interface LanguageProfile {
+  label: string;
+  htmlLang: string;
+  ogLocale: string;
+  rssLanguage: string;
+  dateLocale: string;
+  timeZone: string;
+  giscusLang: string;
+  wordCountStyle: WordCountStyle;
+  fallbackLang: string;
+}
+
+export const languageProfiles = {
+  'zh-cn': {
+    label: '简体中文',
+    htmlLang: 'zh-CN',
+    ogLocale: 'zh_CN',
+    rssLanguage: 'zh-CN',
+    dateLocale: 'zh-CN',
+    timeZone: 'Asia/Shanghai',
+    giscusLang: 'zh-CN',
+    wordCountStyle: 'cjk',
+    fallbackLang: 'zh-cn',
+  },
+  'en-us': {
+    label: 'English',
+    htmlLang: 'en-US',
+    ogLocale: 'en_US',
+    rssLanguage: 'en-US',
+    dateLocale: 'en-US',
+    timeZone: 'UTC',
+    giscusLang: 'en',
+    wordCountStyle: 'latin',
+    fallbackLang: 'zh-cn',
+  },
 } as const;
 
-export type Lang = keyof typeof languages;
+export type Lang = keyof typeof languageProfiles;
 
 export const defaultLang = siteConfig.defaultLang as Lang;
+
+export const languages: Record<Lang, string> = Object.fromEntries(
+  Object.entries(languageProfiles).map(([lang, profile]) => [lang, profile.label]),
+) as Record<Lang, string>;
+
+export function getSupportedLangs(): Lang[] {
+  return Object.keys(languageProfiles) as Lang[];
+}
+
+export function isSupportedLang(lang: string): lang is Lang {
+  return lang in languageProfiles;
+}
+
+export function getLangProfile(lang: string): LanguageProfile {
+  return isSupportedLang(lang) ? languageProfiles[lang] : languageProfiles[defaultLang];
+}
+
+export function getLocalizedValue<T>(
+  record: Readonly<Partial<Record<string, T>>> | undefined,
+  lang: string,
+  fallbackLang = getLangProfile(lang).fallbackLang,
+): T | undefined {
+  return record?.[lang] ?? record?.[fallbackLang] ?? record?.[defaultLang];
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function getPathLang(pathname: string): Lang {
+  return getSupportedLangs().find((lang) => {
+    if (lang === defaultLang) return false;
+    return pathname === `/${lang}` || pathname.startsWith(`/${lang}/`);
+  }) ?? defaultLang;
+}
+
+export function getLocalizedPath(pathname: string, fromLang: string, toLang: string): string {
+  if (fromLang === toLang) return pathname;
+
+  const activePathLang = isSupportedLang(fromLang) ? fromLang : getPathLang(pathname);
+  if (toLang === defaultLang) {
+    if (activePathLang === defaultLang) return pathname;
+    return pathname.replace(new RegExp(`^/${escapeRegExp(activePathLang)}(?=/|$)`), '') || '/';
+  }
+
+  if (activePathLang === defaultLang) {
+    return pathname === '/' ? `/${toLang}/` : `/${toLang}${pathname}`;
+  }
+
+  return pathname.replace(new RegExp(`^/${escapeRegExp(activePathLang)}(?=/|$)`), `/${toLang}`);
+}
 
 /**
  * How to name a language when writing *in* another language.
  * languageNames[uiLang][targetLang] → localized name of targetLang
  */
-export const languageNames: Record<Lang, Record<Lang, string>> = {
+export const languageNames: Partial<Record<Lang, Partial<Record<Lang, string>>>> = {
   'zh-cn': { 'zh-cn': '简体中文', 'en-us': '英语' },
   'en-us': { 'zh-cn': 'Simplified Chinese', 'en-us': 'English' },
 };
 
-export const ui = {
-  'zh-cn': {
+export function getLanguageName(targetLang: string, uiLang: string = defaultLang): string {
+  const safeTargetLang = isSupportedLang(targetLang) ? targetLang : defaultLang;
+  const safeUiLang = isSupportedLang(uiLang) ? uiLang : defaultLang;
+  return languageNames[safeUiLang]?.[safeTargetLang]
+    ?? languageNames[defaultLang]?.[safeTargetLang]
+    ?? getLangProfile(safeTargetLang).label;
+}
+
+const zhCnUi = {
     'nav.home': '文章',
     'nav.about': '关于',
     'nav.archive': '归档',
@@ -101,7 +193,33 @@ export const ui = {
     'comments.privacy': 'GitHub 隐私声明',
     'comments.loadingTitle': '正在加载评论区',
     'comments.loadingDescription': '评论区由 giscus 提供，稍等片刻即可查看和参与讨论。',
-  },
+    'seo.article': '{site} 的《{title}》文章。',
+    'seo.page': '{site} 的“{title}”页面。',
+    'seo.archive': '浏览 {site} 的文章归档。',
+    'seo.tag': '浏览 {site} 中带有“{label}”标签的文章。',
+    'seo.category': '浏览 {site} 中“{label}”分类下的文章。',
+    'seo.paginatedArticles': '浏览 {site} 的文章列表第 {page} 页。',
+    'seo.friends': '浏览 {site} 的友情链接页面。',
+    'seo.search': '搜索 {site} 的文章和页面。',
+    'seo.notFound': '{site} 的 404 页面，提示当前链接没有找到可用内容。',
+    'external.redirecting': '正在跳转到外部文章',
+    'external.redirectHint': '如果浏览器没有自动跳转，请使用下面的链接继续阅读。',
+    'external.continue': '继续阅读',
+    'crosspost.weixin.label': '本文亦发布于公众号「{name}」',
+    'crosspost.weixin.aria': '前往微信公众号「{name}」阅读',
+    'crosspost.msft.label': '本文亦发布于 Microsoft 支持社区',
+    'crosspost.msft.aria': '前往 Microsoft 支持社区阅读',
+    'crosspost.read': '→ 前往阅读',
+    'announcement.aria': '全站公告',
+  } as const;
+
+type DefaultUi = typeof zhCnUi;
+type TranslationKey = keyof DefaultUi;
+type TranslationMap = Record<TranslationKey, string>;
+type UiMap = { 'zh-cn': TranslationMap } & Partial<Record<Lang, Partial<TranslationMap>>>;
+
+export const ui: UiMap = {
+  'zh-cn': zhCnUi,
   'en-us': {
     'nav.home': 'Articles',
     'nav.about': 'About',
@@ -184,14 +302,29 @@ export const ui = {
     'comments.privacy': 'GitHub Privacy Statement',
     'comments.loadingTitle': 'Loading comments',
     'comments.loadingDescription': 'The discussion is provided by giscus and should be ready in a moment.',
+    'seo.article': 'Article “{title}” on {site}.',
+    'seo.page': 'Page “{title}” on {site}.',
+    'seo.archive': 'Browse the article archive on {site}.',
+    'seo.tag': 'Browse articles tagged “{label}” on {site}.',
+    'seo.category': 'Browse articles in the “{label}” category on {site}.',
+    'seo.paginatedArticles': 'Browse page {page} of the article list on {site}.',
+    'seo.friends': 'Browse the friends and links page on {site}.',
+    'seo.search': 'Search articles and pages on {site}.',
+    'seo.notFound': 'The 404 page for {site}, shown when no content is available at the current link.',
+    'external.redirecting': 'Redirecting to the external article',
+    'external.redirectHint': 'If your browser does not redirect automatically, use the link below to continue reading.',
+    'external.continue': 'Continue reading',
+    'crosspost.weixin.label': 'This article is also published on WeChat official account “{name}”.',
+    'crosspost.weixin.aria': 'Read this article on WeChat official account “{name}”.',
+    'crosspost.msft.label': 'This article is also published on Microsoft Q&A Community',
+    'crosspost.msft.aria': 'Read this article on Microsoft Q&A Community',
+    'crosspost.read': '→ Read on',
+    'announcement.aria': 'Site announcements',
   },
-} as const;
-
-type DefaultLang = typeof siteConfig.defaultLang;
-type TranslationKey = keyof (typeof ui)[DefaultLang];
+};
 
 export function useTranslations(lang: Lang = defaultLang) {
   return function t(key: TranslationKey): string {
-    return ui[lang]?.[key] ?? ui[defaultLang][key];
+    return ui[lang]?.[key] ?? ui['zh-cn'][key];
   };
 }

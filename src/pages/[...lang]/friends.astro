@@ -1,7 +1,7 @@
 ---
 import Layout from '@/layouts/Layout.astro';
 import { siteConfig } from '@/config';
-import { useTranslations, languages, defaultLang, type Lang } from '@/i18n/ui';
+import { getLocalizedValue, useTranslations, defaultLang, getSupportedLangs, type Lang } from '@/i18n/ui';
 import yaml from 'js-yaml';
 import friendsRaw from '@/data/friends.yaml?raw';
 import HugeIcon from '@/components/HugeIcon';
@@ -9,7 +9,7 @@ import { pinyin } from 'pinyin-pro';
 import { describeListingPage } from '@/lib/seo';
 
 export async function getStaticPaths() {
-  return Object.keys(languages).map(lang => ({
+  return getSupportedLangs().map(lang => ({
     params: { lang: lang === defaultLang ? undefined : lang },
     props: { lang },
   }));
@@ -51,7 +51,7 @@ const friends = yaml.load(friendsRaw) as Friend[];
 const buildTime = Date.now();
 
 function localizeFriend(friend: Friend, lang: Lang): Friend {
-  const localized = friend.i18n?.[lang];
+  const localized = getLocalizedValue(friend.i18n, lang);
   if (!localized) return friend;
 
   return {

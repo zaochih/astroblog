@@ -2,7 +2,7 @@
 import { getCollection } from 'astro:content';
 import Layout from '@/layouts/Layout.astro';
 import { siteConfig } from '@/config';
-import { useTranslations, languages, defaultLang, type Lang } from '@/i18n/ui';
+import { useTranslations, defaultLang, getSupportedLangs, type Lang } from '@/i18n/ui';
 import { localizeAndSortPosts, isPublishedEntry } from '@/lib/content';
 import { getCategoryName, getCategoryPathSegment, resolveCategoryKey } from '@/i18n/taxonomy';
 import TaxonomyPostList from '@/components/TaxonomyPostList.astro';
@@ -10,26 +10,27 @@ import { describeListingPage } from '@/lib/seo';
 
 export async function getStaticPaths() {
   const allPosts = await getCollection('blog');
-  const locales = Object.keys(languages) as Lang[];
-  const allCategories = [...new Set(allPosts
-    .filter(isPublishedEntry)
-    .map(p => p.data.category)
-    .filter((c): c is string => !!c)
-    .map(resolveCategoryKey))];
+  const locales = getSupportedLangs();
 
-  return locales.flatMap(lang =>
-    allCategories.map(category => ({
+  return locales.flatMap(lang => {
+    const allCategories = [...new Set(localizeAndSortPosts(allPosts, lang, { includeFallback: false })
+      .filter(({ post }) => isPublishedEntry(post))
+      .map(({ post }) => post.data.category)
+      .filter((c): c is string => !!c)
+      .map(resolveCategoryKey))];
+
+    return allCategories.map(category => ({
       params: { lang: lang === defaultLang ? undefined : lang, category: getCategoryPathSegment(category, lang) },
       props: { lang, category },
-    })),
-  );
+    }));
+  });
 }
 
 const { lang, category } = Astro.props as { lang: string; category: string };
 const t = useTranslations(lang as Lang);
 
 const allPosts = await getCollection('blog');
-const localizedPosts = localizeAndSortPosts(allPosts, lang)
+const localizedPosts = localizeAndSortPosts(allPosts, lang, { includeFallback: false })
   .filter(({ post }) => post.data.category && resolveCategoryKey(post.data.category) === category);
 
 const categoryName = getCategoryName(category, lang as Lang);

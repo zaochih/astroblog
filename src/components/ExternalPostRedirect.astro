@@ -12,7 +12,6 @@ interface Props {
 }
 
 const { title, description, lang, redirectUrl } = Astro.props as Props;
-const isZh = lang === 'zh-cn';
 const t = useTranslations(lang);
 ---
 
@@ -28,22 +27,20 @@ const t = useTranslations(lang);
 
   <article class="mx-auto mt-16 max-w-2xl text-center">
     <p class="mb-3 text-sm font-medium text-muted-foreground">
-      {isZh ? '正在跳转到外部文章' : 'Redirecting to the external article'}
+      {t('external.redirecting')}
     </p>
     <h1 class="mb-6 text-3xl font-bold tracking-tight text-foreground">
       {title}
     </h1>
     <p class="mb-8 text-sm leading-relaxed text-muted-foreground">
-      {isZh
-        ? '如果浏览器没有自动跳转，请使用下面的链接继续阅读。'
-        : 'If your browser does not redirect automatically, use the link below to continue reading.'}
+      {t('external.redirectHint')}
     </p>
     <a
       href={redirectUrl}
       aria-label={t('aria.externalContinue').replace('{title}', title)}
       class={`${buttonVariants({ variant: 'default', size: 'lg' })} rounded-lg px-6 text-sm`}
     >
-      {isZh ? '继续阅读' : 'Continue reading'}
+      {t('external.continue')}
     </a>
   </article>
 

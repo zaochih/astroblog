@@ -1,6 +1,6 @@
 ---
 import HugeIcon from '@/components/HugeIcon';
-import type { Lang } from '@/i18n/ui';
+import { useTranslations, type Lang } from '@/i18n/ui';
 
 type Props =
   | { platform: 'weixin'; name: string; href: string; lang: Lang }
@@ -8,8 +8,7 @@ type Props =
 
 const { platform, href, lang } = Astro.props as Props;
 const name = 'name' in Astro.props ? Astro.props.name : undefined;
-
-const isZh = lang === 'zh-cn';
+const t = useTranslations(lang);
 
 const colors = {
   weixin: {
@@ -28,19 +27,15 @@ const iconName = platform === 'weixin' ? 'wechat' : 'microsoft';
 
 const label =
   platform === 'weixin'
-    ? `本文亦发布于公众号「${name}」`
-    : isZh
-      ? '本文亦发布于 Microsoft 支持社区'
-      : 'This article is also published on Microsoft Q&A Community';
+    ? t('crosspost.weixin.label').replace('{name}', name ?? '')
+    : t('crosspost.msft.label');
 
 const ariaLabel =
   platform === 'weixin'
-    ? `前往微信公众号「${name}」阅读`
-    : isZh
-      ? '前往 Microsoft 支持社区阅读'
-      : 'Read this article on Microsoft Q&A Community';
+    ? t('crosspost.weixin.aria').replace('{name}', name ?? '')
+    : t('crosspost.msft.aria');
 
-const btnText = isZh ? '→ 前往阅读' : '→ Read on';
+const btnText = t('crosspost.read');
 
 const c = colors[platform];
 ---

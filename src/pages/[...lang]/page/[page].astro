@@ -2,7 +2,7 @@
 import { getCollection } from 'astro:content';
 import Layout from '@/layouts/Layout.astro';
 import { siteConfig } from '@/config';
-import { useTranslations, defaultLang, type Lang } from '@/i18n/ui';
+import { useTranslations, defaultLang, getSupportedLangs, type Lang } from '@/i18n/ui';
 import { localizeAndSortPosts } from '@/lib/content';
 import PostFeed from '@/components/PostFeed.astro';
 import BlogSidebar from '@/components/BlogSidebar.astro';
@@ -14,13 +14,12 @@ export async function getStaticPaths() {
   const PAGE_SIZE = 10;
   const { getCollection } = await import('astro:content');
   const { localizeAndSortPosts } = await import('@/lib/content');
-  const { languages, defaultLang } = await import('@/i18n/ui');
 
   const allPosts = await getCollection('blog');
   const paths = [];
 
-  for (const lang of Object.keys(languages)) {
-    const localizedPosts = localizeAndSortPosts(allPosts, lang);
+  for (const lang of getSupportedLangs()) {
+    const localizedPosts = localizeAndSortPosts(allPosts, lang, { includeFallback: false });
     const totalPages = Math.ceil(localizedPosts.length / PAGE_SIZE);
     for (let page = 2; page <= totalPages; page++) {
       paths.push({
@@ -40,7 +39,7 @@ const { lang, page, totalPages } = Astro.props as { lang: string; page: number; 
 const t = useTranslations(lang as Lang);
 
 const allPosts = await getCollection('blog');
-const localizedPosts = localizeAndSortPosts(allPosts, lang);
+const localizedPosts = localizeAndSortPosts(allPosts, lang, { includeFallback: false });
 
 const pagedPosts = localizedPosts.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 const baseHref = lang === defaultLang ? '/' : `/${lang}/`;

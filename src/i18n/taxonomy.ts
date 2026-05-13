@@ -1,8 +1,8 @@
-import type { Lang } from './ui';
+import { defaultLang, getLocalizedValue, type Lang } from './ui';
 
 type LocalizedTaxonomy = {
-  name: Record<Lang, string>;
-  slug: Record<Lang, string>;
+  name: Partial<Record<Lang, string>>;
+  slug: Partial<Record<Lang, string>>;
 };
 
 /**
@@ -153,20 +153,20 @@ export function resolveCategoryKey(value: string): string {
 
 export function getTagPathSegment(value: string, lang: Lang): string {
   const key = resolveTagKey(value);
-  return Tags[key]?.slug[lang] ?? key;
+  return getLocalizedValue(Tags[key]?.slug, lang, defaultLang) ?? key;
 }
 
 export function getCategoryPathSegment(value: string, lang: Lang): string {
   const key = resolveCategoryKey(value);
-  return Categories[key]?.slug[lang] ?? key;
+  return getLocalizedValue(Categories[key]?.slug, lang, defaultLang) ?? key;
 }
 
 export function getTagName(value: string, lang: Lang): string {
   const key = resolveTagKey(value);
-  return Tags[key]?.name[lang] ?? value;
+  return getLocalizedValue(Tags[key]?.name, lang, defaultLang) ?? value;
 }
 
 export function getCategoryName(value: string, lang: Lang): string {
   const key = resolveCategoryKey(value);
-  return Categories[key]?.name[lang] ?? value;
+  return getLocalizedValue(Categories[key]?.name, lang, defaultLang) ?? value;
 }

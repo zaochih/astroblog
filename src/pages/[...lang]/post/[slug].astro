@@ -3,7 +3,7 @@ import { getCollection, render, type CollectionEntry } from 'astro:content';
 import Layout from '@/layouts/Layout.astro';
 import { buttonVariants } from '@/components/ui/button';
 import { siteConfig } from '@/config';
-import { useTranslations, languages, languageNames, defaultLang, type Lang } from '@/i18n/ui';
+import { useTranslations, languages, defaultLang, getLanguageName, getLangProfile, getSupportedLangs, type Lang } from '@/i18n/ui';
 import { getCategoryHref, getPostHref, countWords, readingMinutes, formatDateTime, mergeWithPrimary, isPublishedEntry, localizeAndSortPosts } from '@/lib/content';
 import { getCategoryName } from '@/i18n/taxonomy';
 import HugeIcon from '@/components/HugeIcon';
@@ -22,7 +22,7 @@ export async function getStaticPaths() {
   }
 
   const allPosts = await getCollection('blog');
-  const locales = Object.keys(languages) as Lang[];
+  const locales = getSupportedLangs();
 
   // Group posts by slug across languages
   const postsBySlug = new Map<string, Record<string, CollectionEntry<'blog'>>>();
@@ -40,9 +40,10 @@ export async function getStaticPaths() {
   for (const [slug, langsMap] of postsBySlug) {
     for (const lang of locales) {
       const localizedPost = langsMap[lang];
-      const fallbackPost = langsMap[defaultLang];
+      const fallbackLang = getLangProfile(lang).fallbackLang as Lang;
+      const fallbackPost = langsMap[fallbackLang];
       const post = localizedPost && isPublishedEntry(localizedPost) ? localizedPost : undefined;
-      const publishedFallbackPost = fallbackPost && isPublishedEntry(fallbackPost) ? fallbackPost : undefined;
+      const publishedFallbackPost = fallbackLang !== lang && fallbackPost && isPublishedEntry(fallbackPost) ? fallbackPost : undefined;
       const availableLangs = Object.entries(langsMap)
         .filter(([, post]) => isPublishedEntry(post))
         .map(([lang]) => lang);
@@ -61,7 +62,7 @@ export async function getStaticPaths() {
         paths.push({
           params: { lang: routeLang, slug },
           props: {
-            post: publishedFallbackPost, slug, isFallback: true, currentLang: lang, fallbackLang: defaultLang, otherLangs: availableLangs,
+            post: publishedFallbackPost, slug, isFallback: true, currentLang: lang, fallbackLang, otherLangs: availableLangs,
             primaryData: undefined,
           },
         });
@@ -112,7 +113,7 @@ const pageDescription = resolveContentDescription({
   kind: 'article',
 });
 
-const fallbackLangName = isFallback && fallbackLang ? languageNames[currentLang][fallbackLang] : '';
+const fallbackLangName = isFallback && fallbackLang ? getLanguageName(fallbackLang, currentLang) : '';
 const fallbackDesc = t('alert.fallback.desc').replace('{lang}', fallbackLangName);
 
 const getLangLink = (l: string) =>
@@ -121,7 +122,7 @@ const otherLanguageLinks = otherLangs.map(l => ({
   href: getLangLink(l),
   label: languages[l as Lang],
   lang: l,
-  ariaLabel: t('aria.switchLanguage').replace('{lang}', languageNames[currentLang][l as Lang]),
+  ariaLabel: t('aria.switchLanguage').replace('{lang}', getLanguageName(l, currentLang)),
 }));
 
 const homeHref = currentLang === defaultLang ? '/' : `/${currentLang}/`;

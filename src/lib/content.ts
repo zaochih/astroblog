@@ -1,12 +1,7 @@
 import type { CollectionEntry } from 'astro:content';
-import { defaultLang } from '@/i18n/ui';
+import { defaultLang, getLangProfile } from '@/i18n/ui';
 import { getCategoryPathSegment, getTagPathSegment } from '@/i18n/taxonomy';
 import type { Lang } from '@/i18n/ui';
-
-const defaultTimeZones: Record<string, string> = {
-  'zh-cn': 'Asia/Shanghai',
-  'en-us': 'UTC',
-};
 
 export function getSlugFromId(id: string): string {
   return id.split('/').slice(1).join('/');
@@ -22,6 +17,10 @@ export interface LocalizedPost {
   isFallback: boolean;
 }
 
+interface LocalizePostsOptions {
+  includeFallback?: boolean;
+}
+
 export function isPublishedEntry<T extends { data: { draft?: boolean } }>(entry: T): boolean {
   return !entry.data.draft;
 }
@@ -34,7 +33,9 @@ export function isPublishedEntry<T extends { data: { draft?: boolean } }>(entry:
 export function localizeAndSortPosts(
   allPosts: CollectionEntry<'blog'>[],
   lang: string,
+  options: LocalizePostsOptions = {},
 ): LocalizedPost[] {
+  const includeFallback = options.includeFallback ?? true;
   const bySlug = new Map<string, Record<string, CollectionEntry<'blog'>>>();
   for (const post of allPosts) {
     const postLang = getLangFromId(post.id);
@@ -46,10 +47,11 @@ export function localizeAndSortPosts(
   return [...bySlug.entries()]
     .map(([slug, langsMap]) => {
       const localizedPost = langsMap[lang];
-      const fallbackPost = langsMap[defaultLang];
+      const fallbackLang = getLangProfile(lang).fallbackLang;
+      const fallbackPost = langsMap[fallbackLang];
       const post = localizedPost && isPublishedEntry(localizedPost)
         ? localizedPost
-        : lang !== 'en-us' && fallbackPost && isPublishedEntry(fallbackPost)
+        : includeFallback && fallbackLang !== lang && fallbackPost && isPublishedEntry(fallbackPost)
           ? fallbackPost
           : undefined;
       if (!post) return null;
@@ -58,7 +60,7 @@ export function localizeAndSortPosts(
       const merged = primary && post !== primary
         ? { ...post, data: mergeWithPrimary(post.data, primary.data) } as CollectionEntry<'blog'>
         : post;
-      return { post: merged, slug, isFallback: !langsMap[lang] };
+      return { post: merged, slug, isFallback: post !== localizedPost };
     })
     .filter((x): x is LocalizedPost => x !== null)
     .sort((a, b) => (b.post.data.date?.valueOf() ?? 0) - (a.post.data.date?.valueOf() ?? 0));
@@ -83,11 +85,12 @@ export function getArchiveHref(lang: string): string {
 }
 
 function fallbackTimeZone(lang: string): string {
-  return defaultTimeZones[lang] ?? 'UTC';
+  return getLangProfile(lang).timeZone;
 }
 
 function dateParts(date: Date, lang: string): { year: string; month: string; day: string; hour: string; minute: string } {
-  const parts = new Intl.DateTimeFormat('en-US', {
+  const profile = getLangProfile(lang);
+  const parts = new Intl.DateTimeFormat(profile.dateLocale, {
     timeZone: fallbackTimeZone(lang),
     year: 'numeric',
     month: '2-digit',
@@ -113,11 +116,12 @@ export function getPostYear(date: Date, lang: string): number {
 
 /** Format a Date as a human-readable date string in the language's fallback timezone. */
 export function formatDate(date: Date, lang: string): string {
-  if (lang === 'zh-cn') {
+  const profile = getLangProfile(lang);
+  if (profile.wordCountStyle === 'cjk') {
     const { year, month, day } = dateParts(date, lang);
     return `${year}年${month}月${day}日`;
   }
-  return date.toLocaleDateString('en-US', {
+  return date.toLocaleDateString(profile.dateLocale, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -126,11 +130,12 @@ export function formatDate(date: Date, lang: string): string {
 }
 
 export function formatTime(date: Date, lang: string): string {
-  if (lang === 'zh-cn') {
+  const profile = getLangProfile(lang);
+  if (profile.wordCountStyle === 'cjk') {
     const { hour, minute } = dateParts(date, lang);
     return `${hour}:${minute}`;
   }
-  return date.toLocaleTimeString('en-US', {
+  return date.toLocaleTimeString(profile.dateLocale, {
     hour: 'numeric',
     minute: '2-digit',
     timeZone: fallbackTimeZone(lang),
@@ -189,7 +194,7 @@ export function readingMinutes(words: number): number {
  * or English abbreviation (words / k words).
  */
 export function formatWordCount(count: number, lang: string): string {
-  if (lang === 'zh-cn') {
+  if (getLangProfile(lang).wordCountStyle === 'cjk') {
     if (count < 1000) return `${count} 字`;
     if (count < 10000) {
       const v = (count / 1000).toFixed(1).replace(/\.0$/, '');

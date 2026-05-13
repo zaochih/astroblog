@@ -2,11 +2,11 @@
 import Layout from '@/layouts/Layout.astro';
 import HugeIcon from '@/components/HugeIcon';
 import { siteConfig } from '@/config';
-import { useTranslations, languages, defaultLang, type Lang } from '@/i18n/ui';
+import { useTranslations, defaultLang, getSupportedLangs, type Lang } from '@/i18n/ui';
 import { describeListingPage } from '@/lib/seo';
 
 export async function getStaticPaths() {
-  return Object.keys(languages).map(lang => ({
+  return getSupportedLangs().map(lang => ({
     params: { lang: lang === defaultLang ? undefined : lang },
     props: { lang },
   }));

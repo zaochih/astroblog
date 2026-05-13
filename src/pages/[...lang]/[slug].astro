@@ -2,7 +2,7 @@
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import Layout from '@/layouts/Layout.astro';
 import { siteConfig } from '@/config';
-import { useTranslations, languages, languageNames, defaultLang, type Lang } from '@/i18n/ui';
+import { useTranslations, languages, defaultLang, getLanguageName, getLangProfile, getSupportedLangs, type Lang } from '@/i18n/ui';
 import { isPublishedEntry } from '@/lib/content';
 import LanguageNotice from '@/components/LanguageNotice.astro';
 import Comments from '@/components/Comments.astro';
@@ -15,7 +15,7 @@ export async function getStaticPaths() {
   }
 
   const allPages = (await getCollection('pages')).filter(isPublishedEntry);
-  const locales = Object.keys(languages) as Lang[];
+  const locales = getSupportedLangs();
 
   const pagesBySlug = new Map<string, Record<string, CollectionEntry<'pages'>>>();
   for (const page of allPages) {
@@ -32,7 +32,8 @@ export async function getStaticPaths() {
   for (const [slug, langsMap] of pagesBySlug) {
     for (const lang of locales) {
       const page = langsMap[lang];
-      const fallbackPage = langsMap[defaultLang];
+      const fallbackLang = getLangProfile(lang).fallbackLang as Lang;
+      const fallbackPage = fallbackLang !== lang ? langsMap[fallbackLang] : undefined;
       const availableLangs = Object.keys(langsMap);
       const otherLangs = availableLangs.filter(l => l !== lang);
       const routeLang = lang === defaultLang ? undefined : lang;
@@ -45,7 +46,7 @@ export async function getStaticPaths() {
       } else if (fallbackPage) {
         paths.push({
           params: { lang: routeLang, slug },
-          props: { page: fallbackPage, slug, isFallback: true, currentLang: lang, fallbackLang: defaultLang, otherLangs: availableLangs },
+          props: { page: fallbackPage, slug, isFallback: true, currentLang: lang, fallbackLang, otherLangs: availableLangs },
         });
       }
     }
@@ -75,7 +76,7 @@ const pageDescription = resolveContentDescription({
 
 const t = useTranslations(currentLang);
 
-const fallbackLangName = isFallback && fallbackLang ? languageNames[currentLang][fallbackLang] : '';
+const fallbackLangName = isFallback && fallbackLang ? getLanguageName(fallbackLang, currentLang) : '';
 const fallbackDesc = t('page.fallback.desc').replace('{lang}', fallbackLangName);
 
 const getLangLink = (l: string) =>
@@ -84,7 +85,7 @@ const otherLanguageLinks = otherLangs.map(l => ({
   href: getLangLink(l),
   label: languages[l as Lang],
   lang: l,
-  ariaLabel: t('aria.switchLanguage').replace('{lang}', languageNames[currentLang][l as Lang]),
+  ariaLabel: t('aria.switchLanguage').replace('{lang}', getLanguageName(l, currentLang)),
 }));
 ---
 

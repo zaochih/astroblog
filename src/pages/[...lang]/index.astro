@@ -2,13 +2,13 @@
 import Layout from '@/layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 import { siteConfig } from '@/config';
-import { useTranslations, languages, defaultLang, type Lang } from '@/i18n/ui';
+import { useTranslations, defaultLang, getSupportedLangs, type Lang } from '@/i18n/ui';
 import { localizeAndSortPosts } from '@/lib/content';
 import PostFeed from '@/components/PostFeed.astro';
 import BlogSidebar from '@/components/BlogSidebar.astro';
 
 export async function getStaticPaths() {
-  return Object.keys(languages).map(lang => ({
+  return getSupportedLangs().map(lang => ({
     params: { lang: lang === defaultLang ? undefined : lang },
     props: { lang },
   }));
@@ -18,7 +18,7 @@ const { lang } = Astro.props as { lang: string };
 const t = useTranslations(lang as Lang);
 
 const allPosts = await getCollection('blog');
-const localizedPosts = localizeAndSortPosts(allPosts, lang);
+const localizedPosts = localizeAndSortPosts(allPosts, lang, { includeFallback: false });
 
 const PAGE_SIZE = 10;
 const totalPages = Math.max(1, Math.ceil(localizedPosts.length / PAGE_SIZE));

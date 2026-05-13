@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 
@@ -26,6 +26,16 @@ if ((kind !== 'post' && kind !== 'page') || !lang || !slug || !title) {
 
 if (!/^[a-z]{2}-[a-z]{2}$/i.test(lang)) {
   console.error(`Invalid lang: ${lang}`);
+  process.exit(1);
+}
+
+const uiSource = await readFile('src/i18n/ui.ts', 'utf8');
+const supportedLangs = new Set(
+  [...uiSource.matchAll(/^\s*'([a-z]{2}-[a-z]{2})':\s*\{/gim)].map((match) => match[1].toLowerCase()),
+);
+if (!supportedLangs.has(lang.toLowerCase())) {
+  console.error(`Unsupported lang: ${lang}`);
+  console.error(`Supported languages: ${[...supportedLangs].join(', ')}`);
   process.exit(1);
 }
 

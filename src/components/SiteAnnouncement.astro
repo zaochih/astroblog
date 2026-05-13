@@ -1,7 +1,7 @@
 ---
 import yaml from 'js-yaml';
 import HugeIcon from '@/components/HugeIcon';
-import { defaultLang, type Lang } from '@/i18n/ui';
+import { defaultLang, getLocalizedValue, useTranslations, type Lang } from '@/i18n/ui';
 import announcementsRaw from '@/data/announcements.yaml?raw';
 
 type AnnouncementVariant = 'info' | 'holiday' | 'maintenance' | 'event';
@@ -40,7 +40,7 @@ const buildTime = Date.now();
 const announcements = (yaml.load(announcementsRaw) as Announcement[] | null) ?? [];
 
 function localizeAnnouncement(announcement: Announcement, currentLang: Lang): Announcement {
-  const localized = announcement.i18n?.[currentLang];
+  const localized = getLocalizedValue(announcement.i18n, currentLang);
   if (!localized) return announcement;
 
   return {
@@ -105,10 +105,11 @@ function renderInlineMarkdown(value: string): string {
 const activeAnnouncements = announcements
   .filter((announcement) => isActive(announcement, buildTime))
   .map((announcement) => localizeAnnouncement(announcement, lang as Lang));
+const t = useTranslations(lang as Lang);
 ---
 
 {activeAnnouncements.length > 0 && (
-  <aside data-pagefind-ignore class="site-announcements" aria-label={lang === 'zh-cn' ? '全站公告' : 'Site announcements'}>
+  <aside data-pagefind-ignore class="site-announcements" aria-label={t('announcement.aria')}>
     <div class="mx-auto flex max-w-6xl flex-col gap-1.5 px-3 py-1.5 sm:px-4">
       {activeAnnouncements.map((announcement) => {
         const variant = announcement.variant ?? 'info';

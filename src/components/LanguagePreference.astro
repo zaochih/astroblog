@@ -1,5 +1,5 @@
 ---
-import { languages, defaultLang } from '@/i18n/ui';
+import { defaultLang, getSupportedLangs } from '@/i18n/ui';
 
 interface Props {
   currentLang: string;
@@ -9,7 +9,7 @@ const { currentLang } = Astro.props as Props;
 const langPreferenceConfig = JSON.stringify({
   currentLang,
   defaultLang,
-  supportedLangs: Object.keys(languages),
+  supportedLangs: getSupportedLangs(),
 });
 ---
 

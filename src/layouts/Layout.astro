@@ -1,13 +1,8 @@
 ---
 import '../styles/global.css';
 import { siteConfig, licensePresets, type LicensePreset } from '@/config';
-import { useTranslations, languages, languageNames, defaultLang, type Lang } from '@/i18n/ui';
+import { useTranslations, languages, defaultLang, getLanguageName, getLangProfile, getLocalizedPath, type Lang } from '@/i18n/ui';
 import { descriptionFromTitle, getSiteDescription } from '@/lib/seo';
-
-/** Normalise BCP47 tag for HTML: 'zh-cn' → 'zh-CN', 'en-us' → 'en-US' */
-function toHtmlLang(tag: string) {
-  return tag.replace(/-([a-z]+)$/, (_, r) => '-' + r.toUpperCase());
-}
 import LanguageToast from '@/components/LanguageToast.astro';
 import LanguagePreference from '@/components/LanguagePreference.astro';
 import SmartHeader from '@/components/SmartHeader.astro';
@@ -44,6 +39,7 @@ const {
 } = Astro.props as Props;
 
 const t = useTranslations(lang as Lang);
+const langProfile = getLangProfile(lang);
 const pageTitle = title ?? siteConfig.name;
 const homeHref = lang === defaultLang ? '/' : `/${lang}/`;
 const searchHref = lang === defaultLang ? '/search' : `/${lang}/search`;
@@ -58,8 +54,14 @@ const licenseInfo = licenseKey ? licensePresets[licenseKey] : null;
 const chinaFooterOptions = siteConfig.countrySpecificOptions.china;
 const miitIcpQueryUrl = 'https://beian.miit.gov.cn/#/Integrated/recordQuery';
 const mpsBeianQueryBaseUrl = 'https://www.beian.gov.cn/portal/registerSystemInfo';
-const miitIcpRecord = lang === 'zh-cn' ? chinaFooterOptions.miitIcp.recordNumber : null;
-const mpsBeianRecord = lang === 'zh-cn' ? chinaFooterOptions.mpsBeian.recordNumber : null;
+
+function shouldShowChinaFooterRecords(currentLang: string): boolean {
+  return currentLang === defaultLang;
+}
+
+const showChinaFooterRecords = shouldShowChinaFooterRecords(lang);
+const miitIcpRecord = showChinaFooterRecords ? chinaFooterOptions.miitIcp.recordNumber : null;
+const mpsBeianRecord = showChinaFooterRecords ? chinaFooterOptions.mpsBeian.recordNumber : null;
 const mpsBeianRecordCode = mpsBeianRecord?.replace(/\D/g, '') || null;
 const mpsBeianUrl = mpsBeianRecordCode
   ? `${mpsBeianQueryBaseUrl}?recordcode=${encodeURIComponent(mpsBeianRecordCode)}`
@@ -67,22 +69,17 @@ const mpsBeianUrl = mpsBeianRecordCode
 
 // Footer: language switcher URL helper
 function getLangHref(targetLang: string): string {
-  if (targetLang === lang) return pathname;
-  if (targetLang === defaultLang) {
-    // strip current lang prefix: "/en/..." → "/..."
-    return pathname.replace(new RegExp(`^/${lang}(/|$)`), (_, sep) => sep ?? '/') || '/';
-  }
-  if (lang === defaultLang) {
-    // add prefix: "/..." → "/en/..."
-    return `/${targetLang}${pathname}`;
-  }
-  // swap prefix: "/zh/..." → "/en/..."
-  return pathname.replace(new RegExp(`^/${lang}(/|$)`), `/${targetLang}$1`);
+  return getLocalizedPath(pathname, lang, targetLang);
 }
+
+const localDatetimeConfig = JSON.stringify({
+  locale: langProfile.dateLocale,
+  useCjkFormat: langProfile.wordCountStyle === 'cjk',
+});
 ---
 
 <!doctype html>
-<html lang={toHtmlLang(lang)} class="antialiased">
+<html lang={langProfile.htmlLang} class="antialiased">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width" />
@@ -100,7 +97,7 @@ function getLangHref(targetLang: string): string {
         <meta property="og:type" content="website" />
         <meta property="og:url" content={canonicalUrl} />
         <meta property="og:site_name" content={siteConfig.name} />
-        <meta property="og:locale" content={lang === 'zh-cn' ? 'zh_CN' : 'en_US'} />
+        <meta property="og:locale" content={langProfile.ogLocale} />
         {image && <meta property="og:image" content={image} />}
 
         {/* Twitter / X Card */}
@@ -124,7 +121,7 @@ function getLangHref(targetLang: string): string {
         {/* RSS autodiscovery */}
         {lang === defaultLang
           ? <link rel="alternate" type="application/rss+xml" title={siteConfig.name} href="/rss.xml" />
-          : <link rel="alternate" type="application/rss+xml" title={`${siteConfig.name} (EN)`} href="/en-us/rss.xml" />
+          : <link rel="alternate" type="application/rss+xml" title={`${siteConfig.name} (${langProfile.label})`} href={`/${lang}/rss.xml`} />
         }
     </head>
     <body class="flex min-h-screen flex-col">
@@ -169,7 +166,7 @@ function getLangHref(targetLang: string): string {
                     href={getLangHref(l)}
                     data-footer-lang
                     data-lang-switch={l}
-                    aria-label={t('aria.switchLanguage').replace('{lang}', languageNames[lang as Lang][l as Lang])}
+                    aria-label={t('aria.switchLanguage').replace('{lang}', getLanguageName(l, lang))}
                     aria-current={lang === l ? 'page' : undefined}
                     class={`px-2.5 py-1 rounded-full border text-xs font-medium transition-colors ${lang === l ? 'border-primary bg-primary/10 text-primary' : 'border-border hover:border-primary/50 hover:text-foreground'}`}
                   >
@@ -230,13 +227,13 @@ function getLangHref(targetLang: string): string {
 
         {showLangToast && <LanguageToast lang={lang} />}
 
-        <script>
+        <script is:inline define:vars={{ localDatetimeConfig }}>
           function initExternalLinks() {
-            document.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((anchor) => {
+            document.querySelectorAll('a[href]').forEach((anchor) => {
               const rawHref = anchor.getAttribute('href');
               if (!rawHref) return;
 
-              let url: URL;
+              let url;
               try {
                 url = new URL(rawHref, window.location.href);
               } catch {
@@ -257,19 +254,20 @@ function getLangHref(targetLang: string): string {
           }
 
           function initLocalDatetimes() {
-            const htmlLang = document.documentElement.lang || navigator.language || 'en-US';
-            const isZh = htmlLang.toLowerCase().startsWith('zh');
+            const config = JSON.parse(localDatetimeConfig);
+            const locale = config.locale || document.documentElement.lang || navigator.language || 'en-US';
+            const useCjkFormat = Boolean(config.useCjkFormat);
 
-            const partsFor = (date: Date) => {
-              const parts = new Intl.DateTimeFormat(isZh ? 'zh-CN' : 'en-US', {
+            const partsFor = (date) => {
+              const parts = new Intl.DateTimeFormat(locale, {
                 year: 'numeric',
-                month: isZh ? '2-digit' : 'short',
+                month: useCjkFormat ? '2-digit' : 'short',
                 day: '2-digit',
                 hour: '2-digit',
                 minute: '2-digit',
-                hour12: !isZh,
+                hour12: !useCjkFormat,
               }).formatToParts(date);
-              const value = (type: Intl.DateTimeFormatPartTypes) => parts.find(part => part.type === type)?.value ?? '';
+              const value = (type) => parts.find(part => part.type === type)?.value ?? '';
               const hour = value('hour') === '24' ? '00' : value('hour');
               return {
                 year: value('year'),
@@ -281,24 +279,24 @@ function getLangHref(targetLang: string): string {
               };
             };
 
-            const formatDate = (date: Date) => {
-              if (isZh) {
+            const formatDate = (date) => {
+              if (useCjkFormat) {
                 const { year, month, day } = partsFor(date);
                 return `${year}年${month}月${day}日`;
               }
-              return date.toLocaleDateString('en-US', {
+              return date.toLocaleDateString(locale, {
                 year: 'numeric',
                 month: 'short',
                 day: 'numeric',
               });
             };
 
-            const formatTime = (date: Date) => {
-              if (isZh) {
+            const formatTime = (date) => {
+              if (useCjkFormat) {
                 const { hour, minute } = partsFor(date);
                 return `${hour}:${minute}`;
               }
-              return date.toLocaleTimeString('en-US', {
+              return date.toLocaleTimeString(locale, {
                 hour: 'numeric',
                 minute: '2-digit',
               });

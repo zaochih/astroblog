@@ -1,5 +1,5 @@
 import { siteConfig } from '@/config';
-import { defaultLang, type Lang } from '@/i18n/ui';
+import { defaultLang, getLocalizedValue, isSupportedLang, useTranslations, type Lang } from '@/i18n/ui';
 
 const DESCRIPTION_MAX_LENGTH = 160;
 const DESCRIPTION_MIN_CUT_LENGTH = 110;
@@ -23,12 +23,11 @@ interface ListingDescriptionOptions {
 }
 
 function asLang(lang: string): Lang {
-  return lang in siteConfig.description ? lang as Lang : defaultLang;
+  return isSupportedLang(lang) ? lang : defaultLang;
 }
 
 export function getSiteDescription(lang: string): string {
-  const safeLang = asLang(lang);
-  return siteConfig.description[safeLang] ?? siteConfig.description[defaultLang];
+  return getLocalizedValue(siteConfig.description, asLang(lang)) ?? siteConfig.description[siteConfig.defaultLang];
 }
 
 export function normalizeDescription(value?: string | null): string | undefined {
@@ -138,16 +137,11 @@ export function excerptFirstParagraph(body?: string): string | undefined {
 export function genericContentDescription(kind: ContentDescriptionKind, title: string, lang: string): string {
   const siteName = siteConfig.name;
   const safeTitle = normalizeDescription(title) ?? siteName;
-
-  if (asLang(lang) === 'zh-cn') {
-    return kind === 'article'
-      ? `${siteName} 的《${safeTitle}》文章。`
-      : `${siteName} 的“${safeTitle}”页面。`;
-  }
-
-  return kind === 'article'
-    ? `Article “${safeTitle}” on ${siteName}.`
-    : `Page “${safeTitle}” on ${siteName}.`;
+  const t = useTranslations(asLang(lang));
+  const key = kind === 'article' ? 'seo.article' : 'seo.page';
+  return t(key)
+    .replace('{site}', siteName)
+    .replace('{title}', safeTitle);
 }
 
 export function resolveContentDescription(options: ContentDescriptionOptions): string {
@@ -162,41 +156,27 @@ export function describeListingPage(options: ListingDescriptionOptions): string 
   const lang = asLang(options.lang);
   const label = normalizeDescription(options.label);
   const page = options.page ?? 1;
-
-  if (lang === 'zh-cn') {
-    switch (options.kind) {
-      case 'archive':
-        return `浏览 ${siteConfig.name} 的文章归档。`;
-      case 'tag':
-        return `浏览 ${siteConfig.name} 中带有“${label}”标签的文章。`;
-      case 'category':
-        return `浏览 ${siteConfig.name} 中“${label}”分类下的文章。`;
-      case 'paginatedArticles':
-        return `浏览 ${siteConfig.name} 的文章列表第 ${page} 页。`;
-      case 'friends':
-        return `浏览 ${siteConfig.name} 的友情链接页面。`;
-      case 'search':
-        return `搜索 ${siteConfig.name} 的文章和页面。`;
-      case 'notFound':
-        return `${siteConfig.name} 的 404 页面，提示当前链接没有找到可用内容。`;
-    }
-  }
+  const t = useTranslations(lang);
+  const replace = (template: string) => template
+    .replace('{site}', siteConfig.name)
+    .replace('{label}', label ?? '')
+    .replace('{page}', String(page));
 
   switch (options.kind) {
     case 'archive':
-      return `Browse the article archive on ${siteConfig.name}.`;
+      return replace(t('seo.archive'));
     case 'tag':
-      return `Browse articles tagged “${label}” on ${siteConfig.name}.`;
+      return replace(t('seo.tag'));
     case 'category':
-      return `Browse articles in the “${label}” category on ${siteConfig.name}.`;
+      return replace(t('seo.category'));
     case 'paginatedArticles':
-      return `Browse page ${page} of the article list on ${siteConfig.name}.`;
+      return replace(t('seo.paginatedArticles'));
     case 'friends':
-      return `Browse the friends and links page on ${siteConfig.name}.`;
+      return replace(t('seo.friends'));
     case 'search':
-      return `Search articles and pages on ${siteConfig.name}.`;
+      return replace(t('seo.search'));
     case 'notFound':
-      return `The 404 page for ${siteConfig.name}, shown when no content is available at the current link.`;
+      return replace(t('seo.notFound'));
   }
 }
 
