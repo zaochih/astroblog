@@ -1,6 +1,6 @@
 ---
 import yaml from 'js-yaml';
-import HugeIcon from '@/components/HugeIcon';
+import Icon from '@/components/Icon';
 import { defaultLang, getLocalizedValue, useTranslations, type Lang } from '@/i18n/ui';
 import announcementsRaw from '@/data/announcements.yaml?raw';
 
@@ -117,7 +117,7 @@ const t = useTranslations(lang as Lang);
         return (
           <section class={`site-announcement site-announcement-${variant}`}>
             <div class="site-announcement-icon" aria-hidden="true">
-              <HugeIcon name={announcement.icon ?? 'megaphone'} className="size-4" size={16} />
+              <Icon name={announcement.icon ?? 'megaphone'} className="size-4" size={16} />
             </div>
 
             <p class="site-announcement-text">
@@ -128,7 +128,7 @@ const t = useTranslations(lang as Lang);
 
             {announcement.action && (
               <a href={announcement.action.url} class="site-announcement-action">
-                <HugeIcon name={announcement.action.icon ?? 'arrowRight'} className="size-4" size={16} />
+                <Icon name={announcement.action.icon ?? 'arrowRight'} className="size-4" size={16} />
                 <span>{announcement.action.text}</span>
               </a>
             )}

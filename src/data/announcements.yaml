@@ -2,11 +2,11 @@
 # ─────────────────────────
 # enabled:   可选，false 时隐藏
 # variant:   可选，info / holiday / maintenance / event；默认 info
-# icon:      可选，HugeIcon 名称，例如 megaphone / info / fireworks / wrench / gift / party
+# icon:      可选，Icon 名称（Lucide），例如 megaphone / info / fireworks / wrench / gift / party
 # title:     标题，会加粗显示在正文前
 # body:      正文；支持安全的行内链接语法 [文本](https://example.com)、[文本](/path)、[文本](#hash)
 # action:    可选，右侧链接按钮
-#   icon:    可选，HugeIcon 名称
+#   icon:    可选，Icon 名称（Lucide）
 #   text:    按钮文本
 #   url:     链接地址
 # startAt:   可选，ISO 8601 开始时间；开始前不显示

@@ -1,6 +1,6 @@
 ---
 import Layout from '@/layouts/Layout.astro';
-import HugeIcon from '@/components/HugeIcon';
+import Icon from '@/components/Icon';
 import { siteConfig } from '@/config';
 import { useTranslations, defaultLang, getSupportedLangs, type Lang } from '@/i18n/ui';
 import { describeListingPage } from '@/lib/seo';
@@ -37,7 +37,7 @@ const labels = {
 
     <label class="relative block">
       <span class="sr-only">{t('search.title')}</span>
-      <HugeIcon name="search" className="pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2 text-muted-foreground" size={20} />
+      <Icon name="search" className="pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2 text-muted-foreground" size={20} />
       <input
         data-search-input
         type="search"

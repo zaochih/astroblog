@@ -1,5 +1,5 @@
 ---
-import HugeIcon from '@/components/HugeIcon';
+import Icon from '@/components/Icon';
 import { useTranslations, type Lang } from '@/i18n/ui';
 
 type Props =
@@ -23,7 +23,7 @@ const colors = {
   },
 } as const;
 
-const iconName = platform === 'weixin' ? 'wechat' : 'microsoft';
+const iconName = platform === 'weixin' ? 'wechat' : null;
 
 const label =
   platform === 'weixin'
@@ -42,7 +42,7 @@ const c = colors[platform];
 
 <div class={`mb-4 flex flex-wrap items-center gap-3 rounded-lg border p-4 text-sm text-foreground shadow-fluent-sm ${c.wrap}`}>
   <div class="flex min-w-0 items-center gap-2">
-    <HugeIcon name={iconName} className={`size-4 shrink-0 ${c.icon}`} size={16} />
+    {iconName && <Icon name={iconName} className={`size-4 shrink-0 ${c.icon}`} size={16} />}
     <span class="min-w-0">{label}</span>
   </div>
   <a

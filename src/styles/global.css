@@ -2,8 +2,8 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 @config "../../tailwind.config.mjs";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+
+
 
 @custom-variant dark (@media (prefers-color-scheme: dark));
 

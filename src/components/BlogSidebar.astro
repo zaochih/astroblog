@@ -1,5 +1,5 @@
 ---
-import HugeIcon from '@/components/HugeIcon';
+import Icon from '@/components/Icon';
 import { siteConfig } from '@/config';
 import type { CollectionEntry } from 'astro:content';
 import { getTagHref, getCategoryHref, countWords, formatWordCount } from '@/lib/content';
@@ -51,7 +51,7 @@ const [wordTotal, ...wordUnit] = totalWordsFormatted.split(' ');
             aria-label={t('aria.authorGithub').replace('{name}', siteConfig.author.name)}
             title="GitHub"
           >
-            <HugeIcon name="github" className="size-4" size={16} />
+            <Icon name="github" className="size-4" size={16} />
           </a>
         )}
         {siteConfig.author.links.twitter && (
@@ -63,7 +63,7 @@ const [wordTotal, ...wordUnit] = totalWordsFormatted.split(' ');
             aria-label={t('aria.authorTwitter').replace('{name}', siteConfig.author.name)}
             title="X / Twitter"
           >
-            <HugeIcon name="x" className="size-4" size={16} />
+            <Icon name="x" className="size-4" size={16} />
           </a>
         )}
       </div>

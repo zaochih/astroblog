@@ -1,6 +1,5 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { getPostHref, getTagHref, getCategoryHref, countWords, readingMinutes, formatDateTime } from '@/lib/content';
 import { getTagName, getCategoryName } from '@/i18n/taxonomy';
 import { useTranslations, type Lang } from '@/i18n/ui';
@@ -64,14 +63,14 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
     const coverSrc = coverSrcBySlug.get(slug);
     return (
       <div class="group relative" transition:name={`post-${slug}`}>
-        <Card className={`flex flex-col border-border/50 bg-card overflow-hidden ${coverSrc ? 'pt-0' : ''}`}>
+        <div class={`group/card flex flex-col gap-4 overflow-hidden rounded-lg bg-card py-4 text-xs/relaxed text-card-foreground shadow-fluent-sm ring-1 ring-foreground/[0.06] border-border/50 ${coverSrc ? 'pt-0' : ''}`}>
           {coverSrc && (
             <div class="h-52 w-full overflow-hidden border-b border-border/30">
               <img src={coverSrc} alt={post.data.coverAlt ?? post.data.title} class="w-full h-full object-cover" />
             </div>
           )}
 
-          <CardHeader>
+          <div class="grid auto-rows-min items-start gap-1 px-4">
             <div class="flex flex-wrap items-center gap-x-1 gap-y-0.5 text-xs text-muted-foreground mb-2">
               {post.data.category && (
                 <>
@@ -96,7 +95,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
               <span class="shrink-0">{timeStr}</span>
             </div>
 
-            <CardTitle className="text-xl leading-tight">
+            <div class="font-heading text-xl font-medium leading-tight">
               <a
                 href={postHref}
                 aria-label={t('aria.readPost').replace('{title}', post.data.title)}
@@ -104,18 +103,18 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
               >
                 {post.data.title}
               </a>
-            </CardTitle>
-          </CardHeader>
+            </div>
+          </div>
 
           {post.data.description && (
-            <CardContent>
-              <CardDescription className="line-clamp-3 text-sm">
+            <div class="px-4">
+              <div class="line-clamp-3 text-sm text-muted-foreground">
                 {post.data.description}
-              </CardDescription>
-            </CardContent>
+              </div>
+            </div>
           )}
 
-          <CardContent>
+          <div class="px-4">
             <div class="flex flex-wrap items-center gap-1.5">
               {post.data.tags?.map(tag => (
                 <a
@@ -134,8 +133,8 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
                 {t('post.continueReading')}
               </a>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     );
   })}

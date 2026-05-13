@@ -8,7 +8,7 @@ import LanguagePreference from '@/components/LanguagePreference.astro';
 import SmartHeader from '@/components/SmartHeader.astro';
 import DetailsAnimator from '@/components/DetailsAnimator.astro';
 import SiteAnnouncement from '@/components/SiteAnnouncement.astro';
-import HugeIcon from '@/components/HugeIcon';
+import Icon from '@/components/Icon';
 import { ClientRouter } from 'astro:transitions';
 
 interface Props {
@@ -144,7 +144,7 @@ const localDatetimeConfig = JSON.stringify({
               <a href={`${homeHref}friends`} class="hover:text-primary transition-colors">{t('nav.friends')}</a>
               <a href={`${homeHref}about`} class="hover:text-primary transition-colors">{t('nav.about')}</a>
               <a href={searchHref} aria-label={t('aria.nav.search')} class="inline-flex items-center justify-center rounded-sm p-1.5 hover:bg-accent hover:text-primary transition-colors">
-                <HugeIcon name="search" className="size-4" size={16} />
+                <Icon name="search" className="size-4" size={16} />
               </a>
             </nav>
           </div>

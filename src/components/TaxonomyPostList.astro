@@ -1,6 +1,5 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { getPostHref, formatDateTime } from '@/lib/content';
 import { useTranslations, type Lang } from '@/i18n/ui';
 
@@ -16,8 +15,8 @@ const t = useTranslations(lang as Lang);
 <div class="flex flex-col gap-5">
   {posts.map(({ post, slug }) => (
     <div class="relative">
-      <Card className="flex flex-col border-border/50">
-        <CardHeader>
+      <div class="group/card flex flex-col gap-4 overflow-hidden rounded-lg bg-card py-4 text-xs/relaxed text-card-foreground shadow-fluent-sm ring-1 ring-foreground/[0.06] border-border/50">
+        <div class="grid auto-rows-min items-start gap-1 px-4">
           <div class="flex items-center gap-3 mb-1">
             {post.data.date && (
               <time data-local-datetime datetime={post.data.date.toISOString()} class="text-xs text-muted-foreground">
@@ -25,7 +24,7 @@ const t = useTranslations(lang as Lang);
               </time>
             )}
           </div>
-          <CardTitle className="text-xl leading-tight">
+          <div class="font-heading text-xl font-medium leading-tight">
             <a
               href={getPostHref(slug, lang)}
               aria-label={t('aria.readPost').replace('{title}', post.data.title)}
@@ -33,16 +32,16 @@ const t = useTranslations(lang as Lang);
             >
               {post.data.title}
             </a>
-          </CardTitle>
-        </CardHeader>
+          </div>
+        </div>
         {post.data.description && (
-          <CardContent>
-            <CardDescription className="line-clamp-2 text-sm">
+          <div class="px-4">
+            <div class="line-clamp-2 text-sm text-muted-foreground">
               {post.data.description}
-            </CardDescription>
-          </CardContent>
+            </div>
+          </div>
         )}
-      </Card>
+      </div>
     </div>
   ))}
 </div>

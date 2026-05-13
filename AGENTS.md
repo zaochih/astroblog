@@ -13,7 +13,7 @@
 - Comments use giscus configured in `siteConfig.comments`. Posts default to comments on and can use `comments: false`; pages default to comments off and can use `comments: true`. Use stable terms `posts/<slug>` and `pages/<slug>` so multilingual variants share one discussion.
 - Friend links can define optional `i18n.<lang>` overrides for `name`, `description`, `url`, and `links`; unspecified localized fields fall back to the base entry.
 - The 404 page is intentionally Chinese-only at `src/pages/404.astro`; keep the footer language switcher hidden there.
-- Shadcn is configured with Hugeicons. Prefer `src/components/HugeIcon.tsx` for UI icons before adding inline SVG.
+- Icons use `src/components/Icon.tsx` (Lucide for general icons, HugeIcons for brand icons: GitHub, X, WeChat). Prefer this component before adding inline SVG.
 - Explicit language switches write `localStorage["lang-preference"]`; pages with a stored preference should redirect to the preferred language without showing the toast again.
 - Ask for user approval before making breaking changes, including removing or renaming existing public routes, URLs, files, CLI commands, config keys, or content paths that may already be used externally.
 - Avoid `any` in TypeScript. Prefer explicit interfaces, generics, `unknown` with narrowing, or local type aliases; only use `any` when a boundary cannot be typed more precisely and document why.

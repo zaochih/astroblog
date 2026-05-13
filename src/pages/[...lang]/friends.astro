@@ -4,7 +4,7 @@ import { siteConfig } from '@/config';
 import { getLocalizedValue, useTranslations, defaultLang, getSupportedLangs, type Lang } from '@/i18n/ui';
 import yaml from 'js-yaml';
 import friendsRaw from '@/data/friends.yaml?raw';
-import HugeIcon from '@/components/HugeIcon';
+import Icon from '@/components/Icon';
 import { pinyin } from 'pinyin-pro';
 import { describeListingPage } from '@/lib/seo';
 
@@ -243,12 +243,12 @@ const sortedFriends = [...sponsoredFriends, ...regularFriends, ...referralFriend
                     aria-label={t('aria.friendLink').replace('{name}', friend.name).replace('{type}', link.icon)}
                     title={link.icon}
                   >
-                    <HugeIcon name={link.icon} className="size-4" size={16} />
+                    <Icon name={link.icon} className="size-4" size={16} />
                   </a>
                 ))}
               </div>
               <span class={`transition-colors ${arrowClass}`} aria-hidden="true">
-                <HugeIcon name="arrowRight" className="size-5" size={20} />
+                <Icon name="arrowRight" className="size-5" size={20} />
               </span>
             </div>
           </div>

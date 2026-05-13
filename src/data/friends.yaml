@@ -16,7 +16,7 @@
 #     description: Localized description
 #     backgroundIcon: /path/to/localized-icon.png
 # links:       可选，子链接列表
-#   - icon: HugeIcon 名称 (home / image / globe / link / paperclip / rss / github / mail / pen)
+#   - icon: Icon 名称（Lucide）(home / image / globe / link / paperclip / rss / github / mail / pen)
 #     url:  子链接地址
 
 ### Friends Part ###
