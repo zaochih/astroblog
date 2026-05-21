@@ -127,7 +127,10 @@ const localDatetimeConfig = JSON.stringify({
           : <link rel="alternate" type="application/rss+xml" title={`${siteConfig.name} (${langProfile.label})`} href={`/${lang}/rss.xml`} />
         }
     </head>
-    <body class="flex min-h-screen flex-col">
+    <body
+      class="flex min-h-screen flex-col"
+      data-local-datetime-config={localDatetimeConfig}
+    >
         <SiteAnnouncement lang={lang} />
 
         <header
@@ -233,7 +236,7 @@ const localDatetimeConfig = JSON.stringify({
 
         {showLangToast && <LanguageToast lang={lang} />}
 
-        <script is:inline define:vars={{ localDatetimeConfig }}>
+        <script is:inline>
           function initExternalLinks() {
             document.querySelectorAll('a[href]').forEach((anchor) => {
               const rawHref = anchor.getAttribute('href');
@@ -260,7 +263,13 @@ const localDatetimeConfig = JSON.stringify({
           }
 
           function initLocalDatetimes() {
-            const config = JSON.parse(localDatetimeConfig);
+            const rawConfig = document.body?.dataset.localDatetimeConfig;
+            let config = {};
+            try {
+              config = rawConfig ? JSON.parse(rawConfig) : {};
+            } catch {
+              config = {};
+            }
             const locale = config.locale || document.documentElement.lang || navigator.language || 'en-US';
             const useCjkFormat = Boolean(config.useCjkFormat);
 
@@ -324,10 +333,16 @@ const localDatetimeConfig = JSON.stringify({
             });
           }
 
+          if (!window.__lczLayoutEnhancementsBound) {
+            window.__lczLayoutEnhancementsBound = true;
+            document.addEventListener('astro:page-load', () => {
+              initExternalLinks();
+              initLocalDatetimes();
+            });
+          }
+
           initExternalLinks();
           initLocalDatetimes();
-          document.addEventListener('astro:page-load', initExternalLinks);
-          document.addEventListener('astro:page-load', initLocalDatetimes);
         </script>
     </body>
 </html>
