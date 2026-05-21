@@ -94,7 +94,12 @@
   --sidebar-border: oklch(92.2% 0 0deg);
   --sidebar-ring: #0078D4;
 
-  text-autospace: normal;
+}
+
+@supports (text-autospace: normal) {
+  :root {
+    text-autospace: normal;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -146,9 +151,6 @@
     @apply font-sans;
 
     overflow-y: scroll;
-    scrollbar-gutter: stable;
-    scrollbar-color: color-mix(in oklch, var(--muted-foreground) 30%, transparent) transparent;
-    scrollbar-width: thin;
 
     --site-header-height: 3.5rem;
     --site-header-visible-height: var(--site-header-height);
@@ -157,21 +159,57 @@
     --toc-sticky-top: calc(var(--sticky-header-offset) + 1.5rem);
   }
 
-  ::-webkit-scrollbar {
-    width: 8px;
+  @supports (scrollbar-gutter: stable) {
+    html {
+      scrollbar-gutter: stable;
+    }
   }
 
-  ::-webkit-scrollbar-track {
-    background: transparent;
+  @supports (scrollbar-width: thin) {
+    html {
+      scrollbar-width: thin;
+    }
   }
 
-  ::-webkit-scrollbar-thumb {
-    background-color: color-mix(in oklch, var(--muted-foreground) 30%, transparent);
-    border-radius: 4px;
+  @supports (scrollbar-color: #000 transparent) {
+    html {
+      scrollbar-color: rgb(100 116 139 / 35%) transparent;
+    }
   }
 
-  ::-webkit-scrollbar-thumb:hover {
-    background-color: color-mix(in oklch, var(--muted-foreground) 50%, transparent);
+  @supports (color: color-mix(in oklch, black 50%, transparent)) and (scrollbar-color: #000 transparent) {
+    html {
+      scrollbar-color: color-mix(in oklch, var(--muted-foreground) 30%, transparent) transparent;
+    }
+  }
+
+  @supports selector(::-webkit-scrollbar) {
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: rgb(100 116 139 / 35%);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background-color: rgb(100 116 139 / 55%);
+    }
+  }
+
+  @supports (color: color-mix(in oklch, black 50%, transparent)) and selector(::-webkit-scrollbar) {
+    ::-webkit-scrollbar-thumb {
+      background-color: color-mix(in oklch, var(--muted-foreground) 30%, transparent);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background-color: color-mix(in oklch, var(--muted-foreground) 50%, transparent);
+    }
   }
 }
 
@@ -180,27 +218,44 @@
   scroll-margin-top: var(--content-anchor-offset);
 }
 
-.prose a:not(:has(img), [data-footnote-backref]) {
+.prose a:not([data-footnote-backref]) {
   background-image: linear-gradient(currentColor, currentColor);
   background-position: 0 100%;
   background-repeat: no-repeat;
   background-size: 0 1px;
-  box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
   text-decoration: none;
   transition: background-size 180ms ease;
 }
 
-.prose a:not(:has(img), [data-footnote-backref]):hover,
-.prose a:not(:has(img), [data-footnote-backref]):focus-visible {
+.prose a:not([data-footnote-backref]):hover,
+.prose a:not([data-footnote-backref]):focus-visible {
   background-size: 100% 1px;
 }
 
 .prose p:not(.image-block)>img,
-.prose p:not(.image-block)>a:has(> img:only-child)>img {
+.prose p:not(.image-block)>a>img {
   display: inline-block;
   margin: 0 0.15em;
   vertical-align: middle;
+}
+
+@supports selector(:has(*)) {
+  .prose a:has(img) {
+    background-image: none;
+  }
+
+  .prose a:has(img):hover,
+  .prose a:has(img):focus-visible {
+    background-size: 0 1px;
+  }
+
+  .prose p:not(.image-block)>a:not(:has(> img:only-child))>img {
+    display: revert;
+    margin: revert;
+    vertical-align: revert;
+  }
 }
 
 .prose p.image-block {
