@@ -146,6 +146,7 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
   server: {
+    host: "127.0.0.1",
     allowedHosts: true,
     headers: {
       "Access-Control-Allow-Origin": "https://giscus.app",
