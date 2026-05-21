@@ -29,7 +29,7 @@ export type LicensePreset = keyof typeof licensePresets;
 
 export const siteConfig = {
   name: 'LCZBlog',
-  siteUrl: 'https://example.com',
+  siteUrl: 'https://blog.licaoz.com',
   defaultLang: 'zh-cn',
   description: {
     'zh-cn': '立足中国，服务全球互联网的垃圾文字贩子。',
