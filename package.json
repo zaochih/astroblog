@@ -10,6 +10,8 @@
     "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
     "astro": "astro",
+    "lint:css": "stylelint \"src/**/*.css\" \"public/**/*.css\"",
+    "format:css": "stylelint \"src/**/*.css\" \"public/**/*.css\" --fix",
     "new:post": "bun scripts/new-content.js post",
     "new:page": "bun scripts/new-content.js page",
     "post": "bun scripts/new-content.js post",
@@ -46,7 +48,9 @@
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
-    "pagefind": "^1.5.2"
+    "pagefind": "^1.5.2",
+    "stylelint": "^17.12.0",
+    "stylelint-config-standard": "^40.0.0"
   },
   "overrides": {
     "vite": "^7.3.2"
