@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 import { getPostHref, formatDateTime } from '@/lib/content';
 import { useTranslations, type Lang } from '@/i18n/ui';
+import { getPostSkeletonKind } from '@/lib/route-skeleton';
 
 interface Props {
   posts: Array<{ post: CollectionEntry<'blog'>; slug: string }>;
@@ -10,6 +11,11 @@ interface Props {
 
 const { posts, lang } = Astro.props;
 const t = useTranslations(lang as Lang);
+const skeletonKindBySlug = new Map(
+  await Promise.all(
+    posts.map(async ({ post, slug }) => [slug, await getPostSkeletonKind(post)] as const),
+  ),
+);
 ---
 
 <div class="flex flex-col gap-5">
@@ -27,6 +33,7 @@ const t = useTranslations(lang as Lang);
           <div class="font-heading text-xl font-medium leading-tight">
             <a
               href={getPostHref(slug, lang)}
+              data-skeleton-kind={skeletonKindBySlug.get(slug) ?? 'post-without-toc'}
               aria-label={t('aria.readPost').replace('{title}', post.data.title)}
               class="hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
             >

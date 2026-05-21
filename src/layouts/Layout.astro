@@ -8,6 +8,7 @@ import LanguagePreference from '@/components/LanguagePreference.astro';
 import SmartHeader from '@/components/SmartHeader.astro';
 import DetailsAnimator from '@/components/DetailsAnimator.astro';
 import SiteAnnouncement from '@/components/SiteAnnouncement.astro';
+import RouteSkeleton from '@/components/RouteSkeleton.astro';
 import Icon from '@/components/Icon';
 import { ClientRouter } from 'astro:transitions';
 
@@ -141,15 +142,15 @@ const localDatetimeConfig = JSON.stringify({
           class="sticky top-0 z-50 w-full border-b border-border/60 bg-background shadow-fluent-sm transition-transform duration-200 ease-out data-[state=hidden]:-translate-y-full"
         >
           <div class="max-w-6xl mx-auto px-3 sm:px-4 min-h-14 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 py-2">
-            <a href={homeHref} aria-label={t('aria.nav.home')} class="shrink-0 font-semibold text-primary tracking-tight hover:opacity-80 transition-opacity">
+            <a href={homeHref} data-skeleton-kind="feed" aria-label={t('aria.nav.home')} class="shrink-0 font-semibold text-primary tracking-tight hover:opacity-80 transition-opacity">
               {siteConfig.name}
             </a>
             <nav aria-label={t('aria.nav.main')} class="flex min-w-0 flex-1 items-center justify-end gap-3 overflow-x-auto whitespace-nowrap text-sm font-medium text-muted-foreground sm:gap-6">
-              <a href={homeHref} class="hover:text-primary transition-colors">{t('nav.home')}</a>
-              <a href={`${homeHref}archive`} class="hover:text-primary transition-colors">{t('nav.archive')}</a>
-              <a href={`${homeHref}friends`} class="hover:text-primary transition-colors">{t('nav.friends')}</a>
-              <a href={`${homeHref}about`} class="hover:text-primary transition-colors">{t('nav.about')}</a>
-              <a href={searchHref} aria-label={t('aria.nav.search')} class="inline-flex items-center justify-center rounded-sm p-1.5 hover:bg-accent hover:text-primary transition-colors">
+              <a href={homeHref} data-skeleton-kind="feed" class="hover:text-primary transition-colors">{t('nav.home')}</a>
+              <a href={`${homeHref}archive`} data-skeleton-kind="archive" class="hover:text-primary transition-colors">{t('nav.archive')}</a>
+              <a href={`${homeHref}friends`} data-skeleton-kind="friends" class="hover:text-primary transition-colors">{t('nav.friends')}</a>
+              <a href={`${homeHref}about`} data-skeleton-kind="page" class="hover:text-primary transition-colors">{t('nav.about')}</a>
+              <a href={searchHref} data-skeleton-kind="search" aria-label={t('aria.nav.search')} class="inline-flex items-center justify-center rounded-sm p-1.5 hover:bg-accent hover:text-primary transition-colors">
                 <Icon name="search" className="size-4" size={16} />
               </a>
             </nav>
@@ -160,7 +161,10 @@ const localDatetimeConfig = JSON.stringify({
           class="flex-1 w-full max-w-6xl mx-auto px-3 py-6 sm:px-4 sm:py-8"
           {...(searchable ? { 'data-pagefind-body': true, 'data-pagefind-filter': `lang:${lang}` } : { 'data-pagefind-ignore': true })}
         >
-            <slot />
+            <div data-route-content>
+              <slot />
+            </div>
+            <RouteSkeleton />
         </main>
 
         <footer data-pagefind-ignore data-site-footer class="border-t border-border/40 bg-background mt-auto">
@@ -237,6 +241,131 @@ const localDatetimeConfig = JSON.stringify({
         {showLangToast && <LanguageToast lang={lang} />}
 
         <script is:inline>
+          function inferRouteSkeletonKind(url) {
+            const path = url.pathname.replace(/\/+$/, '') || '/';
+            const segments = path.split('/').filter(Boolean);
+            const first = segments[0];
+            const routeStart = first && first.includes('-') ? 1 : 0;
+            const route = segments[routeStart] || '';
+
+            if (path === '/' || route === '' || route === 'page') return 'feed';
+            if (route === 'post') return 'post-without-toc';
+            if (route === 'archive') return 'archive';
+            if (route === 'tags' || route === 'categories') return 'taxonomy';
+            if (route === 'friends') return 'friends';
+            if (route === 'search') return 'search';
+            return 'page';
+          }
+
+          function initRouteSkeleton() {
+            if (window.__lczRouteSkeletonBound) return;
+            window.__lczRouteSkeletonBound = true;
+
+            const validKinds = new Set([
+              'feed',
+              'post-with-toc',
+              'post-without-toc',
+              'archive',
+              'taxonomy',
+              'friends',
+              'search',
+              'page',
+            ]);
+            let pendingKind = null;
+            let loadingTimer = 0;
+
+            const getSkeleton = () => document.querySelector('[data-route-skeleton]');
+
+            const setKind = (kind) => {
+              const skeleton = getSkeleton();
+              const nextKind = validKinds.has(kind) ? kind : 'page';
+              if (skeleton) skeleton.setAttribute('data-skeleton-kind', nextKind);
+            };
+
+            const clearLoading = () => {
+              if (loadingTimer) {
+                window.clearTimeout(loadingTimer);
+                loadingTimer = 0;
+              }
+              document.body?.removeAttribute('data-route-loading');
+              document.body?.removeAttribute('data-route-loading-exit');
+              pendingKind = null;
+            };
+
+            const clearLoadingAfterReveal = () => {
+              if (loadingTimer) {
+                window.clearTimeout(loadingTimer);
+                loadingTimer = 0;
+              }
+
+              if (document.body?.dataset.routeLoading === 'true') {
+                document.body.setAttribute('data-route-loading-exit', 'true');
+                window.setTimeout(clearLoading, 420);
+                return;
+              }
+
+              clearLoading();
+            };
+
+            const clearPreparationTimer = () => {
+              if (!loadingTimer) return;
+              window.clearTimeout(loadingTimer);
+              loadingTimer = 0;
+            };
+
+            document.addEventListener('click', (event) => {
+              if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+                return;
+              }
+
+              const target = event.target;
+              const anchor = target instanceof Element ? target.closest('a[href]') : null;
+              if (!anchor) return;
+              if (anchor.target && anchor.target !== '_self') return;
+              if (anchor.hasAttribute('download')) return;
+
+              let url;
+              try {
+                url = new URL(anchor.getAttribute('href') || '', window.location.href);
+              } catch {
+                return;
+              }
+
+              if (url.origin !== window.location.origin) return;
+              if (url.pathname === window.location.pathname && url.search === window.location.search) return;
+
+              pendingKind = anchor.dataset.skeletonKind || inferRouteSkeletonKind(url);
+            }, true);
+
+            document.addEventListener('astro:before-preparation', (event) => {
+              const to = event.to instanceof URL ? event.to : new URL(window.location.href);
+              const kind = pendingKind || inferRouteSkeletonKind(to);
+              setKind(kind);
+              if (loadingTimer) window.clearTimeout(loadingTimer);
+              document.body?.removeAttribute('data-route-loading-exit');
+              loadingTimer = window.setTimeout(() => {
+                window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                document.body?.setAttribute('data-route-loading', 'true');
+              }, 150);
+            });
+
+            document.addEventListener('astro:before-swap', (event) => {
+              if (document.body?.dataset.routeLoading !== 'true') return;
+
+              event.newDocument.body.setAttribute('data-route-loading', 'true');
+              event.newDocument.body.removeAttribute('data-route-loading-exit');
+
+              const currentKind = getSkeleton()?.getAttribute('data-skeleton-kind') || pendingKind || 'page';
+              const nextSkeleton = event.newDocument.querySelector('[data-route-skeleton]');
+              if (nextSkeleton) {
+                nextSkeleton.setAttribute('data-skeleton-kind', validKinds.has(currentKind) ? currentKind : 'page');
+              }
+            });
+
+            document.addEventListener('astro:after-preparation', clearPreparationTimer);
+            document.addEventListener('astro:page-load', clearLoadingAfterReveal);
+          }
+
           function initExternalLinks() {
             document.querySelectorAll('a[href]').forEach((anchor) => {
               const rawHref = anchor.getAttribute('href');
@@ -343,6 +472,7 @@ const localDatetimeConfig = JSON.stringify({
 
           initExternalLinks();
           initLocalDatetimes();
+          initRouteSkeleton();
         </script>
     </body>
 </html>
@@ -358,5 +488,9 @@ const localDatetimeConfig = JSON.stringify({
         margin: 0;
         width: 100%;
         min-height: 100vh;
+    }
+
+    :global(body[data-route-loading='true']:not([data-route-loading-exit='true']) [data-route-content]) {
+        display: none;
     }
 </style>

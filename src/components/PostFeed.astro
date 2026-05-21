@@ -4,6 +4,7 @@ import { getPostHref, getTagHref, getCategoryHref, countWords, readingMinutes, f
 import { getTagName, getCategoryName } from '@/i18n/taxonomy';
 import { useTranslations, type Lang } from '@/i18n/ui';
 import { optimizeLocalImage } from '@/lib/rehype-image-size.mjs';
+import { getPostSkeletonKind } from '@/lib/route-skeleton';
 
 interface Props {
   posts: Array<{ post: CollectionEntry<'blog'>; slug: string }>;
@@ -22,6 +23,11 @@ const coverSrcBySlug = new Map<string, string | undefined>(
       slug,
       post.data.cover ? (await optimizeLocalImage(post.data.cover, { force: true })).src : undefined,
     ] as const),
+  ),
+);
+const skeletonKindBySlug = new Map(
+  await Promise.all(
+    posts.map(async ({ post, slug }) => [slug, await getPostSkeletonKind(post)] as const),
   ),
 );
 
@@ -59,6 +65,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
     const wordStr = t('post.wordCount').replace('{count}', String(words));
     const timeStr = t('post.readingTime').replace('{min}', String(mins));
     const postHref = getPostHref(slug, lang);
+    const postSkeletonKind = skeletonKindBySlug.get(slug) ?? 'post-without-toc';
     const categoryName = post.data.category ? getCategoryName(post.data.category, lang as Lang) : '';
     const coverSrc = coverSrcBySlug.get(slug);
     return (
@@ -76,6 +83,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
                 <>
                   <a
                     href={getCategoryHref(post.data.category, lang)}
+                    data-skeleton-kind="taxonomy"
                     aria-label={t('aria.category').replace('{name}', categoryName)}
                     class="relative z-10 font-medium text-foreground/60 hover:text-primary transition-colors"
                   >
@@ -98,6 +106,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
             <div class="font-heading text-xl font-medium leading-tight">
               <a
                 href={postHref}
+                data-skeleton-kind={postSkeletonKind}
                 aria-label={t('aria.readPost').replace('{title}', post.data.title)}
                 class="hover:text-primary transition-colors after:absolute after:inset-0 after:content-['']"
               >
@@ -119,6 +128,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
               {post.data.tags?.map(tag => (
                 <a
                   href={getTagHref(tag, lang)}
+                  data-skeleton-kind="taxonomy"
                   aria-label={t('aria.tag').replace('{name}', getTagName(tag, lang as Lang))}
                   class="relative z-10 text-xs px-2 py-0.5 rounded-md bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
                 >
@@ -127,6 +137,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
               ))}
               <a
                 href={postHref}
+                data-skeleton-kind={postSkeletonKind}
                 aria-label={t('aria.continueReading').replace('{title}', post.data.title)}
                 class="relative z-10 ml-auto text-xs font-medium text-primary hover:underline transition-colors shrink-0"
               >
@@ -145,6 +156,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
     {currentPage > 1 ? (
       <a
         href={pageHref(currentPage - 1)}
+        data-skeleton-kind="feed"
         aria-label={t('pagination.prev')}
         class="px-3 py-1.5 text-sm rounded-md border border-border/50 text-muted-foreground hover:text-primary hover:border-primary/50 transition-colors"
       >
@@ -162,6 +174,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
       ) : (
         <a
           href={pageHref(p as number)}
+          data-skeleton-kind="feed"
           aria-label={t('aria.pageNumber').replace('{page}', String(p))}
           class={`px-3 py-1.5 text-sm rounded-md border transition-colors ${
             p === currentPage
@@ -178,6 +191,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
     {currentPage < totalPages ? (
       <a
         href={pageHref(currentPage + 1)}
+        data-skeleton-kind="feed"
         aria-label={t('pagination.next')}
         class="px-3 py-1.5 text-sm rounded-md border border-border/50 text-muted-foreground hover:text-primary hover:border-primary/50 transition-colors"
       >

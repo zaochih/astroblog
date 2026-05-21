@@ -1,0 +1,349 @@
+---
+const feedCards = [0, 1, 2];
+const compactRows = [0, 1, 2, 3, 4];
+const articleLines = [0, 1, 2, 3, 4, 5];
+const tocRows = [0, 1, 2, 3, 4, 5];
+const friendCards = [0, 1, 2, 3];
+---
+
+<div data-route-skeleton data-skeleton-kind="page" aria-hidden="true">
+  <div data-skeleton-panel="feed" class="lg:grid lg:grid-cols-[220px_1fr_220px] lg:gap-8">
+    <aside class="mb-6 space-y-4 lg:mb-0">
+      <div class="skeleton-card flex items-center gap-4 p-4 lg:flex-col lg:gap-3 lg:p-5">
+        <span class="skeleton-block size-14 rounded-full lg:size-20"></span>
+        <div class="w-full flex-1 space-y-2 lg:text-center">
+          <span class="skeleton-block mx-auto h-4 w-28"></span>
+          <span class="skeleton-block h-3 w-full"></span>
+          <span class="skeleton-block h-3 w-3/4 lg:mx-auto"></span>
+        </div>
+      </div>
+      <div class="grid grid-cols-4 gap-px overflow-hidden rounded-lg border border-border/50 bg-border/50 lg:grid-cols-2">
+        {[0, 1, 2, 3].map(() => (
+          <div class="bg-card px-3 py-3">
+            <span class="skeleton-block mx-auto h-4 w-8"></span>
+            <span class="skeleton-block mx-auto mt-2 h-2.5 w-12"></span>
+          </div>
+        ))}
+      </div>
+    </aside>
+
+    <div class="space-y-5">
+      {feedCards.map(index => (
+        <div class={`skeleton-card overflow-hidden ${index === 0 ? 'pt-0' : ''}`}>
+          {index === 0 && <span class="skeleton-block block h-52 w-full rounded-none"></span>}
+          <div class="space-y-4 p-4">
+            <div class="flex flex-wrap gap-2">
+              <span class="skeleton-block h-3 w-20"></span>
+              <span class="skeleton-block h-3 w-24"></span>
+              <span class="skeleton-block h-3 w-16"></span>
+            </div>
+            <span class="skeleton-block h-6 w-4/5"></span>
+            <div class="space-y-2">
+              <span class="skeleton-block h-3 w-full"></span>
+              <span class="skeleton-block h-3 w-11/12"></span>
+              <span class="skeleton-block h-3 w-2/3"></span>
+            </div>
+            <div class="flex gap-2">
+              <span class="skeleton-block h-5 w-14"></span>
+              <span class="skeleton-block h-5 w-16"></span>
+              <span class="skeleton-block ml-auto h-4 w-20"></span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <aside class="mt-8 hidden space-y-6 lg:mt-0 lg:block">
+      <div class="skeleton-card space-y-3 p-5">
+        <span class="skeleton-block h-3 w-24"></span>
+        {[0, 1, 2, 3].map(() => <span class="skeleton-block h-5 w-full"></span>)}
+      </div>
+      <div class="skeleton-card space-y-3 p-5">
+        <span class="skeleton-block h-3 w-16"></span>
+        <div class="flex flex-wrap gap-2">
+          {[0, 1, 2, 3, 4, 5].map(() => <span class="skeleton-block h-5 w-14"></span>)}
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div data-skeleton-panel="post-with-toc" class="mx-auto mt-6 sm:mt-10 xl:grid xl:max-w-5xl xl:grid-cols-[1fr_220px] xl:items-start xl:gap-10">
+    <div class="min-w-0">
+      <div class="skeleton-article">
+        <span class="skeleton-block mb-6 h-7 w-20"></span>
+        <header class="mb-8 space-y-4 text-center">
+          <span class="skeleton-block mx-auto h-9 w-5/6 sm:h-10"></span>
+          <span class="skeleton-block mx-auto h-4 w-3/5"></span>
+        </header>
+        <div class="mb-4 rounded-lg border border-border/50 bg-card p-4 xl:hidden">
+          <span class="skeleton-block h-3 w-20"></span>
+          <div class="mt-3 space-y-2">
+            {[0, 1, 2].map(() => <span class="skeleton-block h-3 w-full"></span>)}
+          </div>
+        </div>
+        <div class="space-y-5">
+          {articleLines.map(index => (
+            <div class="space-y-2">
+              <span class={`skeleton-block h-4 ${index % 3 === 0 ? 'w-full' : index % 3 === 1 ? 'w-11/12' : 'w-4/5'}`}></span>
+              <span class={`skeleton-block h-4 ${index % 2 === 0 ? 'w-5/6' : 'w-full'}`}></span>
+            </div>
+          ))}
+          <span class="skeleton-block my-8 h-44 w-full"></span>
+          {articleLines.slice(0, 3).map(index => (
+            <div class="space-y-2">
+              <span class={`skeleton-block h-4 ${index % 2 === 0 ? 'w-full' : 'w-10/12'}`}></span>
+              <span class="skeleton-block h-4 w-4/5"></span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+    <aside class="hidden xl:block">
+      <div class="skeleton-card sticky top-[var(--toc-sticky-top)] space-y-3 p-4">
+        <span class="skeleton-block h-3 w-20"></span>
+        {tocRows.map(index => (
+          <span class={`skeleton-block h-3 ${index % 3 === 2 ? 'ml-3 w-3/4' : 'w-full'}`}></span>
+        ))}
+      </div>
+    </aside>
+  </div>
+
+  <div data-skeleton-panel="post-without-toc" class="skeleton-article mx-auto mt-6 max-w-3xl sm:mt-10">
+    <span class="skeleton-block mb-6 h-7 w-20"></span>
+    <header class="mb-8 space-y-4 text-center">
+      <span class="skeleton-block mx-auto h-9 w-5/6 sm:h-10"></span>
+      <span class="skeleton-block mx-auto h-4 w-3/5"></span>
+    </header>
+    <div class="space-y-5">
+      {articleLines.map(index => (
+        <div class="space-y-2">
+          <span class={`skeleton-block h-4 ${index % 3 === 0 ? 'w-full' : index % 3 === 1 ? 'w-11/12' : 'w-4/5'}`}></span>
+          <span class={`skeleton-block h-4 ${index % 2 === 0 ? 'w-5/6' : 'w-full'}`}></span>
+        </div>
+      ))}
+      <span class="skeleton-block my-8 h-44 w-full"></span>
+      {articleLines.slice(0, 3).map(index => (
+        <div class="space-y-2">
+          <span class={`skeleton-block h-4 ${index % 2 === 0 ? 'w-full' : 'w-10/12'}`}></span>
+          <span class="skeleton-block h-4 w-4/5"></span>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <div data-skeleton-panel="archive" class="mx-auto max-w-2xl">
+    <span class="skeleton-block mb-3 h-8 w-36"></span>
+    <span class="skeleton-block mb-8 h-4 w-24"></span>
+    <div class="space-y-10">
+      {[0, 1].map(() => (
+        <section>
+          <span class="skeleton-block mb-4 h-6 w-20"></span>
+          <div class="space-y-3">
+            {compactRows.map(() => (
+              <div class="flex items-baseline gap-4">
+                <span class="skeleton-block h-7 w-24 shrink-0"></span>
+                <span class="skeleton-block h-4 flex-1"></span>
+              </div>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  </div>
+
+  <div data-skeleton-panel="taxonomy" class="mx-auto max-w-2xl">
+    <span class="skeleton-block mb-3 h-8 w-52"></span>
+    <span class="skeleton-block mb-8 h-4 w-24"></span>
+    <div class="space-y-5">
+      {compactRows.slice(0, 4).map(() => (
+        <div class="skeleton-card space-y-3 p-4">
+          <span class="skeleton-block h-3 w-28"></span>
+          <span class="skeleton-block h-6 w-4/5"></span>
+          <span class="skeleton-block h-4 w-full"></span>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <div data-skeleton-panel="friends" class="mx-auto max-w-4xl">
+    <span class="skeleton-block mb-6 h-8 w-32"></span>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      {friendCards.map(() => (
+        <div class="skeleton-card min-h-[140px] space-y-5 p-5">
+          <div class="space-y-2">
+            <span class="skeleton-block h-5 w-32"></span>
+            <span class="skeleton-block h-3 w-full"></span>
+            <span class="skeleton-block h-3 w-2/3"></span>
+          </div>
+          <div class="flex gap-2">
+            <span class="skeleton-block h-5 w-5 rounded-full"></span>
+            <span class="skeleton-block h-5 w-5 rounded-full"></span>
+            <span class="skeleton-block ml-auto h-5 w-5 rounded-full"></span>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <div data-skeleton-panel="search" class="mx-auto mt-6 max-w-3xl sm:mt-10">
+    <span class="skeleton-block mb-6 h-8 w-28"></span>
+    <span class="skeleton-block h-12 w-full"></span>
+    <span class="skeleton-block mt-4 h-4 w-40"></span>
+    <div class="mt-6 space-y-3">
+      {compactRows.slice(0, 3).map(() => (
+        <div class="skeleton-card space-y-3 p-4">
+          <span class="skeleton-block h-5 w-1/2"></span>
+          <span class="skeleton-block h-4 w-full"></span>
+          <span class="skeleton-block h-4 w-4/5"></span>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <div data-skeleton-panel="page" class="skeleton-article mx-auto mt-10 max-w-3xl">
+    <header class="mb-8">
+      <span class="skeleton-block h-10 w-2/3"></span>
+    </header>
+    <div class="space-y-5">
+      {articleLines.map(index => (
+        <div class="space-y-2">
+          <span class={`skeleton-block h-4 ${index % 3 === 0 ? 'w-full' : index % 3 === 1 ? 'w-11/12' : 'w-4/5'}`}></span>
+          <span class={`skeleton-block h-4 ${index % 2 === 0 ? 'w-5/6' : 'w-full'}`}></span>
+        </div>
+      ))}
+      <span class="skeleton-block my-8 h-44 w-full"></span>
+      {articleLines.slice(0, 3).map(index => (
+        <div class="space-y-2">
+          <span class={`skeleton-block h-4 ${index % 2 === 0 ? 'w-full' : 'w-10/12'}`}></span>
+          <span class="skeleton-block h-4 w-4/5"></span>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+
+<style>
+  [data-route-skeleton] {
+    display: none;
+    opacity: 0;
+    transform: translateY(0.5rem);
+    transform-origin: top center;
+    will-change: opacity, transform, clip-path;
+  }
+
+  :global(body[data-route-loading='true']) [data-route-skeleton] {
+    display: block;
+    animation: route-skeleton-enter 220ms ease-out both;
+  }
+
+  :global(body[data-route-loading-exit='true']) [data-route-skeleton] {
+    display: block;
+    animation: route-skeleton-garage-exit 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  [data-skeleton-panel] {
+    display: none;
+  }
+
+  [data-route-skeleton][data-skeleton-kind='feed'] [data-skeleton-panel='feed'],
+  [data-route-skeleton][data-skeleton-kind='post-with-toc'] [data-skeleton-panel='post-with-toc'],
+  [data-route-skeleton][data-skeleton-kind='post-without-toc'] [data-skeleton-panel='post-without-toc'],
+  [data-route-skeleton][data-skeleton-kind='archive'] [data-skeleton-panel='archive'],
+  [data-route-skeleton][data-skeleton-kind='taxonomy'] [data-skeleton-panel='taxonomy'],
+  [data-route-skeleton][data-skeleton-kind='friends'] [data-skeleton-panel='friends'],
+  [data-route-skeleton][data-skeleton-kind='search'] [data-skeleton-panel='search'],
+  [data-route-skeleton][data-skeleton-kind='page'] [data-skeleton-panel='page'] {
+    display: block;
+  }
+
+  @media (min-width: 64rem) {
+    [data-route-skeleton][data-skeleton-kind='feed'] [data-skeleton-panel='feed'] {
+      display: grid;
+    }
+  }
+
+  @media (min-width: 80rem) {
+    [data-route-skeleton][data-skeleton-kind='post-with-toc'] [data-skeleton-panel='post-with-toc'] {
+      display: grid;
+    }
+  }
+
+  .skeleton-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--card);
+    box-shadow: var(--shadow-fluent-sm);
+  }
+
+  .skeleton-block {
+    display: block;
+    overflow: hidden;
+    border-radius: 0.375rem;
+    background:
+      linear-gradient(
+        90deg,
+        transparent,
+        color-mix(in oklab, var(--foreground) 7%, transparent),
+        transparent
+      ),
+      var(--muted);
+    background-size: 220% 100%;
+    animation: route-skeleton-shimmer 1.4s ease-in-out infinite;
+  }
+
+  .skeleton-article {
+    min-width: 0;
+  }
+
+  @keyframes route-skeleton-shimmer {
+    from {
+      background-position: 140% 0;
+    }
+    to {
+      background-position: -80% 0;
+    }
+  }
+
+  @keyframes route-skeleton-enter {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem);
+      filter: blur(2px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+  }
+
+  @keyframes route-skeleton-garage-exit {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+      clip-path: inset(0 0 0 0);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(-0.75rem);
+      clip-path: inset(0 0 100% 0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-route-skeleton],
+    :global(body[data-route-loading='true']) [data-route-skeleton],
+    :global(body[data-route-loading-exit='true']) [data-route-skeleton] {
+      opacity: 1;
+      transform: none;
+      clip-path: none;
+      animation: none;
+      filter: none;
+    }
+
+    .skeleton-block {
+      animation: none;
+      background-image: none;
+    }
+  }
+</style>

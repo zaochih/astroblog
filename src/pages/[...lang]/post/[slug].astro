@@ -13,6 +13,7 @@ import ExternalPostRedirect from '@/components/ExternalPostRedirect.astro';
 import Comments from '@/components/Comments.astro';
 import { optimizeLocalImage } from '@/lib/rehype-image-size.mjs';
 import { resolveContentDescription } from '@/lib/seo';
+import { getPostSkeletonKind, getPostSkeletonKindFromHeadings } from '@/lib/route-skeleton';
 
 export async function getStaticPaths() {
   // Helper: "zh/hello-world" → ["zh", "hello-world"]
@@ -90,7 +91,8 @@ const { Content, headings } = await render(post);
 const t = useTranslations(currentLang);
 const wordCount = countWords(post.body ?? '');
 const minutes = readingMinutes(wordCount);
-const hasToc = headings.filter(h => h.depth <= 3).length > 2;
+const currentPostSkeletonKind = getPostSkeletonKindFromHeadings(headings);
+const hasToc = currentPostSkeletonKind === 'post-with-toc';
 const seriesPosts = data.series
   ? localizeAndSortPosts(await getCollection('blog'), currentLang)
       .filter(({ post: seriesPost }) => seriesPost.data.series === data.series)
@@ -104,6 +106,8 @@ const seriesPosts = data.series
 const seriesIndex = seriesPosts.findIndex(seriesPost => seriesPost.slug === slug);
 const previousSeriesPost = seriesIndex > 0 ? seriesPosts[seriesIndex - 1] : null;
 const nextSeriesPost = seriesIndex >= 0 && seriesIndex < seriesPosts.length - 1 ? seriesPosts[seriesIndex + 1] : null;
+const previousSeriesSkeletonKind = previousSeriesPost ? await getPostSkeletonKind(previousSeriesPost.post) : null;
+const nextSeriesSkeletonKind = nextSeriesPost ? await getPostSkeletonKind(nextSeriesPost.post) : null;
 const coverImage = data.cover ? (await optimizeLocalImage(data.cover, { force: true })).src : undefined;
 const pageDescription = resolveContentDescription({
   frontmatterDescription: data.description,
@@ -149,7 +153,7 @@ const homeHref = currentLang === defaultLang ? '/' : `/${currentLang}/`;
   <div class={hasToc ? "max-w-5xl mx-auto mt-6 sm:mt-10 xl:grid xl:grid-cols-[1fr_220px] xl:gap-10 xl:items-start" : "max-w-3xl mx-auto mt-6 sm:mt-10"}>
   <article transition:name={`post-${slug}`} class="min-w-0">
 
-    <a href={homeHref} aria-label={t('aria.postBack')} class="group/button inline-flex shrink-0 items-center justify-center rounded-md text-xs/relaxed font-medium whitespace-nowrap transition-all hover:bg-muted hover:text-foreground mb-6 hover:bg-accent/50 -ml-4 h-7 gap-1 px-2">
+    <a href={homeHref} data-skeleton-kind="feed" aria-label={t('aria.postBack')} class="group/button inline-flex shrink-0 items-center justify-center rounded-md text-xs/relaxed font-medium whitespace-nowrap transition-all hover:bg-muted hover:text-foreground mb-6 hover:bg-accent/50 -ml-4 h-7 gap-1 px-2">
       {t('post.back')}
     </a>
 
@@ -167,6 +171,7 @@ const homeHref = currentLang === defaultLang ? '/' : `/${currentLang}/`;
         {data.category && (
           <a
             href={getCategoryHref(data.category, currentLang)}
+            data-skeleton-kind="taxonomy"
             aria-label={t('aria.category').replace('{name}', getCategoryName(data.category, currentLang))}
             class="inline-flex items-center gap-1 hover:text-primary transition-colors"
           >
@@ -234,6 +239,7 @@ const homeHref = currentLang === defaultLang ? '/' : `/${currentLang}/`;
         {previousSeriesPost ? (
           <a
             href={getPostHref(previousSeriesPost.slug, currentLang)}
+            data-skeleton-kind={previousSeriesSkeletonKind}
             aria-label={t('aria.seriesPrevious').replace('{title}', previousSeriesPost.post.data.title)}
             class="rounded-lg border border-border/50 p-4 text-sm transition-colors hover:border-primary/50 hover:text-primary"
           >
@@ -246,6 +252,7 @@ const homeHref = currentLang === defaultLang ? '/' : `/${currentLang}/`;
         {nextSeriesPost && (
           <a
             href={getPostHref(nextSeriesPost.slug, currentLang)}
+            data-skeleton-kind={nextSeriesSkeletonKind}
             aria-label={t('aria.seriesNext').replace('{title}', nextSeriesPost.post.data.title)}
             class="rounded-lg border border-border/50 p-4 text-right text-sm transition-colors hover:border-primary/50 hover:text-primary"
           >

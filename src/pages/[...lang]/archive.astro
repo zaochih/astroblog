@@ -5,6 +5,7 @@ import { siteConfig } from '@/config';
 import { useTranslations, defaultLang, getSupportedLangs, type Lang } from '@/i18n/ui';
 import { localizeAndSortPosts, getPostHref, formatDate, formatTime, getPostYear } from '@/lib/content';
 import { describeListingPage } from '@/lib/seo';
+import { getPostSkeletonKind } from '@/lib/route-skeleton';
 
 export async function getStaticPaths() {
   return getSupportedLangs().map(lang => ({
@@ -18,6 +19,11 @@ const t = useTranslations(lang as Lang);
 
 const allPosts = await getCollection('blog');
 const localizedPosts = localizeAndSortPosts(allPosts, lang, { includeFallback: false });
+const skeletonKindBySlug = new Map(
+  await Promise.all(
+    localizedPosts.map(async ({ post, slug }) => [slug, await getPostSkeletonKind(post)] as const),
+  ),
+);
 
 // Group posts by year, newest first
 const postsByYear = localizedPosts.reduce<Record<number, typeof localizedPosts>>((acc, p) => {
@@ -63,6 +69,7 @@ const years = Object.keys(postsByYear).map(Number).sort((a, b) => b - a);
                   )}
                   <a
                     href={getPostHref(slug, lang)}
+                    data-skeleton-kind={skeletonKindBySlug.get(slug) ?? 'post-without-toc'}
                     aria-label={t('aria.archivePost').replace('{title}', post.data.title)}
                     class="text-sm text-foreground hover:text-primary transition-colors leading-snug"
                   >

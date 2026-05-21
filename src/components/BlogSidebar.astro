@@ -101,6 +101,7 @@ const [wordTotal, ...wordUnit] = totalWordsFormatted.split(' ');
           {allCategories.map(category => (
             <a
               href={getCategoryHref(category, lang)}
+              data-skeleton-kind="taxonomy"
               aria-label={t('aria.category').replace('{name}', getCategoryName(category, lang as Lang))}
               class="group relative flex items-center gap-3 rounded-md bg-muted px-2.5 py-1 text-xs leading-6 text-muted-foreground transition-colors hover:bg-muted/80 hover:text-foreground lg:bg-transparent lg:py-0.5 lg:pl-3 lg:pr-2"
             >
@@ -126,6 +127,7 @@ const [wordTotal, ...wordUnit] = totalWordsFormatted.split(' ');
           {allTags.map(tag => (
             <a
               href={getTagHref(tag, lang)}
+              data-skeleton-kind="taxonomy"
               aria-label={t('aria.tag').replace('{name}', getTagName(tag, lang as Lang))}
               class="text-xs px-2 py-0.5 rounded-md bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
             >
