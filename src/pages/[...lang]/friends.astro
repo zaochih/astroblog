@@ -282,7 +282,8 @@ const sortedFriends = [...sponsoredFriends, ...regularFriends, ...referralFriend
     transition: background-size 180ms ease;
   }
 
-  .group:is(:hover, :focus-within) .friend-card-title {
+  :global(html:not([data-link-hover-suppressed])) .group:hover .friend-card-title,
+  :global(html[data-keyboard-focus]) .group:has(:focus-visible) .friend-card-title {
     background-size: 100% 1px;
   }
 
@@ -342,7 +343,8 @@ const sortedFriends = [...sponsoredFriends, ...regularFriends, ...referralFriend
       transform 220ms ease-out;
   }
 
-  [data-friend-glow-card]:is(:hover, :focus-within) .friend-glow {
+  :global(html:not([data-link-hover-suppressed])) [data-friend-glow-card]:hover .friend-glow,
+  :global(html[data-keyboard-focus]) [data-friend-glow-card]:has(:focus-visible) .friend-glow {
     opacity: 0.28;
   }
 

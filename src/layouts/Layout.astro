@@ -462,16 +462,81 @@ const localDatetimeConfig = JSON.stringify({
             });
           }
 
+          function initLinkHoverReset() {
+            if (window.__lczLinkHoverResetBound) return;
+            window.__lczLinkHoverResetBound = true;
+
+            const suppressHover = () => {
+              document.documentElement.setAttribute('data-link-hover-suppressed', 'true');
+            };
+
+            const restoreHover = () => {
+              document.documentElement.removeAttribute('data-link-hover-suppressed');
+            };
+
+            const enableKeyboardFocus = () => {
+              document.documentElement.setAttribute('data-keyboard-focus', 'true');
+              restoreHover();
+            };
+
+            const disableKeyboardFocus = () => {
+              document.documentElement.removeAttribute('data-keyboard-focus');
+            };
+
+            document.addEventListener('pointerdown', (event) => {
+              if (event.button !== 0) return;
+              const target = event.target;
+              const anchor = target instanceof Element ? target.closest('a[href]') : null;
+              if (!anchor) return;
+              disableKeyboardFocus();
+              suppressHover();
+            }, true);
+
+            document.addEventListener('click', (event) => {
+              const target = event.target;
+              const anchor = target instanceof Element ? target.closest('a[href]') : null;
+              if (!anchor) return;
+              disableKeyboardFocus();
+              suppressHover();
+            }, true);
+
+            window.addEventListener('blur', () => {
+              const active = document.activeElement;
+              const anchor = active instanceof Element ? active.closest('a[href]') : null;
+              if (!anchor) return;
+              disableKeyboardFocus();
+              suppressHover();
+            });
+
+            document.addEventListener('visibilitychange', () => {
+              if (document.visibilityState !== 'hidden') return;
+              const active = document.activeElement;
+              const anchor = active instanceof Element ? active.closest('a[href]') : null;
+              if (!anchor) return;
+              disableKeyboardFocus();
+              suppressHover();
+            });
+
+            document.addEventListener('pointermove', restoreHover, true);
+            document.addEventListener('mousemove', restoreHover, true);
+            document.addEventListener('keydown', (event) => {
+              if (event.key === 'Tab') enableKeyboardFocus();
+            }, true);
+            document.addEventListener('astro:page-load', restoreHover);
+          }
+
           if (!window.__lczLayoutEnhancementsBound) {
             window.__lczLayoutEnhancementsBound = true;
             document.addEventListener('astro:page-load', () => {
               initExternalLinks();
               initLocalDatetimes();
+              initLinkHoverReset();
             });
           }
 
           initExternalLinks();
           initLocalDatetimes();
+          initLinkHoverReset();
           initRouteSkeleton();
         </script>
     </body>

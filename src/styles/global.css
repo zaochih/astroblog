@@ -229,8 +229,8 @@
   transition: background-size 180ms ease;
 }
 
-.prose a:not([data-footnote-backref]):hover,
-.prose a:not([data-footnote-backref]):focus-visible {
+html:not([data-link-hover-suppressed]) .prose a:not([data-footnote-backref]):hover,
+html[data-keyboard-focus] .prose a:not([data-footnote-backref]):focus-visible {
   background-size: 100% 1px;
 }
 
@@ -246,8 +246,8 @@
     background-image: none;
   }
 
-  .prose a:has(img):hover,
-  .prose a:has(img):focus-visible {
+  html:not([data-link-hover-suppressed]) .prose a:has(img):hover,
+  html[data-keyboard-focus] .prose a:has(img):focus-visible {
     background-size: 0 1px;
   }
 
