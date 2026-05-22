@@ -5,6 +5,7 @@ import { getTagName, getCategoryName } from '@/i18n/taxonomy';
 import { useTranslations, type Lang } from '@/i18n/ui';
 import { optimizeLocalImage } from '@/lib/rehype-image-size.mjs';
 import { getPostSkeletonKind } from '@/lib/route-skeleton';
+import Icon from '@/components/Icon';
 
 interface Props {
   posts: Array<{ post: CollectionEntry<'blog'>; slug: string }>;
@@ -130,9 +131,10 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
                   href={getTagHref(tag, lang)}
                   data-skeleton-kind="taxonomy"
                   aria-label={t('aria.tag').replace('{name}', getTagName(tag, lang as Lang))}
-                  class="relative z-10 text-xs px-2 py-0.5 rounded-md bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+                  class="relative z-10 inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-md bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
                 >
-                  #{getTagName(tag, lang as Lang)}
+                  <Icon name="hash" className="size-3 shrink-0" size={12} strokeWidth={2.5} />
+                  <span>{getTagName(tag, lang as Lang)}</span>
                 </a>
               ))}
               <a
