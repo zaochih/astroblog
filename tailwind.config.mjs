@@ -11,12 +11,6 @@ export default {
             'blockquote p:last-of-type::after': {
               content: 'none',
             },
-            'code::before': {
-              content: 'none',
-            },
-            'code::after': {
-              content: 'none',
-            },
           },
         },
       },

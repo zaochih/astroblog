@@ -9,8 +9,8 @@
 
 @theme inline {
   --font-heading: var(--font-sans);
-  --font-sans: "Fluent Emoji Color", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei UI", Roboto, "Helvetica Neue", sans-serif;
-  --font-mono: "Fluent Emoji Color", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", "Microsoft YaHei Mono", monospace;
+  --font-sans: "Fluent Emoji Color", "Google Sans Flex", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-mono: "Fluent Emoji Color", "Google Sans Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", "Microsoft YaHei Mono", monospace;
   --shadow-fluent-sm: 0 2px 4px rgb(0 0 0 / 8%),
   0 0 2px rgb(0 0 0 / 8%);
   --shadow-fluent-md: 0 4px 8px rgb(0 0 0 / 10%),
@@ -285,13 +285,13 @@ pre[data-lang]::before {
   position: absolute;
   top: 0.2rem;
   right: 0.5rem;
-  font-size: 1.625rem;
+  font-size: 2rem;
   font-weight: 700;
   line-height: 1;
-  font-family: ui-monospace, var(--font-mono), 'Cascadia Code', 'Source Code Pro', monospace;
+  font-family: "Google Sans Flex", var(--font-sans);
   text-transform: uppercase;
   color: #fff;
-  opacity: 0.2;
+  opacity: 0.1;
   pointer-events: none;
   -webkit-user-select: none;
   user-select: none;
