@@ -218,6 +218,11 @@
   scroll-margin-top: var(--content-anchor-offset);
 }
 
+.prose s,
+.prose del {
+  opacity: 0.8;
+}
+
 .prose a:not([data-footnote-backref]) {
   background-image: linear-gradient(currentColor, currentColor);
   background-position: 0 100%;
