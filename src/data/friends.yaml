@@ -97,14 +97,14 @@
 
 - name: Microsoft 问答社区
   description: 在这里找到 Microsoft 产品技术问题的解决方案。
-  url: https://learn.microsoft.com/zh-cn/answers/?WT.mc_id=studentamb_203301
+  url: https://learn.microsoft.com/zh-cn/answers/?WT.mc_id=studentamb_203301&sharingId=9D258C438B761AB
   backgroundIcon: /assets/images/friends/learn-qna-logo.png
   referral: true
   i18n:
     en-us:
       name: Microsoft Q&A
       description: The home for technical questions and answers at Microsoft.
-      url: https://learn.microsoft.com/en-us/answers/?WT.mc_id=studentamb_203301
+      url: https://learn.microsoft.com/en-us/answers/?WT.mc_id=studentamb_203301&sharingId=9D258C438B761AB
 
 - name: 微软电脑管家
   description: 简单无打扰，安全又安心
