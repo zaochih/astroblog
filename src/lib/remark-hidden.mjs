@@ -5,7 +5,7 @@
 
 import { visit } from "unist-util-visit";
 
-const HIDDEN_RE = /\[(hidden|spoiler)([^\]]*)\]([\s\S]*?)\[\/\1\]/g;
+const hiddenPattern = /\[(hidden|spoiler)([^\]]*)\]([\s\S]*?)\[\/\1\]/g;
 
 export default function remarkHidden() {
   /** @param {import('mdast').Root} tree */
@@ -42,10 +42,10 @@ function parseAttr(attrStr, name) {
 function splitHidden(text) {
   const nodes = [];
   let lastIndex = 0;
-  HIDDEN_RE.lastIndex = 0;
+  hiddenPattern.lastIndex = 0;
   let match;
 
-  while ((match = HIDDEN_RE.exec(text)) !== null) {
+  while ((match = hiddenPattern.exec(text)) !== null) {
     if (match.index > lastIndex) {
       nodes.push({ type: "text", value: text.slice(lastIndex, match.index) });
     }

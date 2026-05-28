@@ -5,9 +5,38 @@ import { XMLParser } from 'fast-xml-parser';
 import yaml from 'js-yaml';
 import TurndownService from 'turndown';
 
-const DEFAULT_PRIMARY_LANG = 'zh-cn';
-const DEFAULT_SOURCE_LANG = 'en-us';
-const DEFAULT_OUT_DIR = 'src/data/posts';
+const defaultPrimaryLang = 'zh-cn';
+const defaultSourceLang = 'en-us';
+const defaultOutDir = 'src/data/posts';
+
+/**
+ * @typedef {object} MigrationArgs
+ * @property {string} file
+ * @property {boolean} dryRun
+ * @property {boolean} overwrite
+ * @property {number} limit
+ * @property {string} slug
+ * @property {string} primaryLang
+ * @property {string} sourceLang
+ * @property {string} outDir
+ * @property {boolean} draftSource
+ */
+
+/**
+ * @typedef {object} NormalizedPost
+ * @property {string} slug
+ * @property {string} status
+ * @property {string} primaryPath
+ * @property {string} sourcePath
+ * @property {string} primaryContent
+ * @property {string} sourceContent
+ */
+
+/**
+ * @typedef {object} WriteResult
+ * @property {string} filePath
+ * @property {"exists" | "planned" | "written"} status
+ */
 
 function usage() {
   console.error(`Usage: bun migrate:wp <wordpress-export.xml> [options]
@@ -25,6 +54,10 @@ Options:
   process.exit(1);
 }
 
+/**
+ * @param {string[]} argv
+ * @returns {MigrationArgs}
+ */
 function parseArgs(argv) {
   const args = {
     file: '',
@@ -32,9 +65,9 @@ function parseArgs(argv) {
     overwrite: false,
     limit: Number.POSITIVE_INFINITY,
     slug: '',
-    primaryLang: DEFAULT_PRIMARY_LANG,
-    sourceLang: DEFAULT_SOURCE_LANG,
-    outDir: DEFAULT_OUT_DIR,
+    primaryLang: defaultPrimaryLang,
+    sourceLang: defaultSourceLang,
+    outDir: defaultOutDir,
     draftSource: false,
   };
 
@@ -53,11 +86,11 @@ function parseArgs(argv) {
     } else if (arg === '--slug') {
       args.slug = argv[++i] ?? '';
     } else if (arg === '--primary-lang') {
-      args.primaryLang = argv[++i] ?? DEFAULT_PRIMARY_LANG;
+      args.primaryLang = argv[++i] ?? defaultPrimaryLang;
     } else if (arg === '--source-lang') {
-      args.sourceLang = argv[++i] ?? DEFAULT_SOURCE_LANG;
+      args.sourceLang = argv[++i] ?? defaultSourceLang;
     } else if (arg === '--out-dir') {
-      args.outDir = argv[++i] ?? DEFAULT_OUT_DIR;
+      args.outDir = argv[++i] ?? defaultOutDir;
     } else {
       usage();
     }
@@ -216,6 +249,12 @@ function getCover(item, attachmentUrlById) {
   return thumbnailId ? attachmentUrlById.get(thumbnailId) : undefined;
 }
 
+/**
+ * @param {Record<string, unknown>} item
+ * @param {Map<string, string>} attachmentUrlById
+ * @param {MigrationArgs} args
+ * @returns {NormalizedPost}
+ */
 function normalizePost(item, attachmentUrlById, args) {
   const title = text(item.title).trim() || '(untitled)';
   const slug = slugify(item['wp:post_name']) || slugify(title);
@@ -261,6 +300,12 @@ function normalizePost(item, attachmentUrlById, args) {
   };
 }
 
+/**
+ * @param {string} filePath
+ * @param {string} content
+ * @param {MigrationArgs} args
+ * @returns {Promise<WriteResult>}
+ */
 async function writeIfAllowed(filePath, content, args) {
   if (existsSync(filePath) && !args.overwrite) {
     return { filePath, status: 'exists' };

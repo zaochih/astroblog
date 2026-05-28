@@ -1,8 +1,8 @@
 import { siteConfig } from '@/config';
 import { defaultLang, getLocalizedValue, isSupportedLang, useTranslations, type Lang } from '@/i18n/ui';
 
-const DESCRIPTION_MAX_LENGTH = 160;
-const DESCRIPTION_MIN_CUT_LENGTH = 110;
+const descriptionMaxLength = 160;
+const descriptionMinCutLength = 110;
 
 type ContentDescriptionKind = 'article' | 'page';
 type ListingDescriptionKind = 'archive' | 'tag' | 'category' | 'paginatedArticles' | 'friends' | 'search' | 'notFound';
@@ -73,9 +73,9 @@ function isSkippableMarkdownLine(line: string): boolean {
 }
 
 function truncateDescription(value: string): string {
-  if (value.length <= DESCRIPTION_MAX_LENGTH) return value;
+  if (value.length <= descriptionMaxLength) return value;
 
-  const slice = value.slice(0, DESCRIPTION_MAX_LENGTH + 1);
+  const slice = value.slice(0, descriptionMaxLength + 1);
   const punctuationIndex = Math.max(
     slice.lastIndexOf('。'),
     slice.lastIndexOf('！'),
@@ -85,16 +85,16 @@ function truncateDescription(value: string): string {
     slice.lastIndexOf('?'),
   );
 
-  if (punctuationIndex >= DESCRIPTION_MIN_CUT_LENGTH) {
+  if (punctuationIndex >= descriptionMinCutLength) {
     return slice.slice(0, punctuationIndex + 1).trim();
   }
 
   const whitespaceIndex = slice.lastIndexOf(' ');
-  if (whitespaceIndex >= DESCRIPTION_MIN_CUT_LENGTH) {
+  if (whitespaceIndex >= descriptionMinCutLength) {
     return `${slice.slice(0, whitespaceIndex).trim()}…`;
   }
 
-  return `${value.slice(0, DESCRIPTION_MAX_LENGTH - 1).trim()}…`;
+  return `${value.slice(0, descriptionMaxLength - 1).trim()}…`;
 }
 
 export function excerptFirstParagraph(body?: string): string | undefined {

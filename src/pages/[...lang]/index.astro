@@ -20,9 +20,9 @@ const t = useTranslations(lang as Lang);
 const allPosts = await getCollection('blog');
 const localizedPosts = localizeAndSortPosts(allPosts, lang, { includeFallback: false });
 
-const PAGE_SIZE = 10;
-const totalPages = Math.max(1, Math.ceil(localizedPosts.length / PAGE_SIZE));
-const page1Posts = localizedPosts.slice(0, PAGE_SIZE);
+const pageSize = 10;
+const totalPages = Math.max(1, Math.ceil(localizedPosts.length / pageSize));
+const page1Posts = localizedPosts.slice(0, pageSize);
 const baseHref = lang === defaultLang ? '/' : `/${lang}/`;
 
 ---

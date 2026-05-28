@@ -4,6 +4,32 @@
  * @property {string} icon
  */
 
+/**
+ * @typedef {object} MdastNode
+ * @property {string} type
+ * @property {string} [value]
+ * @property {MdastNode[]} [children]
+ * @property {{ hName?: string, hProperties?: Record<string, unknown>, [key: string]: unknown }} [data]
+ */
+
+/**
+ * @typedef {object} CalloutMarker
+ * @property {keyof typeof calloutTypes} type
+ * @property {string | boolean | undefined} icon
+ * @property {boolean} collapsible
+ * @property {boolean} open
+ * @property {MdastNode[]} titleChildren
+ */
+
+/**
+ * @typedef {object} ParsedTitle
+ * @property {boolean} collapsible
+ * @property {boolean} open
+ * @property {string} text
+ */
+
+/** @typedef {Record<string, string | boolean>} CalloutOptions */
+
 /** @satisfies {Record<string, CalloutType>} */
 const calloutTypes = {
   note: {
@@ -74,11 +100,13 @@ const iconAliases = {
  *   > Content
  */
 export default function remarkCallouts() {
+  /** @param {MdastNode} tree */
   return function transform(tree) {
     visit(tree);
   };
 }
 
+/** @param {MdastNode} node */
 function visit(node) {
   if (!node.children) return;
 
@@ -88,6 +116,7 @@ function visit(node) {
   }
 }
 
+/** @param {MdastNode} node */
 function transformBlockquote(node) {
   if (node.type !== "blockquote") return;
 
@@ -99,6 +128,7 @@ function transformBlockquote(node) {
 
   const config = calloutTypes[marker.type] ?? calloutTypes.note;
   const icon = normalizeIcon(marker.icon ?? config.icon);
+  /** @type {MdastNode[]} */
   const titleChildren = marker.titleChildren.length > 0
     ? marker.titleChildren
     : [{ type: "text", value: config.label }];
@@ -144,6 +174,10 @@ function transformBlockquote(node) {
   };
 }
 
+/**
+ * @param {MdastNode} paragraph
+ * @returns {CalloutMarker | null}
+ */
 function readMarker(paragraph) {
   const children = paragraph.children ?? [];
   const first = children[0];
@@ -157,6 +191,7 @@ function readMarker(paragraph) {
 
   const options = parseOptions(match[2] ?? "");
   const title = parseTitle(match[3] ?? "", options);
+  /** @type {MdastNode[]} */
   const titleChildren = [];
 
   if (title.text) {
@@ -176,7 +211,12 @@ function readMarker(paragraph) {
   };
 }
 
+/**
+ * @param {string} raw
+ * @returns {CalloutOptions}
+ */
 function parseOptions(raw) {
+  /** @type {CalloutOptions} */
   const options = {};
   for (const match of raw.matchAll(/\b([A-Za-z][\w-]*)=(?:"([^"]+)"|'([^']+)'|([^\s]+))/g)) {
     options[match[1].toLowerCase()] = match[2] ?? match[3] ?? match[4];
@@ -188,6 +228,11 @@ function parseOptions(raw) {
   return options;
 }
 
+/**
+ * @param {string} raw
+ * @param {CalloutOptions} options
+ * @returns {ParsedTitle}
+ */
 function parseTitle(raw, options) {
   let text = raw;
   let collapsible = Boolean(options.collapse || options.collapsed || options.fold || options.folded || options.open);
@@ -203,15 +248,21 @@ function parseTitle(raw, options) {
   return { collapsible, open, text };
 }
 
+/** @param {unknown} icon */
 function normalizeIcon(icon) {
   const key = String(icon).toLowerCase();
   return iconAliases[key] ?? (isSupportedIcon(key) ? key : "info");
 }
 
+/** @param {string} icon */
 function isSupportedIcon(icon) {
   return ["circle-alert", "circle-check", "circle-x", "info", "sparkles", "triangle-alert"].includes(icon);
 }
 
+/**
+ * @param {MdastNode[]} children
+ * @returns {MdastNode[]}
+ */
 function trimInlineChildren(children) {
   const result = [...children];
   trimTextNode(result, 0, "start");
@@ -219,6 +270,11 @@ function trimInlineChildren(children) {
   return result.filter((child) => child.type !== "text" || child.value !== "");
 }
 
+/**
+ * @param {MdastNode[]} children
+ * @param {number} index
+ * @param {"start" | "end"} side
+ */
 function trimTextNode(children, index, side) {
   const child = children[index];
   if (!child || child.type !== "text") return;

@@ -17,11 +17,11 @@ const langPreferenceConfig = JSON.stringify({
   (() => {
     const config = JSON.parse(langPreferenceConfig);
     const { currentLang, defaultLang, supportedLangs } = config;
-    const PREFERENCE_KEY = 'lang-preference';
+    const preferenceKey = 'lang-preference';
 
     function getStoredPreference() {
       try {
-        const value = localStorage.getItem(PREFERENCE_KEY);
+        const value = localStorage.getItem(preferenceKey);
         return supportedLangs.includes(value) ? value : null;
       } catch {
         return null;
@@ -31,7 +31,7 @@ const langPreferenceConfig = JSON.stringify({
     function setStoredPreference(lang) {
       if (!supportedLangs.includes(lang)) return;
       try {
-        localStorage.setItem(PREFERENCE_KEY, lang);
+        localStorage.setItem(preferenceKey, lang);
       } catch {
         // Ignore storage failures in private or restricted browsing contexts.
       }

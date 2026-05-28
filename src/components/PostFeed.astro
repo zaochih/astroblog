@@ -40,11 +40,11 @@ function getPageNumbers(current: number, total: number): (number | '...')[] {
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
 
   // Keep it compact for large totals: first + last + (current-1, current, current+1)
-  const NEARBY = 1;
+  const nearby = 1;
   const pages: (number | '...')[] = [1];
 
-  const start = Math.max(2, current - NEARBY);
-  const end = Math.min(total - 1, current + NEARBY);
+  const start = Math.max(2, current - nearby);
+  const end = Math.min(total - 1, current + nearby);
 
   if (start > 2) pages.push('...');
   for (let i = start; i <= end; i++) {

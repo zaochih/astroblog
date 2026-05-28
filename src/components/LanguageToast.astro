@@ -22,20 +22,20 @@ const toastConfig = JSON.stringify({
     const config = JSON.parse(toastConfig);
     const { currentLang, defaultLang, languages, supportedLangs, ui } = config;
 
-    const PREFERENCE_KEY = 'lang-preference';
-    const DISMISSED_KEY = 'lang-toast-dismissed';
+    const preferenceKey = 'lang-preference';
+    const dismissedKey = 'lang-toast-dismissed';
     const supported = supportedLangs;
     const setStoredPreference = (lang) => {
       if (!supported.includes(lang)) return;
       try {
-        localStorage.setItem(PREFERENCE_KEY, lang);
+        localStorage.setItem(preferenceKey, lang);
       } catch {
         // Ignore storage failures; the UI action should still complete.
       }
     };
     const storedPreference = (() => {
       try {
-        const value = localStorage.getItem(PREFERENCE_KEY);
+        const value = localStorage.getItem(preferenceKey);
         return supported.includes(value) ? value : null;
       } catch {
         return null;
@@ -43,7 +43,7 @@ const toastConfig = JSON.stringify({
     })();
 
     if (storedPreference) return;
-    if (sessionStorage.getItem(DISMISSED_KEY)) return;
+    if (sessionStorage.getItem(dismissedKey)) return;
 
     // Match browser locale by primary subtag: 'zh-CN' → 'zh' matches 'zh-cn'
     const raw = (navigator.languages?.[0] ?? navigator.language) || '';
@@ -125,7 +125,7 @@ const toastConfig = JSON.stringify({
     dismissBtn.addEventListener('click', () => {
       setStoredPreference(currentLang);
       try {
-        sessionStorage.setItem(DISMISSED_KEY, 'true');
+        sessionStorage.setItem(dismissedKey, 'true');
       } catch {
         // Ignore storage failures; the toast is already being dismissed.
       }

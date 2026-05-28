@@ -4,10 +4,10 @@
  *
  * For images whose `src` starts with "/" (i.e. files served from `public/`):
  *   1. Read actual pixel dimensions via sharp.
- *   2. If the width exceeds OPTIMIZED_IMAGE_WIDTH, resize the image to that width,
+ *   2. If the width exceeds optimizedImageWidth, resize the image to that width,
  *      convert it to WebP, save it to `public/assets/images/optimized/...`,
  *      and update `src`.
- *   3. Cap the declared width to CONTENT_DISPLAY_WIDTH so the browser reserves
+ *   3. Cap the declared width to contentDisplayWidth so the browser reserves
  *      a sensible amount of space (the CSS `max-width: 100%; height: auto`
  *      rule takes care of smaller viewports).
  *   4. Add `loading="lazy"` and `decoding="async"` for performance.
@@ -21,11 +21,39 @@ import { resolve, parse, relative } from 'node:path';
 import { mkdir, stat } from 'node:fs/promises';
 
 /** prose area max-width (px). Matches Tailwind's `max-w-3xl` = 48rem ~= 768px. */
-const CONTENT_DISPLAY_WIDTH = 768;
+const contentDisplayWidth = 768;
 /** Generate larger images than the display slot so high-DPR screens stay sharp. */
-const OPTIMIZED_IMAGE_WIDTH = Math.round(CONTENT_DISPLAY_WIDTH * 1.5);
-const PHOTO_WEBP_QUALITY = 100;
-const OPT_OUT_QUERY_KEYS = ['hdr', 'raw', 'noopt', 'original'];
+const optimizedImageWidth = Math.round(contentDisplayWidth * 1.5);
+const photoWebpQuality = 100;
+const optOutQueryKeys = ['hdr', 'raw', 'noopt', 'original'];
+
+/**
+ * @typedef {object} SplitImageSrc
+ * @property {string} pathname
+ * @property {string} query
+ * @property {string} hash
+ */
+
+/**
+ * @typedef {object} OptimizedImagePath
+ * @property {import('node:path').ParsedPath} parsed
+ * @property {string} outDir
+ * @property {string} urlDir
+ */
+
+/**
+ * @typedef {object} OptimizeImageOptions
+ * @property {number} [width]
+ * @property {boolean} [force]
+ */
+
+/**
+ * @typedef {object} OptimizeImageResult
+ * @property {string} src
+ * @property {boolean} optimized
+ * @property {number} [width]
+ * @property {number} [height]
+ */
 
 /**
  * Determine whether a src string refers to a local (public/) asset.
@@ -68,6 +96,7 @@ function decodePath(path) {
  * Split a URL-ish image path into path/query/hash while preserving the original
  * query/hash for links that opt out of optimization.
  * @param {string} src
+ * @returns {SplitImageSrc}
  */
 function splitImageSrc(src) {
   const hashIndex = src.indexOf('#');
@@ -87,7 +116,7 @@ function splitImageSrc(src) {
 function hasOptOutQuery(query) {
   if (!query) return false;
   const params = new URLSearchParams(query.slice(1));
-  return OPT_OUT_QUERY_KEYS.some((key) => {
+  return optOutQueryKeys.some((key) => {
     const value = params.get(key);
     return value !== null && value !== '0' && value !== 'false';
   });
@@ -110,7 +139,7 @@ function shouldPreserveOriginal(query = '') {
 function cleanImageControlParams(pathname, query, hash) {
   if (!query) return `${pathname}${hash}`;
   const params = new URLSearchParams(query.slice(1));
-  for (const key of OPT_OUT_QUERY_KEYS) {
+  for (const key of optOutQueryKeys) {
     params.delete(key);
   }
   const cleanedQuery = params.toString();
@@ -128,6 +157,7 @@ function publicFilePath(relPath) {
  * Place generated images under public/assets/images/optimized while preserving
  * the source image's path below public/assets/images when possible.
  * @param {string} decodedRelPath
+ * @returns {OptimizedImagePath}
  */
 function optimizedImagePath(decodedRelPath) {
   const parsed = parse(decodedRelPath);
@@ -154,7 +184,8 @@ function optimizedImagePath(decodedRelPath) {
  * intentionally keep the original; these build-only params are removed from
  * the emitted URL.
  * @param {string} src
- * @param {{ width?: number, force?: boolean }} [options]
+ * @param {OptimizeImageOptions} [options]
+ * @returns {Promise<OptimizeImageResult>}
  */
 export async function optimizeLocalImage(src, options = {}) {
   if (!isLocalImage(src)) return { src, optimized: false };
@@ -189,7 +220,7 @@ export async function optimizeLocalImage(src, options = {}) {
       };
     }
 
-    const targetWidth = options.width ?? OPTIMIZED_IMAGE_WIDTH;
+    const targetWidth = options.width ?? optimizedImageWidth;
     const outputWidth = options.force ? Math.min(metadata.width, targetWidth) : targetWidth;
     if (!options.force && metadata.width <= targetWidth) {
       return { src, optimized: false, width: metadata.width, height: metadata.height };
@@ -198,7 +229,7 @@ export async function optimizeLocalImage(src, options = {}) {
     const outputHeight = Math.round(metadata.height * (outputWidth / metadata.width));
     const { parsed, outDir, urlDir } = optimizedImagePath(decodedRelPath);
     const ext = parsed.ext.toLowerCase();
-    const qualitySuffix = ext === '.png' ? 'lossless' : `q${PHOTO_WEBP_QUALITY}`;
+    const qualitySuffix = ext === '.png' ? 'lossless' : `q${photoWebpQuality}`;
     const outName = `${parsed.name}-${outputWidth}w-${qualitySuffix}.webp`;
     const outPath = resolve(outDir, outName);
 
@@ -225,7 +256,7 @@ export async function optimizeLocalImage(src, options = {}) {
       if (ext === '.png') {
         await pipeline.webp({ lossless: true }).toFile(outPath);
       } else {
-        await pipeline.webp({ quality: PHOTO_WEBP_QUALITY, smartSubsample: true }).toFile(outPath);
+        await pipeline.webp({ quality: photoWebpQuality, smartSubsample: true }).toFile(outPath);
       }
     }
 
@@ -286,13 +317,13 @@ export default function rehypeImageSize() {
 
           const sourceWidth = metadata.width;
           const sourceHeight = metadata.height;
-          const displayWidth = Math.min(sourceWidth, CONTENT_DISPLAY_WIDTH);
+          const displayWidth = Math.min(sourceWidth, contentDisplayWidth);
           const displayHeight = Math.round(sourceHeight * (displayWidth / sourceWidth));
 
           if (shouldPreserveOriginal(query)) {
             src = cleanImageControlParams(pathname, query, hash);
             node.properties.src = src;
-          } else if (sourceWidth > OPTIMIZED_IMAGE_WIDTH) {
+          } else if (sourceWidth > optimizedImageWidth) {
             const optimized = await optimizeLocalImage(src);
             src = optimized.src;
             node.properties.src = src;
