@@ -95,7 +95,7 @@ const [wordTotal, ...wordUnit] = totalWordsFormatted.split(' ');
 <aside class="mt-8 space-y-3 lg:sticky lg:top-20 lg:mt-0 lg:self-start lg:space-y-6">
   {allCategories.length > 0 && (
     <details class="animated-details rounded-lg border border-border/50 bg-card p-4 shadow-fluent-sm lg:block lg:p-5" open>
-      <summary class="cursor-pointer select-none text-xs font-semibold uppercase tracking-wider text-foreground lg:pointer-events-none lg:mb-3 lg:list-none">
+      <summary class="details-static-lg cursor-pointer select-none text-xs font-semibold uppercase tracking-wider text-foreground lg:pointer-events-none lg:mb-3 lg:list-none">
         {t('sidebar.categories')}
       </summary>
       <div class="details-content">
@@ -121,7 +121,7 @@ const [wordTotal, ...wordUnit] = totalWordsFormatted.split(' ');
 
   {allTags.length > 0 && (
     <details class="animated-details rounded-lg border border-border/50 bg-card p-4 shadow-fluent-sm lg:block lg:p-5" open>
-      <summary class="cursor-pointer select-none text-xs font-semibold uppercase tracking-wider text-foreground lg:pointer-events-none lg:mb-3 lg:list-none">
+      <summary class="details-static-lg cursor-pointer select-none text-xs font-semibold uppercase tracking-wider text-foreground lg:pointer-events-none lg:mb-3 lg:list-none">
         {t('sidebar.tags')}
       </summary>
       <div class="details-content">

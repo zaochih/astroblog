@@ -11,6 +11,7 @@ import remarkCjkFriendlyGfmStrikethrough from "remark-cjk-friendly-gfm-strikethr
 import rehypeKatex from "rehype-katex";
 import rehypeImageSize from "./src/lib/rehype-image-size.mjs";
 import remarkHidden from "./src/lib/remark-hidden.mjs";
+import remarkCallouts from "./src/lib/remark-callouts.mjs";
 
 /**
  * @typedef {object} HastNode
@@ -185,6 +186,7 @@ export default defineConfig({
       remarkMath,
       remarkCustomHeaderId,
       remarkHidden, // must run before remarkCjkFriendly
+      remarkCallouts,
       remarkCjkFriendly,
       remarkCjkFriendlyGfmStrikethrough,
     ],

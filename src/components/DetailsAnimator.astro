@@ -2,8 +2,18 @@
   (() => {
     const duration = 180;
 
-    function getContent(details) {
-      return details.querySelector(':scope > .details-content');
+    function getContent(details, summary = details.querySelector(':scope > summary')) {
+      const existing = details.querySelector(':scope > .details-content');
+      if (existing || !summary) return existing;
+
+      const content = document.createElement('div');
+      content.className = 'details-content';
+
+      while (summary.nextSibling) {
+        content.appendChild(summary.nextSibling);
+      }
+      details.appendChild(content);
+      return content;
     }
 
     function finish(details, content, open) {
@@ -44,7 +54,7 @@
       root.querySelectorAll('details.animated-details').forEach((details) => {
         if (details.dataset.animatedBound === 'true') return;
         const summary = details.querySelector(':scope > summary');
-        const content = getContent(details);
+        const content = getContent(details, summary);
         if (!summary || !content) return;
 
         details.dataset.animatedBound = 'true';
