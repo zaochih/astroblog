@@ -139,18 +139,18 @@ const localDatetimeConfig = JSON.stringify({
           id="site-header"
           data-state="visible"
           data-hide-on-scroll={hideHeaderOnScroll ? 'true' : 'false'}
-          class="sticky top-0 z-50 w-full border-b border-border/60 bg-background shadow-fluent-sm transition-transform duration-200 ease-out data-[state=hidden]:-translate-y-full"
+          class="sticky top-0 z-50 w-full border-b border-border/60 bg-background/90 shadow-fluent-sm backdrop-blur-md transition-transform duration-200 ease-out data-[state=hidden]:-translate-y-full"
         >
           <div class="max-w-6xl mx-auto px-3 sm:px-4 min-h-14 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 py-2">
             <a href={homeHref} data-skeleton-kind="feed" aria-label={t('aria.nav.home')} class="shrink-0 font-semibold text-primary tracking-tight hover:opacity-80 transition-opacity">
               {siteConfig.name}
             </a>
-            <nav aria-label={t('aria.nav.main')} class="flex min-w-0 flex-1 items-center justify-end gap-3 overflow-x-auto whitespace-nowrap text-sm font-medium text-muted-foreground sm:gap-6">
-              <a href={homeHref} data-skeleton-kind="feed" class="hover:text-primary transition-colors">{t('nav.home')}</a>
-              <a href={`${homeHref}archive`} data-skeleton-kind="archive" class="hover:text-primary transition-colors">{t('nav.archive')}</a>
-              <a href={`${homeHref}friends`} data-skeleton-kind="friends" class="hover:text-primary transition-colors">{t('nav.friends')}</a>
-              <a href={`${homeHref}about`} data-skeleton-kind="page" class="hover:text-primary transition-colors">{t('nav.about')}</a>
-              <a href={searchHref} data-skeleton-kind="search" aria-label={t('aria.nav.search')} class="inline-flex items-center justify-center rounded-sm p-1.5 hover:bg-accent hover:text-primary transition-colors">
+            <nav aria-label={t('aria.nav.main')} class="flex min-w-0 flex-1 items-center justify-end gap-1 overflow-x-auto whitespace-nowrap text-sm font-medium text-muted-foreground sm:gap-2">
+              <a href={homeHref} data-skeleton-kind="feed" class="rounded-sm px-2 py-1.5 hover:bg-support/10 hover:text-support transition-colors">{t('nav.home')}</a>
+              <a href={`${homeHref}archive`} data-skeleton-kind="archive" class="rounded-sm px-2 py-1.5 hover:bg-support/10 hover:text-support transition-colors">{t('nav.archive')}</a>
+              <a href={`${homeHref}friends`} data-skeleton-kind="friends" class="rounded-sm px-2 py-1.5 hover:bg-support/10 hover:text-support transition-colors">{t('nav.friends')}</a>
+              <a href={`${homeHref}about`} data-skeleton-kind="page" class="rounded-sm px-2 py-1.5 hover:bg-support/10 hover:text-support transition-colors">{t('nav.about')}</a>
+              <a href={searchHref} data-skeleton-kind="search" aria-label={t('aria.nav.search')} class="inline-flex items-center justify-center rounded-sm p-1.5 hover:bg-support/10 hover:text-support transition-colors">
                 <Icon name="search" className="size-4" size={16} />
               </a>
             </nav>

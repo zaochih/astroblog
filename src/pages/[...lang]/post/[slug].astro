@@ -173,7 +173,7 @@ const homeHref = currentLang === defaultLang ? '/' : `/${currentLang}/`;
             href={getCategoryHref(data.category, currentLang)}
             data-skeleton-kind="taxonomy"
             aria-label={t('aria.category').replace('{name}', getCategoryName(data.category, currentLang))}
-            class="inline-flex items-center gap-1 hover:text-primary transition-colors"
+            class="inline-flex items-center gap-1 hover:text-support transition-colors"
           >
             <Icon name="folder" className="size-3.5" size={14} />
             {getCategoryName(data.category, currentLang)}
@@ -203,7 +203,7 @@ const homeHref = currentLang === defaultLang ? '/' : `/${currentLang}/`;
                   <a
                     href={`#${h.slug}`}
                     aria-label={t('aria.tocJump').replace('{title}', h.text)}
-                    class={`block text-xs leading-relaxed text-muted-foreground transition-colors hover:text-primary ${h.depth >= 3 ? 'pl-3' : ''}`}
+                    class={`block text-xs leading-relaxed text-muted-foreground transition-colors hover:text-support ${h.depth >= 3 ? 'pl-3' : ''}`}
                   >
                     {h.text}
                   </a>
@@ -280,7 +280,7 @@ const homeHref = currentLang === defaultLang ? '/' : `/${currentLang}/`;
                 <a
                   href={`#${h.slug}`}
                   aria-label={t('aria.tocJump').replace('{title}', h.text)}
-                  class={`block text-xs text-muted-foreground hover:text-primary transition-colors leading-relaxed ${h.depth >= 3 ? 'pl-3' : ''}`}
+                  class={`block text-xs text-muted-foreground hover:text-support transition-colors leading-relaxed ${h.depth >= 3 ? 'pl-3' : ''}`}
                 >
                   {h.text}
                 </a>
@@ -298,7 +298,7 @@ const homeHref = currentLang === defaultLang ? '/' : `/${currentLang}/`;
               <circle cx="18" cy="18" r="15.9155" fill="none" stroke="currentColor"
                 stroke-width="4" class="text-border opacity-60" />
               <circle id="toc-progress-ring" cx="18" cy="18" r="15.9155" fill="none"
-                stroke="currentColor" stroke-width="4" class="text-primary"
+                stroke="currentColor" stroke-width="4" class="text-support"
                 stroke-dasharray="100" stroke-dashoffset="100" stroke-linecap="round"
                 style="transition: stroke-dashoffset 0.2s ease;" />
             </svg>

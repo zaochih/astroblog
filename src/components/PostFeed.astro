@@ -71,7 +71,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
     const coverSrc = coverSrcBySlug.get(slug);
     return (
       <div class="group relative" transition:name={`post-${slug}`}>
-        <div class={`group/card flex flex-col gap-4 overflow-hidden rounded-lg bg-card py-4 text-xs/relaxed text-card-foreground shadow-fluent-sm ring-1 ring-foreground/[0.06] border-border/50 ${coverSrc ? 'pt-0' : ''}`}>
+        <div class={`group/card flex flex-col gap-4 overflow-hidden rounded-lg bg-card py-4 text-xs/relaxed text-card-foreground shadow-fluent-sm ring-1 ring-foreground/[0.06] border border-border/50 transition-all duration-200 hover:-translate-y-0.5 hover:border-support/30 hover:shadow-fluent-md ${coverSrc ? 'pt-0' : ''}`}>
           {coverSrc && (
             <div class="h-52 w-full overflow-hidden border-b border-border/30">
               <img src={coverSrc} alt={post.data.coverAlt ?? post.data.title} class="w-full h-full object-cover" />
@@ -86,7 +86,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
                     href={getCategoryHref(post.data.category, lang)}
                     data-skeleton-kind="taxonomy"
                     aria-label={t('aria.category').replace('{name}', categoryName)}
-                    class="relative z-10 font-medium text-foreground/60 hover:text-primary transition-colors"
+                    class="relative z-10 font-medium text-foreground/60 hover:text-support transition-colors"
                   >
                     [{categoryName}]
                   </a>
@@ -131,7 +131,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
                   href={getTagHref(tag, lang)}
                   data-skeleton-kind="taxonomy"
                   aria-label={t('aria.tag').replace('{name}', getTagName(tag, lang as Lang))}
-                  class="relative z-10 inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-md bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+                  class="relative z-10 inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-md bg-muted text-muted-foreground hover:bg-support/10 hover:text-support transition-colors"
                 >
                   <Icon name="hash" className="size-3 shrink-0" size={12} strokeWidth={2.5} />
                   <span>{getTagName(tag, lang as Lang)}</span>
