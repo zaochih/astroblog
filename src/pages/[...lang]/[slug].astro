@@ -96,7 +96,8 @@ const otherLanguageLinks = otherLangs.map(l => ({
   math={page.data.math}
   searchable
 >
-  <article class="max-w-3xl mx-auto mt-10">
+  <div class="max-w-3xl mx-auto mt-10">
+  <article>
 
     <header class="mb-6">
       <h1 class="text-4xl font-extrabold tracking-tight text-foreground leading-tight">
@@ -116,7 +117,8 @@ const otherLanguageLinks = otherLangs.map(l => ({
       <Content />
     </div>
 
-    <Comments lang={currentLang} term={`pages/${slug}`} enabled={page.data.comments === true} />
-
   </article>
+
+  <Comments lang={currentLang} term={`pages/${slug}`} enabled={page.data.comments === true} />
+  </div>
 </Layout>

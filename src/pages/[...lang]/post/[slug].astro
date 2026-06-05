@@ -151,7 +151,8 @@ const homeHref = currentLang === defaultLang ? '/' : `/${currentLang}/`;
   searchable
 >
   <div class={hasToc ? "max-w-5xl mx-auto mt-6 sm:mt-10 xl:grid xl:grid-cols-[1fr_220px] xl:gap-10 xl:items-start" : "max-w-3xl mx-auto mt-6 sm:mt-10"}>
-  <article transition:name={`post-${slug}`} class="min-w-0">
+  <div class="min-w-0">
+  <article transition:name={`post-${slug}`}>
 
     <a href={homeHref} data-skeleton-kind="feed" aria-label={t('aria.postBack')} class="group/button inline-flex shrink-0 items-center justify-center rounded-md text-xs/relaxed font-medium whitespace-nowrap transition-all hover:bg-muted hover:text-foreground mb-6 hover:bg-accent/50 -ml-4 h-7 gap-1 px-2">
       {t('post.back')}
@@ -263,9 +264,10 @@ const homeHref = currentLang === defaultLang ? '/' : `/${currentLang}/`;
       </nav>
     )}
 
-    <Comments lang={currentLang} term={`posts/${slug}`} enabled={data.comments !== false} />
-
   </article>
+
+  <Comments lang={currentLang} term={`posts/${slug}`} enabled={data.comments !== false} />
+  </div>
 
   {hasToc && (
     <aside class="hidden xl:block sticky top-[var(--toc-sticky-top)] self-start transition-[top] duration-200 ease-out">
