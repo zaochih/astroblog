@@ -29,3 +29,9 @@ pnpm-debug.log*
 # temprorily ignore en-us articles
 
 src/data/posts/en-us/*.md
+src/data/posts/zh-cn/2025-7-22.md
+src/data/posts/zh-cn/visiting-beijing-in-late-june.md
+src/data/posts/zh-cn/oh-my-posh-powershell.md
+.gitignore
+src/data/posts/zh-cn/how-to-navigate-chongqing-central-districts-using-rail-transit-and-make-wise-transfers-with-other-transportation-modes.md
+src/data/posts/zh-cn/chrome-manifest-v2.md
