@@ -13,6 +13,7 @@ const pageSize = 10;
 export async function getStaticPaths() {
   const { getCollection } = await import('astro:content');
   const { localizeAndSortPosts } = await import('@/lib/content');
+  const pageSize = 10;
 
   const allPosts = await getCollection('blog');
   const paths = [];
