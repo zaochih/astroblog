@@ -31,7 +31,7 @@ const [wordTotal, ...wordUnit] = totalWordsFormatted.split(' ');
 ---
 
 {side === 'left' ? (
-<aside class="mb-6 space-y-4 lg:sticky lg:top-20 lg:mb-0 lg:self-start">
+<aside class="mb-6 space-y-4 lg:sticky lg:top-20 lg:mb-0 lg:self-start" aria-label={t('aria.sidebar.profile')}>
   <div class="flex items-center gap-4 rounded-lg border border-border/50 bg-card p-4 shadow-fluent-sm lg:flex-col lg:gap-3 lg:p-5">
     <span class="avatar-orbit relative shrink-0 rounded-full p-0.5">
       <img
@@ -92,7 +92,7 @@ const [wordTotal, ...wordUnit] = totalWordsFormatted.split(' ');
   </div>
 </aside>
 ) : (
-<aside class="mt-8 space-y-3 lg:sticky lg:top-20 lg:mt-0 lg:self-start lg:space-y-6">
+<aside class="mt-8 space-y-3 lg:sticky lg:top-20 lg:mt-0 lg:self-start lg:space-y-6" aria-label={t('aria.sidebar.taxonomy')}>
   {allCategories.length > 0 && (
     <details class="animated-details rounded-lg border border-border/50 bg-card p-4 shadow-fluent-sm lg:block lg:p-5" open>
       <summary class="details-static-lg cursor-pointer select-none text-xs font-semibold uppercase tracking-wider text-foreground lg:pointer-events-none lg:mb-3 lg:list-none">

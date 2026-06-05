@@ -154,7 +154,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
 </div>
 
 {totalPages > 1 && (
-  <nav class="flex items-center justify-center gap-1 mt-8" aria-label="Pagination">
+  <nav class="flex items-center justify-center gap-1 mt-8" aria-label={t('aria.pagination')}>
     {currentPage > 1 ? (
       <a
         href={pageHref(currentPage - 1)}
@@ -165,7 +165,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
         {t('pagination.prev')}
       </a>
     ) : (
-      <span class="px-3 py-1.5 text-sm rounded-md border border-border/30 text-muted-foreground/30 cursor-not-allowed select-none">
+      <span class="px-3 py-1.5 text-sm rounded-md border border-border/30 text-muted-foreground/30 cursor-not-allowed select-none" aria-disabled="true">
         {t('pagination.prev')}
       </span>
     )}
@@ -200,7 +200,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
         {t('pagination.next')}
       </a>
     ) : (
-      <span class="px-3 py-1.5 text-sm rounded-md border border-border/30 text-muted-foreground/30 cursor-not-allowed select-none">
+      <span class="px-3 py-1.5 text-sm rounded-md border border-border/30 text-muted-foreground/30 cursor-not-allowed select-none" aria-disabled="true">
         {t('pagination.next')}
       </span>
     )}

@@ -132,6 +132,13 @@ const localDatetimeConfig = JSON.stringify({
       class="flex min-h-screen flex-col"
       data-local-datetime-config={localDatetimeConfig}
     >
+        <a
+          href="#main-content"
+          class="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground focus:shadow-fluent-md"
+        >
+          {t('aria.skipToContent')}
+        </a>
+
         <SiteAnnouncement lang={lang} />
 
         <header
@@ -158,6 +165,7 @@ const localDatetimeConfig = JSON.stringify({
         </header>
 
         <main
+          id="main-content"
           class="flex-1 w-full max-w-6xl mx-auto px-3 py-6 sm:px-4 sm:py-8"
           {...(searchable ? { 'data-pagefind-body': true, 'data-pagefind-filter': `lang:${lang}` } : { 'data-pagefind-ignore': true })}
         >

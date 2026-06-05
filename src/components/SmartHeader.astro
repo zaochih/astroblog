@@ -187,6 +187,15 @@
       lockHeaderForAnchorNavigation();
     }
 
+    function handleHeaderFocus(event) {
+      const target = event.target instanceof Element ? event.target : null;
+      if (!target?.closest('#site-header')) return;
+
+      setHeaderState('visible');
+      state.lastY = getScrollY();
+      state.upwardDistance = 0;
+    }
+
     function refreshAfterLayout() {
       refresh();
       requestAnimationFrame(refresh);
@@ -200,6 +209,7 @@
     window.addEventListener('touchstart', releaseAnchorNavigationLock, { passive: true });
     window.addEventListener('keydown', releaseAnchorNavigationLock);
     document.addEventListener('click', handleAnchorClick, true);
+    document.addEventListener('focusin', handleHeaderFocus);
     document.addEventListener('astro:page-load', refreshAfterLayout);
     document.addEventListener('astro:after-swap', refreshAfterLayout);
 

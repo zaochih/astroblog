@@ -140,6 +140,37 @@ function rehypeImageParagraphs() {
   }
 }
 
+/** Make generated spoiler spans keyboard focusable so focus-visible can reveal them. */
+function rehypeHiddenTextA11y() {
+  /** @param {HastNode} tree */
+  return function (tree) {
+    visit(tree);
+  };
+
+  /** @param {HastNode} node */
+  function visit(node) {
+    if (node.type === "element" && hasClassName(node, "hidden-text")) {
+      node.properties ??= {};
+      node.properties.tabIndex = 0;
+    }
+
+    if (!node.children) return;
+    for (const child of node.children) {
+      visit(child);
+    }
+  }
+
+  /**
+   * @param {HastNode} node
+   * @param {string} name
+   */
+  function hasClassName(node, name) {
+    const className = node.properties?.className;
+    if (Array.isArray(className)) return className.includes(name);
+    return String(className ?? "").split(/\s+/).includes(name);
+  }
+}
+
 // https://astro.build/config
 export default defineConfig({
   integrations: [react(), mdx()],
@@ -195,6 +226,7 @@ export default defineConfig({
       rehypeTaskListA11y,
       [rehypeKatex, {}],
       rehypeImageParagraphs,
+      rehypeHiddenTextA11y,
       rehypeImageSize,
     ],
   },

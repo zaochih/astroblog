@@ -544,7 +544,9 @@ pre[data-lang]::before {
 }
 
 .hidden-text:hover,
-.hidden-text-blur:hover {
+.hidden-text:focus-visible,
+.hidden-text-blur:hover,
+.hidden-text-blur:focus-visible {
   filter: blur(0);
 }
 
@@ -555,7 +557,8 @@ pre[data-lang]::before {
   border-radius: 1px;
 }
 
-.hidden-text-background:hover {
+.hidden-text-background:hover,
+.hidden-text-background:focus-visible {
   background: transparent;
   color: inherit;
   border-radius: 0;
