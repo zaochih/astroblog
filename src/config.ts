@@ -51,7 +51,7 @@ export const siteConfig = {
   },
   author: {
     name: 'Caozhi Li',
-    avatar: '/avtr.png',
+    avatar: '/avtr-pride-month.png',
     bio: {
       'zh-cn': '「行千里，致广大。」',
       'en-us': '「行千里，致广大。」',
