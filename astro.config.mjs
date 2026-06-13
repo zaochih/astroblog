@@ -3,6 +3,7 @@ import { defineConfig } from "astro/config";
 import react from "@astrojs/react";
 import tailwindcss from "@tailwindcss/vite";
 import mdx from "@astrojs/mdx";
+import { unified } from "@astrojs/markdown-remark";
 
 import remarkMath from "remark-math";
 import remarkCustomHeaderId from "remark-custom-header-id";
@@ -212,22 +213,24 @@ export default defineConfig({
         },
       ],
     },
-    smartypants: false,
-    remarkPlugins: [
-      remarkMath,
-      remarkCustomHeaderId,
-      remarkHidden, // must run before remarkCjkFriendly
-      remarkCallouts,
-      remarkCjkFriendly,
-      remarkCjkFriendlyGfmStrikethrough,
-    ],
-    rehypePlugins: [
-      rehypeRemoveFootnoteLabel,
-      rehypeTaskListA11y,
-      [rehypeKatex, {}],
-      rehypeImageParagraphs,
-      rehypeHiddenTextA11y,
-      rehypeImageSize,
-    ],
+    processor: unified({
+      smartypants: false,
+      remarkPlugins: [
+        remarkMath,
+        remarkCustomHeaderId,
+        remarkHidden,
+        remarkCallouts,
+        remarkCjkFriendly,
+        remarkCjkFriendlyGfmStrikethrough,
+      ],
+      rehypePlugins: [
+        rehypeRemoveFootnoteLabel,
+        rehypeTaskListA11y,
+        [rehypeKatex, {}],
+        rehypeImageParagraphs,
+        rehypeHiddenTextA11y,
+        rehypeImageSize,
+      ],
+    }),
   },
 });
