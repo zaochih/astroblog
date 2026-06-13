@@ -71,7 +71,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
     const coverSrc = coverSrcBySlug.get(slug);
     return (
       <div class="group relative" transition:name={`post-${slug}`}>
-        <div class={`group/card flex flex-col gap-4 overflow-hidden rounded-lg bg-card py-4 text-xs/relaxed text-card-foreground shadow-fluent-sm ring-1 ring-foreground/[0.06] border border-border/50 transition-all duration-200 hover:-translate-y-0.5 hover:border-support/30 hover:shadow-fluent-md ${coverSrc ? 'pt-0' : ''}`}>
+        <div class={`group/card flex flex-col gap-4 overflow-hidden rounded-lg bg-card py-4 text-xs/relaxed text-card-foreground shadow-fluent-sm ring-1 ring-foreground/[0.06] border border-border/50 ${coverSrc ? 'pt-0' : ''}`}>
           {coverSrc && (
             <div class="h-52 w-full overflow-hidden border-b border-border/30">
               <img src={coverSrc} alt={post.data.coverAlt ?? post.data.title} class="w-full h-full object-cover" />
