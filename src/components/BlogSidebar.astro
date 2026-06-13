@@ -33,11 +33,11 @@ const [wordTotal, ...wordUnit] = totalWordsFormatted.split(' ');
 {side === 'left' ? (
 <aside class="mb-6 space-y-4 lg:sticky lg:top-20 lg:mb-0 lg:self-start" aria-label={t('aria.sidebar.profile')}>
   <div class="flex items-center gap-4 rounded-lg border border-border/50 bg-card p-4 shadow-fluent-sm lg:flex-col lg:gap-3 lg:p-5">
-    <span class="avatar-orbit relative shrink-0 rounded-full p-0.5">
+    <span class="shrink-0">
       <img
         src={siteConfig.author.avatar}
         alt={siteConfig.author.name}
-        class="relative z-10 size-14 rounded-full border-2 border-support/30 object-cover shadow-sm lg:size-20"
+        class="relative z-10 size-14 rounded-full object-cover shadow-sm lg:size-20"
       />
     </span>
     <div class="min-w-0 flex-1 text-left lg:text-center">
@@ -144,33 +144,3 @@ const [wordTotal, ...wordUnit] = totalWordsFormatted.split(' ');
 </aside>
 )}
 
-<style>
-  .avatar-orbit::before {
-    position: absolute;
-    inset: -0.2rem;
-    border: 1px solid color-mix(in oklab, var(--support) 44%, transparent);
-    border-radius: inherit;
-    content: "";
-    opacity: 0.55;
-    animation: avatar-breathe 3.6s ease-in-out infinite;
-  }
-
-  @keyframes avatar-breathe {
-    0%,
-    100% {
-      opacity: 0.32;
-      transform: scale(0.98);
-    }
-
-    50% {
-      opacity: 0.72;
-      transform: scale(1.05);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .avatar-orbit::before {
-      animation: none;
-    }
-  }
-</style>
