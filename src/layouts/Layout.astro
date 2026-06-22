@@ -544,6 +544,51 @@ const localDatetimeConfig = JSON.stringify({
             document.addEventListener('astro:page-load', restoreHover);
           }
 
+          function initSequentialUnderlines() {
+            document.querySelectorAll(
+              '.prose a:not([data-footnote-backref]):not([data-underline-init])'
+            ).forEach((a) => {
+              a.dataset.underlineInit = '1';
+
+              let pendingTimers = /** @type {number[]} */ ([]);
+              let activeOverlays = /** @type {HTMLElement[]} */ ([]);
+
+              const teardown = () => {
+                pendingTimers.forEach(window.clearTimeout);
+                pendingTimers = [];
+                activeOverlays.forEach(el => el.remove());
+                activeOverlays = [];
+                a.style.transition = '';
+                a.style.backgroundSize = '';
+              };
+
+              a.addEventListener('mouseenter', () => {
+                teardown();
+                const rects = Array.from(a.getClientRects());
+                if (rects.length <= 1) return;
+
+                const color = getComputedStyle(a).color;
+                const DURATION = 180;
+
+                a.style.transition = 'none';
+                a.style.backgroundSize = '0 1px';
+
+                rects.forEach((rect, i) => {
+                  const el = document.createElement('span');
+                  el.setAttribute('aria-hidden', 'true');
+                  el.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.bottom - 1}px;width:${rect.width}px;height:1px;background:${color};transform:scaleX(0);transform-origin:left center;transition:transform ${DURATION}ms ease;pointer-events:none`;
+                  document.body.appendChild(el);
+                  activeOverlays.push(el);
+                  pendingTimers.push(window.setTimeout(() => {
+                    el.style.transform = 'scaleX(1)';
+                  }, i * DURATION));
+                });
+              });
+
+              a.addEventListener('mouseleave', teardown);
+            });
+          }
+
           if (!window.__lczLayoutEnhancementsBound) {
             window.__lczLayoutEnhancementsBound = true;
             document.addEventListener('astro:page-load', () => {
@@ -551,6 +596,7 @@ const localDatetimeConfig = JSON.stringify({
               initLocalDatetimes();
               initLinkHoverReset();
               initLazyImageFade();
+              initSequentialUnderlines();
             });
           }
 
@@ -558,6 +604,7 @@ const localDatetimeConfig = JSON.stringify({
           initLocalDatetimes();
           initLinkHoverReset();
           initLazyImageFade();
+          initSequentialUnderlines();
           initRouteSkeleton();
         </script>
     </body>
