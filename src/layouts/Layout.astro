@@ -550,42 +550,85 @@ const localDatetimeConfig = JSON.stringify({
             ).forEach((a) => {
               a.dataset.underlineInit = '1';
 
-              let pendingTimers = /** @type {number[]} */ ([]);
-              let activeOverlays = /** @type {HTMLElement[]} */ ([]);
+              const DRAW_DURATION = 180;
+              const ERASE_DURATION = 150;
 
-              const teardown = () => {
-                pendingTimers.forEach(window.clearTimeout);
-                pendingTimers = [];
-                activeOverlays.forEach(el => el.remove());
-                activeOverlays = [];
+              let drawTimers = /** @type {number[]} */ ([]);
+              let activeOverlays = /** @type {HTMLElement[]} */ ([]);
+              let erasingOverlays = /** @type {HTMLElement[]} */ ([]);
+              let leaveTimer = /** @type {number | null} */ (null);
+              let removalTimer = /** @type {number | null} */ (null);
+
+              const resetLink = () => {
                 a.style.transition = '';
                 a.style.backgroundSize = '';
               };
 
               a.addEventListener('mouseenter', () => {
-                teardown();
+                // Inter-line gap traversal: cancel the pending leave and keep going
+                if (leaveTimer !== null) {
+                  window.clearTimeout(leaveTimer);
+                  leaveTimer = null;
+                  return;
+                }
+
+                // Clean up any in-flight draw or erase
+                drawTimers.forEach(window.clearTimeout);
+                drawTimers = [];
+                if (removalTimer !== null) { window.clearTimeout(removalTimer); removalTimer = null; }
+                activeOverlays.forEach(el => el.remove());
+                activeOverlays = [];
+                erasingOverlays.forEach(el => el.remove());
+                erasingOverlays = [];
+                resetLink();
+
                 const rects = Array.from(a.getClientRects());
                 if (rects.length <= 1) return;
 
                 const color = getComputedStyle(a).color;
-                const DURATION = 180;
-
                 a.style.transition = 'none';
                 a.style.backgroundSize = '0 1px';
 
                 rects.forEach((rect, i) => {
                   const el = document.createElement('span');
                   el.setAttribute('aria-hidden', 'true');
-                  el.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.bottom - 1}px;width:${rect.width}px;height:1px;background:${color};transform:scaleX(0);transform-origin:left center;transition:transform ${DURATION}ms ease;pointer-events:none`;
+                  el.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.bottom - 1}px;width:${rect.width}px;height:1px;background:${color};transform:scaleX(0);transform-origin:left center;transition:transform ${DRAW_DURATION}ms ease;pointer-events:none`;
                   document.body.appendChild(el);
                   activeOverlays.push(el);
-                  pendingTimers.push(window.setTimeout(() => {
+                  drawTimers.push(window.setTimeout(() => {
                     el.style.transform = 'scaleX(1)';
-                  }, i * DURATION));
+                  }, i * DRAW_DURATION));
                 });
               });
 
-              a.addEventListener('mouseleave', teardown);
+              a.addEventListener('mouseleave', () => {
+                if (activeOverlays.length === 0 && drawTimers.length === 0) return;
+
+                // Debounce: wait to confirm the mouse really left (not just an inter-line gap)
+                leaveTimer = window.setTimeout(() => {
+                  leaveTimer = null;
+
+                  drawTimers.forEach(window.clearTimeout);
+                  drawTimers = [];
+
+                  // Reverse-animate each overlay from its current position
+                  erasingOverlays = activeOverlays;
+                  activeOverlays = [];
+
+                  erasingOverlays.forEach(el => {
+                    el.style.transitionDuration = `${ERASE_DURATION}ms`;
+                    el.style.transformOrigin = 'right center';
+                    el.style.transform = 'scaleX(0)';
+                  });
+
+                  removalTimer = window.setTimeout(() => {
+                    removalTimer = null;
+                    erasingOverlays.forEach(el => el.remove());
+                    erasingOverlays = [];
+                    resetLink();
+                  }, ERASE_DURATION + 10);
+                }, 60);
+              });
             });
           }
 
