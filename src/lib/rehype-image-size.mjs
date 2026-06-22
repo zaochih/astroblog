@@ -286,6 +286,9 @@ export default function rehypeImageSize() {
       const src = /** @type {string | undefined} */ (node.properties?.src);
       if (isLocalImage(src)) {
         localImages.push({ node });
+      } else if (src) {
+        node.properties.loading ??= 'lazy';
+        node.properties.decoding ??= 'async';
       }
     });
 

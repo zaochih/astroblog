@@ -470,6 +470,17 @@ const localDatetimeConfig = JSON.stringify({
             });
           }
 
+          function initLazyImageFade() {
+            document.querySelectorAll('img[loading="lazy"]').forEach((img) => {
+              const el = /** @type {HTMLImageElement} */ (img);
+              if (el.complete && el.naturalWidth > 0) return;
+              el.classList.add('lazy-pending');
+              const reveal = () => el.classList.remove('lazy-pending');
+              el.addEventListener('load', reveal, { once: true });
+              el.addEventListener('error', reveal, { once: true });
+            });
+          }
+
           function initLinkHoverReset() {
             if (window.__lczLinkHoverResetBound) return;
             window.__lczLinkHoverResetBound = true;
@@ -539,12 +550,14 @@ const localDatetimeConfig = JSON.stringify({
               initExternalLinks();
               initLocalDatetimes();
               initLinkHoverReset();
+              initLazyImageFade();
             });
           }
 
           initExternalLinks();
           initLocalDatetimes();
           initLinkHoverReset();
+          initLazyImageFade();
           initRouteSkeleton();
         </script>
     </body>

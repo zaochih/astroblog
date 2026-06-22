@@ -74,7 +74,7 @@ const pageNumbers = getPageNumbers(currentPage, totalPages);
         <div class={`group/card flex flex-col gap-4 overflow-hidden rounded-lg bg-card py-4 text-xs/relaxed text-card-foreground shadow-fluent-sm ring-1 ring-foreground/[0.06] border border-border/50 ${coverSrc ? 'pt-0' : ''}`}>
           {coverSrc && (
             <div class="h-52 w-full overflow-hidden border-b border-border/30">
-              <img src={coverSrc} alt={post.data.coverAlt ?? post.data.title} class="w-full h-full object-cover" />
+              <img src={coverSrc} alt={post.data.coverAlt ?? post.data.title} loading="lazy" decoding="async" class="w-full h-full object-cover" />
             </div>
           )}
 

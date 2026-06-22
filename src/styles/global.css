@@ -537,6 +537,11 @@ pre[data-lang]::before {
   opacity: 1;
 }
 
+img.lazy-pending {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
 /* Hidden / spoiler text */
 .hidden-text {
   filter: blur(4px);
