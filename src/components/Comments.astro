@@ -141,7 +141,21 @@ const giscusConfig = JSON.stringify({
         }
 
         function initGiscus(root = document) {
-          root.querySelectorAll('[data-giscus-comments]').forEach(loadGiscus);
+          root.querySelectorAll('[data-giscus-comments]').forEach((container) => {
+            if (!('IntersectionObserver' in window)) {
+              loadGiscus(container);
+              return;
+            }
+            const io = new IntersectionObserver((entries, obs) => {
+              for (const entry of entries) {
+                if (entry.isIntersecting) {
+                  obs.disconnect();
+                  loadGiscus(/** @type {HTMLElement} */ (entry.target));
+                }
+              }
+            }, { rootMargin: '200px' });
+            io.observe(container);
+          });
         }
 
         if (!window.__lczGiscusBound) {
