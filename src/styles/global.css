@@ -243,6 +243,10 @@
   scroll-margin-top: var(--content-anchor-offset);
 }
 
+.prose :not(pre) > code {
+  overflow-wrap: break-word;
+}
+
 .prose s,
 .prose del {
   opacity: 0.8;
