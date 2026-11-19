@@ -474,10 +474,19 @@ const localDatetimeConfig = JSON.stringify({
             document.querySelectorAll('img[loading="lazy"]').forEach((img) => {
               const el = /** @type {HTMLImageElement} */ (img);
               if (el.complete && el.naturalWidth > 0) return;
-              el.classList.add('lazy-pending');
-              const reveal = () => el.classList.remove('lazy-pending');
+              let settled = false;
+              const reveal = () => {
+                settled = true;
+                el.classList.remove('lazy-pending');
+              };
               el.addEventListener('load', reveal, { once: true });
               el.addEventListener('error', reveal, { once: true });
+              // Give already-cached images a frame to resolve before showing
+              // the fade-in — avoids a visible flash on repeat navigations
+              // (e.g. back to the homepage) where the image is instant.
+              requestAnimationFrame(() => {
+                if (!settled) el.classList.add('lazy-pending');
+              });
             });
           }
 
